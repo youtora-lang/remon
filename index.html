@@ -717,50 +717,17 @@ function renderQuestion(){
   document.getElementById('q-progress-fill').style.width = pct+'%';
   document.getElementById('q-unit-tag').textContent = q.unit||'';
 
-  let showTerm = true;
-  if(currentDir === 'meaning') showTerm = false;
-  else if(currentDir === 'both') showTerm = Math.random() > 0.5;
-  item.showTerm = showTerm;
-
-  document.getElementById('q-direction-label').textContent = showTerm ? '用語' : '意味・説明';
-  document.getElementById('q-text').textContent = showTerm ? q.question : (q.meaning||q.question);
+  document.getElementById('q-direction-label').textContent = '問題';
+  document.getElementById('q-text').textContent = q.question;
   document.getElementById('q-hint').textContent = '';
 
   const choicesEl = document.getElementById('choices');
   choicesEl.innerHTML = '';
   document.getElementById('next-btn').classList.remove('visible');
 
-  const allQs = state.questions[lastSessionSubject]||[];
-  let wrongPool = allQs.filter((_,i) => i !== item.id);
-  wrongPool = shuffle(wrongPool).slice(0,3);
-
-  const correctAnswer = showTerm ? (q.meaning||q.choices[0]) : q.question;
-  let choices = [correctAnswer];
-
-  wrongPool.forEach(wq => {
-    const wrongAns = showTerm ? (wq.meaning||wq.choices&&wq.choices[0]||'') : wq.question;
-    if(wrongAns && wrongAns !== correctAnswer) choices.push(wrongAns);
-  });
-
-  if(q.choices && !showTerm){
-    q.choices.slice(1).forEach(c => {
-      if(choices.length < 4 && c !== correctAnswer) choices.push(c);
-    });
-  }
-
-  if(q.choices && showTerm){
-    q.choices.filter(c=>c!==correctAnswer).forEach(c=>{
-      if(choices.length<4) choices.push(c);
-    });
-  }
-
-  while(choices.length < 4){
-    choices.push('—（該当なし）');
-  }
-  choices = choices.slice(0,4);
-  choices = shuffle(choices);
-
+  const correctAnswer = q.meaning || (q.choices && q.choices[0]) || '';
   item.correctAnswer = correctAnswer;
+  const choices = shuffle([...(q.choices || [correctAnswer])]);
 
   choices.forEach((c,i)=>{
     const btn = document.createElement('button');
