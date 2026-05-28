@@ -142,12 +142,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
 .mode-card-name{font-size:13px;font-weight:600;color:var(--text-dark)}
 .mode-card-desc{font-size:11px;color:var(--text-mid);margin-top:2px}
 
-.dir-section{padding:0 16px 20px}
-.dir-cards{display:flex;gap:10px}
-.dir-card{flex:1;background:rgba(255,255,255,0.6);border:2px solid transparent;border-radius:14px;padding:10px 8px;cursor:pointer;text-align:center;font-family:var(--font-main);transition:border-color 0.15s,background 0.15s}
-.dir-card.selected{background:rgba(255,255,255,0.95);border-color:var(--text-dark)}
-.dir-card-name{font-size:12px;font-weight:600;color:var(--text-dark)}
-.dir-card-desc{font-size:10px;color:var(--text-mid);margin-top:2px}
+
 
 .start-btn{margin:0 16px 32px;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:18px;width:calc(100% - 32px);font-family:var(--font-main);font-size:17px;font-weight:700;cursor:pointer;transition:opacity 0.12s;letter-spacing:0.3px}
 .start-btn:active{opacity:0.8}
@@ -269,13 +264,13 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
       </div>
       <div class="subject-rate" id="rate-kokugo">—</div>
     </button>
-    <button class="subject-btn gijutsu" onclick="openSubject('gijutsu')">
-      <div class="subject-icon">🔧</div>
+    <button class="subject-btn sugaku" onclick="openSubject('sugaku')">
+      <div class="subject-icon">📐</div>
       <div class="subject-info">
-        <div class="subject-name">技術・家庭</div>
-        <div class="subject-count" id="count-gijutsu">問題なし</div>
+        <div class="subject-name">数学</div>
+        <div class="subject-count" id="count-sugaku">問題なし</div>
       </div>
-      <div class="subject-rate" id="rate-gijutsu">—</div>
+      <div class="subject-rate" id="rate-sugaku">—</div>
     </button>
     <button class="subject-btn rika" onclick="openSubject('rika')">
       <div class="subject-icon">🔬</div>
@@ -285,14 +280,6 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
       </div>
       <div class="subject-rate" id="rate-rika">—</div>
     </button>
-    <button class="subject-btn sugaku" onclick="openSubject('sugaku')">
-      <div class="subject-icon">📐</div>
-      <div class="subject-info">
-        <div class="subject-name">数学</div>
-        <div class="subject-count" id="count-sugaku">問題なし</div>
-      </div>
-      <div class="subject-rate" id="rate-sugaku">—</div>
-    </button>
     <button class="subject-btn shakai" onclick="openSubject('shakai')">
       <div class="subject-icon">🌏</div>
       <div class="subject-info">
@@ -300,6 +287,14 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
         <div class="subject-count" id="count-shakai">問題なし</div>
       </div>
       <div class="subject-rate" id="rate-shakai">—</div>
+    </button>
+    <button class="subject-btn gijutsu" onclick="openSubject('gijutsu')">
+      <div class="subject-icon">🔧</div>
+      <div class="subject-info">
+        <div class="subject-name">技術・保体</div>
+        <div class="subject-count" id="count-gijutsu">問題なし</div>
+      </div>
+      <div class="subject-rate" id="rate-gijutsu">—</div>
     </button>
     <button class="subject-btn ongaku" onclick="openSubject('ongaku')">
       <div class="subject-icon">🎨</div>
@@ -350,23 +345,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
     <div class="unit-list" id="unit-list"></div>
   </div>
 
-  <div class="section-label">出題方向</div>
-  <div class="dir-section">
-    <div class="dir-cards">
-      <div class="dir-card selected" id="dir-term" onclick="selectDir('term')">
-        <div class="dir-card-name">用語 → 意味</div>
-        <div class="dir-card-desc">用語を見て答える</div>
-      </div>
-      <div class="dir-card" id="dir-meaning" onclick="selectDir('meaning')">
-        <div class="dir-card-name">意味 → 用語</div>
-        <div class="dir-card-desc">説明を見て答える</div>
-      </div>
-      <div class="dir-card" id="dir-both" onclick="selectDir('both')">
-        <div class="dir-card-name">ミックス</div>
-        <div class="dir-card-desc">両方ランダム</div>
-      </div>
-    </div>
-  </div>
+
 
   <button class="start-btn" onclick="startQuiz()">はじめる 🍋</button>
 </div>
@@ -464,17 +443,38 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
 <script>
 const SUBJECTS = {
   kokugo:{name:'国語',icon:'📖',bg:'var(--kokugo-bg)'},
-  gijutsu:{name:'技術・家庭',icon:'🔧',bg:'var(--gijutsu-bg)'},
-  rika:{name:'理科',icon:'🔬',bg:'var(--rika-bg)'},
   sugaku:{name:'数学',icon:'📐',bg:'var(--sugaku-bg)'},
+  rika:{name:'理科',icon:'🔬',bg:'var(--rika-bg)'},
   shakai:{name:'社会',icon:'🌏',bg:'var(--shakai-bg)'},
+  gijutsu:{name:'技術・保体',icon:'🔧',bg:'var(--gijutsu-bg)'},
   ongaku:{name:'音楽・美術',icon:'🎨',bg:'var(--ongaku-bg)'}
 };
+
+const DEFAULT_STATE = ()=>({questions:{},history:{},streak:0,lastDate:null,totalCorrect:0,todayCorrect:0,todayDate:null,lemons:0});
+
+let _memStore = null;
+function storageGet(key){
+  try{ return localStorage.getItem(key); }
+  catch(e){ return _memStore?_memStore[key]||null:null; }
+}
+function storageSet(key,val){
+  try{ localStorage.setItem(key,val); }
+  catch(e){ if(!_memStore)_memStore={}; _memStore[key]=val; }
+}
+function loadState(){
+  try{
+    const s=storageGet('remon_state');
+    if(s){ return Object.assign(DEFAULT_STATE(),JSON.parse(s)); }
+  }catch(e){}
+  return DEFAULT_STATE();
+}
+function saveState(){
+  try{ storageSet('remon_state',JSON.stringify(state)); }catch(e){}
+}
 
 let state = loadState();
 let currentSubject = null;
 let currentMode = 'today';
-let currentDir = 'term';
 let currentUnits = [];
 let selectedUnits = [];
 let quizQueue = [];
@@ -484,328 +484,216 @@ let quizSessionCorrect = 0;
 let lastSessionSubject = null;
 let lastSessionMode = null;
 
-function loadState(){
-  try{
-    const s = localStorage.getItem('remon_state');
-    if(s) return JSON.parse(s);
-  }catch(e){}
-  return {
-    questions:{},
-    history:{},
-    streak:0,
-    lastDate:null,
-    totalCorrect:0,
-    todayCorrect:0,
-    todayDate:null,
-    lemons:0
-  };
-}
-
-function saveState(){
-  try{ localStorage.setItem('remon_state', JSON.stringify(state)); }catch(e){}
-}
-
 function getTodayStr(){
   return new Date().toISOString().slice(0,10);
 }
 
 function updateStreak(){
   const today = getTodayStr();
-  if(state.todayDate !== today){
-    state.todayCorrect = 0;
-    state.todayDate = today;
+  if(state.todayDate !== today){ state.todayCorrect=0; state.todayDate=today; }
+  if(state.lastDate===null){ state.streak=1; }
+  else{
+    const diff=Math.round((new Date(today)-new Date(state.lastDate))/(1000*60*60*24));
+    if(diff===1) state.streak++;
+    else if(diff>1) state.streak=1;
   }
-  if(state.lastDate === null){
-    state.streak = 1;
-  } else {
-    const last = new Date(state.lastDate);
-    const now = new Date(today);
-    const diff = Math.round((now - last)/(1000*60*60*24));
-    if(diff === 1) state.streak++;
-    else if(diff > 1) state.streak = 1;
-  }
-  state.lastDate = today;
+  state.lastDate=today;
   saveState();
 }
 
 function refreshHome(){
-  const today = getTodayStr();
-  if(state.todayDate !== today){ state.todayCorrect = 0; state.todayDate = today; saveState(); }
-  document.getElementById('streak-display').textContent = state.streak + '日';
-  document.getElementById('total-display').textContent = state.totalCorrect + '問';
-  document.getElementById('today-display').textContent = state.todayCorrect + '問';
-
-  Object.keys(SUBJECTS).forEach(sk => {
-    const qs = state.questions[sk];
-    const countEl = document.getElementById('count-'+sk);
-    const rateEl = document.getElementById('rate-'+sk);
-    if(!qs || qs.length === 0){
-      countEl.textContent = '問題なし';
-      rateEl.textContent = '—';
-      return;
-    }
-    countEl.textContent = qs.length + '問';
-    const h = state.history[sk]||{};
-    const ids = qs.map((_,i)=>i);
+  const today=getTodayStr();
+  if(state.todayDate!==today){ state.todayCorrect=0; state.todayDate=today; saveState(); }
+  document.getElementById('streak-display').textContent=state.streak+'日';
+  document.getElementById('total-display').textContent=state.totalCorrect+'問';
+  document.getElementById('today-display').textContent=state.todayCorrect+'問';
+  Object.keys(SUBJECTS).forEach(sk=>{
+    const qs=state.questions[sk];
+    const countEl=document.getElementById('count-'+sk);
+    const rateEl=document.getElementById('rate-'+sk);
+    if(!qs||qs.length===0){ countEl.textContent='問題なし'; rateEl.textContent='—'; return; }
+    countEl.textContent=qs.length+'問';
+    const h=state.history[sk]||{};
     let correct=0,attempted=0;
-    ids.forEach(id=>{
-      const rec = h[id];
-      if(rec && rec.attempts > 0){
-        attempted++;
-        if(rec.correct > 0) correct++;
-      }
-    });
-    if(attempted === 0){ rateEl.textContent = '—'; return; }
-    rateEl.textContent = Math.round(correct/attempted*100) + '%';
+    qs.forEach((_,i)=>{ const rec=h[i]; if(rec&&rec.attempts>0){ attempted++; if(rec.correct>0)correct++; } });
+    rateEl.textContent=attempted===0?'—':Math.round(correct/attempted*100)+'%';
   });
 }
 
 function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if(id === 'home') refreshHome();
-  if(id === 'data-screen') updateExportPreview();
+  if(id==='home') refreshHome();
+  if(id==='data-screen') updateExportPreview();
 }
 
 function openSubject(sk){
-  currentSubject = sk;
-  document.getElementById('ss-icon').textContent = SUBJECTS[sk].icon;
-  document.getElementById('ss-name').textContent = SUBJECTS[sk].name;
-  document.getElementById('subject-screen').style.background = SUBJECTS[sk].bg;
-  currentMode = 'today';
-  currentDir = 'term';
+  currentSubject=sk;
+  document.getElementById('ss-icon').textContent=SUBJECTS[sk].icon;
+  document.getElementById('ss-name').textContent=SUBJECTS[sk].name;
+  document.getElementById('subject-screen').style.background=SUBJECTS[sk].bg;
+  currentMode='today';
   document.getElementById('mode-today').classList.add('selected');
   document.getElementById('mode-unit').classList.remove('selected');
-  document.getElementById('dir-term').classList.add('selected');
-  document.getElementById('dir-meaning').classList.remove('selected');
-  document.getElementById('dir-both').classList.remove('selected');
-  document.getElementById('unit-section').style.display = 'none';
+  document.getElementById('unit-section').style.display='none';
   showScreen('subject-screen');
 }
 
 function selectMode(m){
-  currentMode = m;
-  document.getElementById('mode-today').classList.toggle('selected', m==='today');
-  document.getElementById('mode-unit').classList.toggle('selected', m==='unit');
-  const unitSec = document.getElementById('unit-section');
-  if(m === 'unit'){
-    unitSec.style.display = 'block';
-    renderUnitList();
-  } else {
-    unitSec.style.display = 'none';
-  }
-}
-
-function selectDir(d){
-  currentDir = d;
-  ['term','meaning','both'].forEach(x =>
-    document.getElementById('dir-'+x).classList.toggle('selected', x===d)
-  );
+  currentMode=m;
+  document.getElementById('mode-today').classList.toggle('selected',m==='today');
+  document.getElementById('mode-unit').classList.toggle('selected',m==='unit');
+  if(m==='unit'){ document.getElementById('unit-section').style.display='block'; renderUnitList(); }
+  else{ document.getElementById('unit-section').style.display='none'; }
 }
 
 function getUnits(sk){
-  const qs = state.questions[sk]||[];
-  const map = {};
-  qs.forEach((q,i) => {
-    const u = q.unit||'その他';
-    if(!map[u]) map[u]=[];
-    map[u].push(i);
-  });
+  const qs=state.questions[sk]||[];
+  const map={};
+  qs.forEach((q,i)=>{ const u=q.unit||'その他'; if(!map[u])map[u]=[]; map[u].push(i); });
   return map;
 }
 
 function renderUnitList(){
-  const sk = currentSubject;
-  const unitMap = getUnits(sk);
-  const el = document.getElementById('unit-list');
-  el.innerHTML = '';
-  selectedUnits = Object.keys(unitMap);
-  Object.entries(unitMap).forEach(([unit, ids])=>{
-    const h = state.history[sk]||{};
-    const today = getTodayStr();
-    const due = ids.filter(id => {
-      const rec = h[id];
-      if(!rec) return true;
-      return rec.nextDate <= today;
-    }).length;
-    const btn = document.createElement('button');
-    btn.className = 'unit-btn selected-unit';
-    btn.dataset.unit = unit;
-    btn.innerHTML = `
-      <div class="unit-info">
-        <div class="unit-name">${unit}</div>
-        <div class="unit-meta">${ids.length}問</div>
-      </div>
-      <div class="unit-due ${due>0?'has-due':''}">${due>0?due+'問期限':'最新'}</div>`;
-    btn.onclick = () => toggleUnit(unit, btn);
+  const sk=currentSubject;
+  const unitMap=getUnits(sk);
+  const el=document.getElementById('unit-list');
+  el.innerHTML='';
+  selectedUnits=Object.keys(unitMap);
+  Object.entries(unitMap).forEach(([unit,ids])=>{
+    const h=state.history[sk]||{};
+    const today=getTodayStr();
+    const due=ids.filter(id=>{ const rec=h[id]; return !rec||rec.nextDate<=today; }).length;
+    const btn=document.createElement('button');
+    btn.className='unit-btn selected-unit';
+    btn.dataset.unit=unit;
+    btn.innerHTML=`<div class="unit-info"><div class="unit-name">${unit}</div><div class="unit-meta">${ids.length}問</div></div><div class="unit-due ${due>0?'has-due':''}">${due>0?due+'問期限':'最新'}</div>`;
+    btn.onclick=()=>toggleUnit(unit,btn);
     el.appendChild(btn);
   });
 }
 
-function toggleUnit(unit, btn){
+function toggleUnit(unit,btn){
   if(selectedUnits.includes(unit)){
-    if(selectedUnits.length === 1) return;
-    selectedUnits = selectedUnits.filter(u=>u!==unit);
+    if(selectedUnits.length===1)return;
+    selectedUnits=selectedUnits.filter(u=>u!==unit);
     btn.style.opacity='0.5';
-  } else {
-    selectedUnits.push(unit);
-    btn.style.opacity='1';
-  }
+  }else{ selectedUnits.push(unit); btn.style.opacity='1'; }
 }
 
 function getDueQuestions(sk){
-  const qs = state.questions[sk]||[];
-  const h = state.history[sk]||{};
-  const today = getTodayStr();
-  return qs.map((_,i)=>i).filter(id=>{
-    const rec = h[id];
-    if(!rec) return true;
-    return rec.nextDate <= today;
-  });
+  const qs=state.questions[sk]||[];
+  const h=state.history[sk]||{};
+  const today=getTodayStr();
+  return qs.map((_,i)=>i).filter(id=>{ const rec=h[id]; return !rec||rec.nextDate<=today; });
 }
 
 function startQuiz(){
-  const sk = currentSubject;
-  const qs = state.questions[sk]||[];
-  if(qs.length === 0){ alert('問題がありません。データを追加してください。'); return; }
-
-  let ids = [];
-  if(currentMode === 'today'){
-    ids = getDueQuestions(sk);
-    if(ids.length === 0){
-      alert('今日の分は終わっています！また明日来てね 🍋');
-      return;
-    }
-  } else {
-    const unitMap = getUnits(sk);
-    selectedUnits.forEach(u => {
-      if(unitMap[u]) ids = ids.concat(unitMap[u]);
-    });
+  const sk=currentSubject;
+  const qs=state.questions[sk]||[];
+  if(qs.length===0){ alert('問題がありません。データを追加してください。'); return; }
+  let ids=[];
+  if(currentMode==='today'){
+    ids=getDueQuestions(sk);
+    if(ids.length===0){ alert('今日の分は終わっています！また明日来てね 🍋'); return; }
+  }else{
+    const unitMap=getUnits(sk);
+    selectedUnits.forEach(u=>{ if(unitMap[u])ids=ids.concat(unitMap[u]); });
   }
-
-  ids = shuffle(ids);
-  quizQueue = ids.map(id => ({id, q: qs[id]}));
-  quizIndex = 0;
-  quizCorrect = 0;
-  quizSessionCorrect = 0;
-  lastSessionSubject = sk;
-  lastSessionMode = currentMode;
-
-  document.getElementById('quiz-bg').style.background = SUBJECTS[sk].bg;
+  ids=shuffle(ids);
+  quizQueue=ids.map(id=>({id,q:qs[id]}));
+  quizIndex=0; quizCorrect=0; quizSessionCorrect=0;
+  lastSessionSubject=sk; lastSessionMode=currentMode;
+  document.getElementById('quiz-bg').style.background=SUBJECTS[sk].bg;
   showScreen('quiz');
   renderQuestion();
 }
 
 function shuffle(arr){
-  const a = [...arr];
-  for(let i=a.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [a[i],a[j]]=[a[j],a[i]];
-  }
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
   return a;
 }
 
 function renderQuestion(){
-  const total = quizQueue.length;
-  const item = quizQueue[quizIndex];
-  const q = item.q;
-
-  document.getElementById('q-current').textContent = quizIndex+1;
-  document.getElementById('q-total').textContent = total;
-  document.getElementById('q-correct-count').textContent = '✓ '+quizCorrect;
-  const pct = (quizIndex/total)*100;
-  document.getElementById('q-progress-fill').style.width = pct+'%';
-  document.getElementById('q-unit-tag').textContent = q.unit||'';
-
-  document.getElementById('q-direction-label').textContent = '問題';
-  document.getElementById('q-text').textContent = q.question;
-  document.getElementById('q-hint').textContent = '';
-
-  const choicesEl = document.getElementById('choices');
-  choicesEl.innerHTML = '';
+  const total=quizQueue.length;
+  const item=quizQueue[quizIndex];
+  const q=item.q;
+  document.getElementById('q-current').textContent=quizIndex+1;
+  document.getElementById('q-total').textContent=total;
+  document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
+  document.getElementById('q-progress-fill').style.width=(quizIndex/total*100)+'%';
+  document.getElementById('q-unit-tag').textContent=q.unit||'';
+  document.getElementById('q-direction-label').textContent='問題';
+  document.getElementById('q-text').textContent=q.question;
+  document.getElementById('q-hint').textContent='';
+  const choicesEl=document.getElementById('choices');
+  choicesEl.innerHTML='';
   document.getElementById('next-btn').classList.remove('visible');
-
-  const correctAnswer = q.meaning || (q.choices && q.choices[0]) || '';
-  item.correctAnswer = correctAnswer;
-  const choices = shuffle([...(q.choices || [correctAnswer])]);
-
-  choices.forEach((c,i)=>{
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.textContent = c;
-    btn.onclick = () => selectChoice(btn, c, correctAnswer, item);
+  const correctAnswer=q.meaning||(q.choices&&q.choices[0])||'';
+  item.correctAnswer=correctAnswer;
+  const choices=shuffle([...(q.choices||[correctAnswer])]);
+  choices.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='choice-btn';
+    btn.textContent=c;
+    btn.onclick=()=>selectChoice(btn,c,correctAnswer,item);
     choicesEl.appendChild(btn);
   });
 }
 
-function selectChoice(btn, chosen, correct, item){
-  const btns = document.querySelectorAll('.choice-btn');
-  btns.forEach(b => b.classList.add('disabled'));
-  btns.forEach(b => { b.onclick = null; });
-
-  const isCorrect = chosen === correct;
-
+function selectChoice(btn,chosen,correct,item){
+  document.querySelectorAll('.choice-btn').forEach(b=>{ b.classList.add('disabled'); b.onclick=null; });
+  const isCorrect=chosen===correct;
   if(isCorrect){
     btn.classList.add('correct');
-    quizCorrect++;
-    quizSessionCorrect++;
-    showFeedback(true);
-    spawnLemons();
-    updateSRRecord(item.id, true);
-  } else {
+    quizCorrect++; quizSessionCorrect++;
+    showFeedback(true); spawnLemons();
+    updateSRRecord(item.id,true);
+  }else{
     btn.classList.add('wrong');
-    btns.forEach(b => {
-      if(b.textContent === correct) b.classList.add('show-correct');
-    });
+    document.querySelectorAll('.choice-btn').forEach(b=>{ if(b.textContent===correct)b.classList.add('show-correct'); });
     showFeedback(false);
-    updateSRRecord(item.id, false);
+    updateSRRecord(item.id,false);
   }
-
-  document.getElementById('q-correct-count').textContent = '✓ '+quizCorrect;
+  document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
   document.getElementById('next-btn').classList.add('visible');
   saveState();
 }
 
-function updateSRRecord(id, correct){
-  const sk = lastSessionSubject;
-  if(!state.history[sk]) state.history[sk]={};
-  const h = state.history[sk];
-  if(!h[id]) h[id]={attempts:0,correct:0,interval:1,nextDate:getTodayStr()};
-  const rec = h[id];
+function updateSRRecord(id,correct){
+  const sk=lastSessionSubject;
+  if(!state.history[sk])state.history[sk]={};
+  const h=state.history[sk];
+  if(!h[id])h[id]={attempts:0,correct:0,interval:1,nextDate:getTodayStr()};
+  const rec=h[id];
   rec.attempts++;
   if(correct){
     rec.correct++;
-    state.totalCorrect++;
-    state.todayCorrect++;
-    state.lemons = (state.lemons||0) + 1;
-    const intervals = [1,3,7,14,30];
-    const idx = Math.min(rec.correct-1, intervals.length-1);
-    rec.interval = intervals[idx];
-  } else {
-    rec.interval = 1;
-  }
-  const next = new Date();
-  next.setDate(next.getDate() + rec.interval);
-  rec.nextDate = next.toISOString().slice(0,10);
+    state.totalCorrect++; state.todayCorrect++;
+    state.lemons=(state.lemons||0)+1;
+    const intervals=[1,3,7,14,30];
+    rec.interval=intervals[Math.min(rec.correct-1,intervals.length-1)];
+  }else{ rec.interval=1; }
+  const next=new Date();
+  next.setDate(next.getDate()+rec.interval);
+  rec.nextDate=next.toISOString().slice(0,10);
 }
 
 function showFeedback(correct){
-  const el = document.getElementById('feedback-flash');
-  const txt = document.getElementById('feedback-text');
-  el.className = 'feedback-flash ' + (correct?'correct-flash':'wrong-flash');
-  txt.textContent = correct ? '✓' : '✕';
+  const el=document.getElementById('feedback-flash');
+  el.className='feedback-flash '+(correct?'correct-flash':'wrong-flash');
+  document.getElementById('feedback-text').textContent=correct?'✓':'✕';
   el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), 400);
+  setTimeout(()=>el.classList.remove('show'),400);
 }
 
 function spawnLemons(){
   for(let i=0;i<2;i++){
     setTimeout(()=>{
-      const el = document.createElement('div');
-      el.className = 'lemon-float';
-      el.textContent = '🍋';
-      el.style.left = (20+Math.random()*60)+'%';
-      el.style.bottom = '80px';
+      const el=document.createElement('div');
+      el.className='lemon-float'; el.textContent='🍋';
+      el.style.left=(20+Math.random()*60)+'%'; el.style.bottom='80px';
       document.body.appendChild(el);
       setTimeout(()=>el.remove(),1200);
     },i*150);
@@ -814,37 +702,30 @@ function spawnLemons(){
 
 function nextQuestion(){
   quizIndex++;
-  if(quizIndex >= quizQueue.length){
-    showResult();
-  } else {
-    renderQuestion();
-  }
+  if(quizIndex>=quizQueue.length) showResult();
+  else renderQuestion();
 }
 
 function showResult(){
   updateStreak();
-  const total = quizQueue.length;
-  const rate = Math.round(quizCorrect/total*100);
-
-  let emoji, title;
-  if(rate >= 90){ emoji='🌟'; title='すごい！パーフェクトに近い！'; }
-  else if(rate >= 70){ emoji='🍋'; title='よくできました！'; }
-  else if(rate >= 50){ emoji='💪'; title='もう少し！次はもっといける！'; }
-  else { emoji='🌱'; title='これが最初の一歩だよ'; }
-
-  document.getElementById('result-emoji').textContent = emoji;
-  document.getElementById('result-title').textContent = title;
-  document.getElementById('result-score').textContent = quizCorrect;
-  document.getElementById('res-total').textContent = total;
-  document.getElementById('res-rate').textContent = rate+'%';
-  document.getElementById('res-lemons').textContent = '🍋×'+quizSessionCorrect;
-
-  const totalLemons = state.lemons||0;
-  let lemonStr = '';
-  for(let i=0;i<Math.min(totalLemons,30);i++) lemonStr+='🍋';
-  if(totalLemons>30) lemonStr += ' +' + (totalLemons-30);
-  document.getElementById('lemons-display').textContent = lemonStr||'まだないよ';
-
+  const total=quizQueue.length;
+  const rate=Math.round(quizCorrect/total*100);
+  let emoji,title;
+  if(rate>=90){emoji='🌟';title='すごい！パーフェクトに近い！';}
+  else if(rate>=70){emoji='🍋';title='よくできました！';}
+  else if(rate>=50){emoji='💪';title='もう少し！次はもっといける！';}
+  else{emoji='🌱';title='これが最初の一歩だよ';}
+  document.getElementById('result-emoji').textContent=emoji;
+  document.getElementById('result-title').textContent=title;
+  document.getElementById('result-score').textContent=quizCorrect;
+  document.getElementById('res-total').textContent=total;
+  document.getElementById('res-rate').textContent=rate+'%';
+  document.getElementById('res-lemons').textContent='🍋×'+quizSessionCorrect;
+  const tl=state.lemons||0;
+  let ls='';
+  for(let i=0;i<Math.min(tl,30);i++)ls+='🍋';
+  if(tl>30)ls+=' +'+(tl-30);
+  document.getElementById('lemons-display').textContent=ls||'まだないよ';
   showScreen('result');
   saveState();
 }
@@ -852,94 +733,64 @@ function showResult(){
 function goHome(){ showScreen('home'); }
 
 function restartSame(){
-  quizIndex=0;
-  quizCorrect=0;
-  quizSessionCorrect=0;
-  quizQueue = shuffle(quizQueue.map(item=>item));
-  document.getElementById('quiz-bg').style.background = SUBJECTS[lastSessionSubject].bg;
-  showScreen('quiz');
-  renderQuestion();
+  quizIndex=0; quizCorrect=0; quizSessionCorrect=0;
+  quizQueue=shuffle([...quizQueue]);
+  document.getElementById('quiz-bg').style.background=SUBJECTS[lastSessionSubject].bg;
+  showScreen('quiz'); renderQuestion();
 }
 
 function importData(){
-  const txt = document.getElementById('import-textarea').value.trim();
+  const txt=document.getElementById('import-textarea').value.trim();
   if(!txt){ alert('JSONを貼り付けてください'); return; }
   try{
-    const data = JSON.parse(txt);
-    if(!data.subject || !data.questions){ alert('フォーマットが正しくありません'); return; }
-    const sk = data.subject;
-    if(!state.questions[sk]) state.questions[sk]=[];
-    const existing = state.questions[sk].map(q=>q.question);
-    let added = 0;
-    data.questions.forEach(q => {
-      q.unit = q.unit || data.unit || 'その他';
-      if(!existing.includes(q.question)){
-        state.questions[sk].push(q);
-        added++;
-      }
+    const data=JSON.parse(txt);
+    if(!data.subject||!data.questions){ alert('フォーマットが正しくありません'); return; }
+    const sk=data.subject;
+    if(!state.questions[sk])state.questions[sk]=[];
+    const existing=state.questions[sk].map(q=>q.question);
+    let added=0;
+    data.questions.forEach(q=>{
+      q.unit=q.unit||data.unit||'その他';
+      if(!existing.includes(q.question)){ state.questions[sk].push(q); added++; }
     });
     saveState();
-    document.getElementById('import-textarea').value = '';
+    document.getElementById('import-textarea').value='';
     alert(added+'問追加しました！（重複はスキップ）');
     updateExportPreview();
-  }catch(e){
-    alert('JSONの読み込みに失敗しました: '+e.message);
-  }
+  }catch(e){ alert('JSONの読み込みに失敗しました: '+e.message); }
 }
 
 function updateExportPreview(){
-  const preview = document.getElementById('export-preview');
-  const exportData = {
-    questions: state.questions,
-    history: state.history,
-    streak: state.streak,
-    lastDate: state.lastDate,
-    totalCorrect: state.totalCorrect,
-    lemons: state.lemons
-  };
-  preview.textContent = JSON.stringify(exportData).slice(0,500)+'...';
+  const exportData={questions:state.questions,history:state.history,streak:state.streak,lastDate:state.lastDate,totalCorrect:state.totalCorrect,lemons:state.lemons};
+  document.getElementById('export-preview').textContent=JSON.stringify(exportData).slice(0,500)+'...';
 }
 
-function showExport(){
-  showScreen('data-screen');
-  updateExportPreview();
-}
+function showExport(){ showScreen('data-screen'); updateExportPreview(); }
 
 function copyExport(){
-  const exportData = {
-    questions: state.questions,
-    history: state.history,
-    streak: state.streak,
-    lastDate: state.lastDate,
-    totalCorrect: state.totalCorrect,
-    lemons: state.lemons
-  };
-  const txt = JSON.stringify(exportData);
+  const exportData={questions:state.questions,history:state.history,streak:state.streak,lastDate:state.lastDate,totalCorrect:state.totalCorrect,lemons:state.lemons};
+  const txt=JSON.stringify(exportData);
   navigator.clipboard.writeText(txt).then(()=>{
     alert('コピーしました！メモ帳などに貼り付けて保存してください。');
   }).catch(()=>{
-    const ta = document.createElement('textarea');
-    ta.value = txt;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
+    const ta=document.createElement('textarea');
+    ta.value=txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
     alert('コピーしました！');
   });
 }
 
 function resetAll(){
-  if(!confirm('全データをリセットしますか？この操作は元に戻せません。')) return;
-  state = {questions:{},history:{},streak:0,lastDate:null,totalCorrect:0,todayCorrect:0,todayDate:null,lemons:0};
-  saveState();
-  alert('リセットしました');
-  showScreen('home');
+  if(!confirm('全データをリセットしますか？この操作は元に戻せません。'))return;
+  state=DEFAULT_STATE(); saveState(); alert('リセットしました'); showScreen('home');
 }
 
 refreshHome();
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
-}
+try{
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); });
+  }
+}catch(e){}
 </script>
 </body>
 </html>
