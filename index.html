@@ -56,10 +56,22 @@
 html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:var(--font-main)}
 html{font-size:calc(16px * var(--font-scale))}
 
+.stripe-bar{
+  position:fixed;left:0;right:0;height:18px;z-index:9000;
+  background:repeating-linear-gradient(
+    90deg,
+    #F5E642 0px, #F5E642 14px,
+    #ffffff 14px, #ffffff 22px
+  );
+  flex-shrink:0;
+}
+.stripe-top{top:0;}
+.stripe-bottom{bottom:0;}
+
 #app{height:100dvh;width:100%;display:flex;flex-direction:column;overflow:hidden;position:relative}
 
 /* ===== SCREENS ===== */
-.screen{display:none;flex-direction:column;height:100%;width:100%;animation:fadeIn 0.25s ease}
+.screen{display:none;flex-direction:column;height:100%;width:100%;animation:fadeIn 0.25s ease;padding-top:18px;padding-bottom:18px;}
 .screen.active{display:flex}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
@@ -232,6 +244,8 @@ html{font-size:calc(16px * var(--font-scale))}
 </head>
 <body>
 <div id="app">
+<div class="stripe-bar stripe-top"></div>
+<div class="stripe-bar stripe-bottom"></div>
 
 <!-- HOME -->
 <div id="home" class="screen active">
