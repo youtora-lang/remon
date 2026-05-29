@@ -15,6 +15,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
+  --font-scale:1;
   --lemon-yellow:#F5E642;
   --lemon-dark:#D4C200;
   --leaf:#5A7A4A;
@@ -53,6 +54,7 @@
 }
 
 html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:var(--font-main)}
+html{font-size:calc(16px * var(--font-scale))}
 
 #app{height:100dvh;width:100%;display:flex;flex-direction:column;overflow:hidden;position:relative}
 
@@ -65,7 +67,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
 #home{background:var(--lemon-yellow);overflow-y:auto}
 
 .home-header{padding:40px 24px 16px;text-align:center;position:relative}
-.home-title{font-family:'Nunito',sans-serif;font-size:42px;font-weight:800;color:var(--text-dark);letter-spacing:-1px;line-height:1}
+.home-title{font-family:'Nunito',sans-serif;font-size:2.625rem;font-weight:800;color:var(--text-dark);letter-spacing:-1px;line-height:1}
 .home-subtitle{font-size:13px;color:var(--text-mid);margin-top:4px}
 .lemon-deco{font-size:28px;margin-bottom:4px}
 
@@ -73,7 +75,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
 .streak-icon{font-size:22px}
 .streak-info{flex:1}
 .streak-label{font-size:11px;color:var(--text-mid)}
-.streak-num{font-family:'Nunito',sans-serif;font-size:20px;font-weight:800;color:var(--text-dark)}
+.streak-num{font-family:'Nunito',sans-serif;font-size:1.25rem;font-weight:800;color:var(--text-dark)}
 .total-correct{text-align:right}
 .total-label{font-size:11px;color:var(--text-mid)}
 .total-num{font-family:'Nunito',sans-serif;font-size:20px;font-weight:800;color:var(--text-dark)}
@@ -89,8 +91,8 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
 .subject-btn:active{transform:scale(0.97);opacity:0.85}
 .subject-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 .subject-info{flex:1}
-.subject-name{font-size:16px;font-weight:700;color:var(--text-dark)}
-.subject-count{font-size:12px;color:var(--text-mid);margin-top:1px}
+.subject-name{font-size:1rem;font-weight:700;color:var(--text-dark)}
+.subject-count{font-size:0.75rem;color:var(--text-mid);margin-top:1px}
 .subject-rate{font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;margin-left:auto}
 
 .subject-btn.kokugo{background:var(--kokugo-card)}
@@ -128,7 +130,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
 .unit-btn{background:rgba(255,255,255,0.6);border:none;border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;font-family:var(--font-main);text-align:left;width:100%;transition:transform 0.12s}
 .unit-btn:active{transform:scale(0.97)}
 .unit-info{flex:1}
-.unit-name{font-size:15px;font-weight:600;color:var(--text-dark)}
+.unit-name{font-size:0.9375rem;font-weight:600;color:var(--text-dark)}
 .unit-meta{font-size:12px;color:var(--text-mid);margin-top:2px}
 .unit-due{font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,0.7);color:var(--text-dark)}
 .unit-due.has-due{background:#FFE0E0;color:#C04040}
@@ -144,7 +146,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
 
 
 
-.start-btn{margin:0 16px 32px;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:18px;width:calc(100% - 32px);font-family:var(--font-main);font-size:17px;font-weight:700;cursor:pointer;transition:opacity 0.12s;letter-spacing:0.3px}
+.start-btn{margin:0 16px 32px;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:18px;width:calc(100% - 32px);font-family:var(--font-main);font-size:1.0625rem;font-weight:700;cursor:pointer;transition:opacity 0.12s;letter-spacing:0.3px}
 .start-btn:active{opacity:0.8}
 
 /* ===== QUIZ SCREEN ===== */
@@ -164,27 +166,30 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
 .card-area{flex:1;display:flex;align-items:center;justify-content:center;padding:0 16px}
 .question-card{background:rgba(255,255,255,0.85);border-radius:24px;padding:28px 24px;width:100%;text-align:center;backdrop-filter:blur(4px)}
 .question-label{font-size:11px;color:var(--text-soft);margin-bottom:12px;letter-spacing:0.5px}
-.question-text{font-size:22px;font-weight:700;color:var(--text-dark);line-height:1.5;word-break:break-all}
+.question-text{font-size:calc(22px * var(--font-scale));font-weight:700;color:var(--text-dark);line-height:1.5;word-break:break-all}
 .question-hint{font-size:13px;color:var(--text-mid);margin-top:8px}
 
 .choices{padding:16px 16px 24px;display:flex;flex-direction:column;gap:10px}
-.choice-btn{background:rgba(255,255,255,0.75);border:2px solid transparent;border-radius:18px;padding:16px 20px;font-family:var(--font-main);font-size:16px;font-weight:500;color:var(--text-dark);cursor:pointer;text-align:left;transition:transform 0.1s,background 0.15s,border-color 0.15s;line-height:1.4;word-break:break-all}
+.choice-btn{background:rgba(255,255,255,0.75);border:2px solid transparent;border-radius:18px;padding:16px 20px;font-family:var(--font-main);font-size:calc(16px * var(--font-scale));font-weight:500;color:var(--text-dark);cursor:pointer;text-align:left;transition:transform 0.1s,background 0.15s,border-color 0.15s;line-height:1.4;word-break:break-all}
 .choice-btn:active:not(.disabled){transform:scale(0.97)}
 .choice-btn.correct{background:#D4F5DE;border-color:var(--correct);color:#1A5A30}
 .choice-btn.wrong{background:#FFE0E0;border-color:var(--wrong);color:#7A1A1A}
 .choice-btn.show-correct{background:#D4F5DE;border-color:var(--correct);color:#1A5A30}
 .choice-btn.disabled{cursor:default}
 
-.next-btn{margin:0 16px 36px;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:18px;font-family:var(--font-main);font-size:16px;font-weight:700;cursor:pointer;transition:opacity 0.12s;display:none}
+.next-btn{margin:0 16px 8px;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:18px;font-family:var(--font-main);font-size:16px;font-weight:700;cursor:pointer;transition:opacity 0.12s;display:none}
 .next-btn.visible{display:block}
 .next-btn:active{opacity:0.8}
+.explanation-box{margin:0 16px 28px;background:rgba(255,255,255,0.75);border-radius:16px;padding:14px 18px;display:none;font-size:calc(13px * var(--font-scale));color:var(--text-mid);line-height:1.6}
+.explanation-box.visible{display:block}
+.explanation-label{font-size:11px;font-weight:700;color:var(--wrong);margin-bottom:4px}
 
 /* ===== RESULT SCREEN ===== */
 #result{overflow-y:auto}
 .result-content{padding:52px 24px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;min-height:100%}
 .result-emoji{font-size:64px;margin-bottom:12px;animation:bounceIn 0.5s ease}
 @keyframes bounceIn{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
-.result-title{font-size:26px;font-weight:700;color:var(--text-dark);margin-bottom:4px}
+.result-title{font-size:1.625rem;font-weight:700;color:var(--text-dark);margin-bottom:4px}
 .result-score{font-family:'Nunito',sans-serif;font-size:52px;font-weight:800;color:var(--text-dark);line-height:1}
 .result-score-label{font-size:14px;color:var(--text-mid);margin-bottom:24px}
 
@@ -251,6 +256,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
   <div class="today-badge">
     <div class="today-label">今日の正解数</div>
     <div class="today-count" id="today-display">0問</div>
+    <div class="today-count" id="today-goal-display" style="font-size:12px;color:var(--text-soft)">目標 —</div>
   </div>
 
   <div class="section-label">教科を選ぶ</div>
@@ -313,8 +319,42 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
     <button class="footer-btn" onclick="showExport()">
       <span>💾</span>データ保存
     </button>
+    <button class="footer-btn" onclick="showFontMenu()">
+      <span>🔤</span>文字サイズ
+    </button>
+    <button class="footer-btn" onclick="showSettingsMenu()">
+      <span>⚙️</span>設定
+    </button>
+  </div>
+  <div id="font-menu" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-radius:20px 20px 0 0;padding:20px 16px 40px;z-index:999;box-shadow:0 -4px 20px rgba(0,0,0,0.15)">
+    <div style="font-size:13px;color:var(--text-mid);margin-bottom:12px;text-align:center">文字サイズ</div>
+    <div style="display:flex;gap:10px">
+      <button class="font-size-btn" id="fs-small" onclick="setFontSize('small')" style="flex:1;padding:14px;border:2px solid transparent;border-radius:14px;background:#F5F0D0;font-family:var(--font-main);font-size:14px;cursor:pointer">小</button>
+      <button class="font-size-btn" id="fs-medium" onclick="setFontSize('medium')" style="flex:1;padding:14px;border:2px solid transparent;border-radius:14px;background:#F5F0D0;font-family:var(--font-main);font-size:17px;cursor:pointer">中</button>
+      <button class="font-size-btn" id="fs-large" onclick="setFontSize('large')" style="flex:1;padding:14px;border:2px solid transparent;border-radius:14px;background:#F5F0D0;font-family:var(--font-main);font-size:20px;cursor:pointer">大</button>
+    </div>
+    <button onclick="document.getElementById('font-menu').style.display='none'" style="width:100%;margin-top:12px;padding:14px;border:none;border-radius:14px;background:#EEE;font-family:var(--font-main);font-size:15px;cursor:pointer">とじる</button>
   </div>
 </div>
+
+  <div id="settings-menu" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-radius:20px 20px 0 0;padding:20px 16px 40px;z-index:999;box-shadow:0 -4px 20px rgba(0,0,0,0.15)">
+    <div style="font-size:1rem;color:var(--text-mid);margin-bottom:16px;text-align:center">設定</div>
+    <div style="font-size:0.75rem;color:var(--text-mid);margin-bottom:8px">📅 一日の目標正解数</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button id="goal-10" onclick="setDailyGoal(10)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">10問</button>
+      <button id="goal-20" onclick="setDailyGoal(20)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">20問</button>
+      <button id="goal-30" onclick="setDailyGoal(30)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">30問</button>
+      <button id="goal-50" onclick="setDailyGoal(50)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">50問</button>
+    </div>
+    <div style="font-size:0.75rem;color:var(--text-mid);margin-bottom:8px">🃏 一回の出題数</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button id="session-5" onclick="setSessionSize(5)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">5問</button>
+      <button id="session-10" onclick="setSessionSize(10)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">10問</button>
+      <button id="session-20" onclick="setSessionSize(20)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">20問</button>
+      <button id="session-all" onclick="setSessionSize(0)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">全問</button>
+    </div>
+    <button onclick="document.getElementById('settings-menu').style.display='none'" style="width:100%;padding:14px;border:none;border-radius:14px;background:#EEE;font-family:var(--font-main);font-size:0.9375rem;cursor:pointer">とじる</button>
+  </div>
 
 <!-- SUBJECT SCREEN -->
 <div id="subject-screen" class="screen">
@@ -376,6 +416,10 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
     </div>
     <div class="choices" id="choices"></div>
     <button class="next-btn" id="next-btn" onclick="nextQuestion()">つぎへ →</button>
+    <div class="explanation-box" id="explanation-box">
+      <div class="explanation-label">📝 解説</div>
+      <div id="explanation-text"></div>
+    </div>
   </div>
   <div class="feedback-flash" id="feedback-flash">
     <div class="feedback-text" id="feedback-text"></div>
@@ -428,12 +472,21 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
     </div>
     <div class="data-card">
       <div class="data-card-title">💾 データをエクスポート</div>
-      <div class="data-export-text" id="export-preview">（ここにデータが表示されます）</div>
-      <button class="copy-btn" onclick="copyExport()">コピーする 📋</button>
+      <div class="data-export-text" id="export-preview">（ボタンを押すとデータが表示されます）</div>
+      <div id="copy-instruction" style="display:none;font-size:12px;color:#5A7A4A;margin-top:6px;padding:6px 10px;background:#E8F8E8;border-radius:8px">上のテキストを長押しして「すべて選択」→「コピー」してください</div>
+      <button class="copy-btn" onclick="copyExport()">データを表示してコピー 📋</button>
     </div>
     <div class="data-card">
       <div class="data-card-title">🗑 全データをリセット</div>
       <button class="data-btn" style="background:#C04040" onclick="resetAll()">リセットする</button>
+      <div id="reset-confirm" style="display:none;margin-top:10px;background:#FFE8E8;border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:13px;color:#7A1A1A;margin-bottom:10px">本当にリセットしますか？<br>この操作は元に戻せません。</div>
+        <div style="display:flex;gap:8px">
+          <button onclick="resetAllConfirm()" style="flex:1;padding:10px;background:#C04040;color:white;border:none;border-radius:10px;font-family:var(--font-main);font-size:14px;font-weight:700;cursor:pointer">はい、リセット</button>
+          <button onclick="document.getElementById('reset-confirm').style.display='none'" style="flex:1;padding:10px;background:#EEE;border:none;border-radius:10px;font-family:var(--font-main);font-size:14px;cursor:pointer">キャンセル</button>
+        </div>
+      </div>
+      <div id="reset-done" style="display:none;margin-top:10px;text-align:center;font-size:14px;color:#3A7A28">✅ リセットしました</div>
     </div>
   </div>
 </div>
@@ -441,7 +494,33 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:
 </div>
 
 <script>
-const SUBJECTS = {
+'use strict';
+
+// ── Storage ──────────────────────────────────────────────
+var _mem = {};
+function sGet(k){ try{ return localStorage.getItem(k); }catch(e){ return _mem[k]||null; } }
+function sSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ _mem[k]=v; } }
+
+// ── State ─────────────────────────────────────────────────
+function defaultState(){
+  return {questions:{},history:{},streak:0,lastDate:null,
+    totalCorrect:0,todayCorrect:0,todayDate:null,lemons:0,
+    fontSize:'small',dailyGoal:20,sessionSize:10};
+}
+function loadState(){
+  try{ var s=sGet('remon_state'); if(s){ return Object.assign(defaultState(),JSON.parse(s)); } }catch(e){}
+  return defaultState();
+}
+function saveState(){ try{ sSet('remon_state',JSON.stringify(state)); }catch(e){} }
+
+var state = loadState();
+
+// ── Quiz vars ─────────────────────────────────────────────
+var currentSubject=null, currentMode='today';
+var selectedUnits=[], quizQueue=[], quizIndex=0;
+var quizCorrect=0, quizSessionCorrect=0, lastSessionSubject=null;
+
+var SUBJECTS={
   kokugo:{name:'国語',icon:'📖',bg:'var(--kokugo-bg)'},
   sugaku:{name:'数学',icon:'📐',bg:'var(--sugaku-bg)'},
   rika:{name:'理科',icon:'🔬',bg:'var(--rika-bg)'},
@@ -450,83 +529,52 @@ const SUBJECTS = {
   ongaku:{name:'音楽・美術',icon:'🎨',bg:'var(--ongaku-bg)'}
 };
 
-const DEFAULT_STATE = ()=>({questions:{},history:{},streak:0,lastDate:null,totalCorrect:0,todayCorrect:0,todayDate:null,lemons:0});
+// ── Helpers ───────────────────────────────────────────────
+function todayStr(){ return new Date().toISOString().slice(0,10); }
 
-let _memStore = null;
-function storageGet(key){
-  try{ return localStorage.getItem(key); }
-  catch(e){ return _memStore?_memStore[key]||null:null; }
-}
-function storageSet(key,val){
-  try{ localStorage.setItem(key,val); }
-  catch(e){ if(!_memStore)_memStore={}; _memStore[key]=val; }
-}
-function loadState(){
-  try{
-    const s=storageGet('remon_state');
-    if(s){ return Object.assign(DEFAULT_STATE(),JSON.parse(s)); }
-  }catch(e){}
-  return DEFAULT_STATE();
-}
-function saveState(){
-  try{ storageSet('remon_state',JSON.stringify(state)); }catch(e){}
+function shuffle(arr){
+  var a=arr.slice();
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
 }
 
-let state = loadState();
-let currentSubject = null;
-let currentMode = 'today';
-let currentUnits = [];
-let selectedUnits = [];
-let quizQueue = [];
-let quizIndex = 0;
-let quizCorrect = 0;
-let quizSessionCorrect = 0;
-let lastSessionSubject = null;
-let lastSessionMode = null;
-
-function getTodayStr(){
-  return new Date().toISOString().slice(0,10);
+function applyFontSize(){
+  var scales={small:1,medium:1.2,large:1.45};
+  document.documentElement.style.setProperty('--font-scale', scales[state.fontSize||'small']);
 }
 
-function updateStreak(){
-  const today = getTodayStr();
-  if(state.todayDate !== today){ state.todayCorrect=0; state.todayDate=today; }
-  if(state.lastDate===null){ state.streak=1; }
-  else{
-    const diff=Math.round((new Date(today)-new Date(state.lastDate))/(1000*60*60*24));
-    if(diff===1) state.streak++;
-    else if(diff>1) state.streak=1;
-  }
-  state.lastDate=today;
-  saveState();
-}
-
+// ── Home ──────────────────────────────────────────────────
 function refreshHome(){
-  const today=getTodayStr();
+  var today=todayStr();
   if(state.todayDate!==today){ state.todayCorrect=0; state.todayDate=today; saveState(); }
   document.getElementById('streak-display').textContent=state.streak+'日';
   document.getElementById('total-display').textContent=state.totalCorrect+'問';
   document.getElementById('today-display').textContent=state.todayCorrect+'問';
-  Object.keys(SUBJECTS).forEach(sk=>{
-    const qs=state.questions[sk];
-    const countEl=document.getElementById('count-'+sk);
-    const rateEl=document.getElementById('rate-'+sk);
-    if(!qs||qs.length===0){ countEl.textContent='問題なし'; rateEl.textContent='—'; return; }
-    countEl.textContent=qs.length+'問';
-    const h=state.history[sk]||{};
-    let correct=0,attempted=0;
-    qs.forEach((_,i)=>{ const rec=h[i]; if(rec&&rec.attempts>0){ attempted++; if(rec.correct>0)correct++; } });
-    rateEl.textContent=attempted===0?'—':Math.round(correct/attempted*100)+'%';
+  var goal=state.dailyGoal||20;
+  var pct=Math.min(Math.round(state.todayCorrect/goal*100),100);
+  document.getElementById('today-goal-display').textContent='目標'+goal+'問 ('+pct+'%)';
+  Object.keys(SUBJECTS).forEach(function(sk){
+    var qs=state.questions[sk]||[];
+    var ce=document.getElementById('count-'+sk);
+    var re=document.getElementById('rate-'+sk);
+    if(!ce||!re) return;
+    if(!qs.length){ ce.textContent='問題なし'; re.textContent='—'; return; }
+    ce.textContent=qs.length+'問';
+    var h=state.history[sk]||{}, correct=0, attempted=0;
+    qs.forEach(function(_,i){ var r=h[i]; if(r&&r.attempts>0){ attempted++; if(r.correct>0)correct++; } });
+    re.textContent=attempted?Math.round(correct/attempted*100)+'%':'—';
   });
 }
 
+// ── Screen ────────────────────────────────────────────────
 function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
   if(id==='home') refreshHome();
   if(id==='data-screen') updateExportPreview();
 }
 
+// ── Subject screen ────────────────────────────────────────
 function openSubject(sk){
   currentSubject=sk;
   document.getElementById('ss-icon').textContent=SUBJECTS[sk].icon;
@@ -548,77 +596,64 @@ function selectMode(m){
 }
 
 function getUnits(sk){
-  const qs=state.questions[sk]||[];
-  const map={};
-  qs.forEach((q,i)=>{ const u=q.unit||'その他'; if(!map[u])map[u]=[]; map[u].push(i); });
+  var qs=state.questions[sk]||[], map={};
+  qs.forEach(function(q,i){ var u=q.unit||'その他'; if(!map[u])map[u]=[]; map[u].push(i); });
   return map;
 }
 
 function renderUnitList(){
-  const sk=currentSubject;
-  const unitMap=getUnits(sk);
-  const el=document.getElementById('unit-list');
+  var sk=currentSubject, unitMap=getUnits(sk), el=document.getElementById('unit-list');
   el.innerHTML='';
-  selectedUnits=Object.keys(unitMap);
-  Object.entries(unitMap).forEach(([unit,ids])=>{
-    const h=state.history[sk]||{};
-    const today=getTodayStr();
-    const due=ids.filter(id=>{ const rec=h[id]; return !rec||rec.nextDate<=today; }).length;
-    const btn=document.createElement('button');
-    btn.className='unit-btn selected-unit';
-    btn.dataset.unit=unit;
-    btn.innerHTML=`<div class="unit-info"><div class="unit-name">${unit}</div><div class="unit-meta">${ids.length}問</div></div><div class="unit-due ${due>0?'has-due':''}">${due>0?due+'問期限':'最新'}</div>`;
-    btn.onclick=()=>toggleUnit(unit,btn);
+  selectedUnits=[];
+  Object.keys(unitMap).forEach(function(unit){
+    var ids=unitMap[unit], h=state.history[sk]||{}, today=todayStr();
+    var due=ids.filter(function(id){ var r=h[id]; return !r||r.nextDate<=today; }).length;
+    var btn=document.createElement('button');
+    btn.className='unit-btn'; btn.dataset.unit=unit;
+    btn.style.opacity='0.4';
+    btn.innerHTML='<div class="unit-info"><div class="unit-name">'+unit+'</div><div class="unit-meta">'+ids.length+'問</div></div>'
+      +'<div class="unit-due'+(due?' has-due':'')+'">'+( due ? due+'問期限' : '最新')+'</div>';
+    btn.onclick=function(){ toggleUnit(unit,btn); };
     el.appendChild(btn);
   });
 }
 
 function toggleUnit(unit,btn){
-  if(selectedUnits.includes(unit)){
-    if(selectedUnits.length===1)return;
-    selectedUnits=selectedUnits.filter(u=>u!==unit);
-    btn.style.opacity='0.5';
-  }else{ selectedUnits.push(unit); btn.style.opacity='1'; }
+  var i=selectedUnits.indexOf(unit);
+  if(i>=0){ selectedUnits.splice(i,1); btn.style.opacity='0.4'; }
+  else{ selectedUnits.push(unit); btn.style.opacity='1'; }
 }
 
+// ── Quiz ──────────────────────────────────────────────────
 function getDueQuestions(sk){
-  const qs=state.questions[sk]||[];
-  const h=state.history[sk]||{};
-  const today=getTodayStr();
-  return qs.map((_,i)=>i).filter(id=>{ const rec=h[id]; return !rec||rec.nextDate<=today; });
+  var qs=state.questions[sk]||[], h=state.history[sk]||{}, today=todayStr();
+  return qs.map(function(_,i){ return i; }).filter(function(id){ var r=h[id]; return !r||r.nextDate<=today; });
 }
 
 function startQuiz(){
-  const sk=currentSubject;
-  const qs=state.questions[sk]||[];
-  if(qs.length===0){ alert('問題がありません。データを追加してください。'); return; }
-  let ids=[];
+  var sk=currentSubject, qs=state.questions[sk]||[];
+  if(!qs.length){ alert('問題がありません。データを追加してください。'); return; }
+  var ids=[];
   if(currentMode==='today'){
     ids=getDueQuestions(sk);
-    if(ids.length===0){ alert('今日の分は終わっています！また明日来てね 🍋'); return; }
-  }else{
-    const unitMap=getUnits(sk);
-    selectedUnits.forEach(u=>{ if(unitMap[u])ids=ids.concat(unitMap[u]); });
+    if(!ids.length){ alert('今日の分は終わっています！また明日来てね 🍋'); return; }
+  } else {
+    var unitMap=getUnits(sk);
+    selectedUnits.forEach(function(u){ if(unitMap[u]) ids=ids.concat(unitMap[u]); });
   }
+  if(currentMode==='unit'&&selectedUnits.length===0){ alert('単元を選んでください'); return; }
   ids=shuffle(ids);
-  quizQueue=ids.map(id=>({id,q:qs[id]}));
-  quizIndex=0; quizCorrect=0; quizSessionCorrect=0;
-  lastSessionSubject=sk; lastSessionMode=currentMode;
+  var sz=state.sessionSize||10;
+  if(sz>0) ids=ids.slice(0,sz);
+  quizQueue=ids.map(function(id){ return {id:id,q:qs[id]}; });
+  quizIndex=0; quizCorrect=0; quizSessionCorrect=0; lastSessionSubject=sk;
   document.getElementById('quiz-bg').style.background=SUBJECTS[sk].bg;
   showScreen('quiz');
   renderQuestion();
 }
 
-function shuffle(arr){
-  const a=[...arr];
-  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
-  return a;
-}
-
 function renderQuestion(){
-  const total=quizQueue.length;
-  const item=quizQueue[quizIndex];
-  const q=item.q;
+  var total=quizQueue.length, item=quizQueue[quizIndex], q=item.q;
   document.getElementById('q-current').textContent=quizIndex+1;
   document.getElementById('q-total').textContent=total;
   document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
@@ -627,77 +662,58 @@ function renderQuestion(){
   document.getElementById('q-direction-label').textContent='問題';
   document.getElementById('q-text').textContent=q.question;
   document.getElementById('q-hint').textContent='';
-  const choicesEl=document.getElementById('choices');
-  choicesEl.innerHTML='';
+  document.getElementById('explanation-box').classList.remove('visible');
+  document.getElementById('explanation-text').textContent='';
   document.getElementById('next-btn').classList.remove('visible');
-  const correctAnswer=q.meaning||(q.choices&&q.choices[0])||'';
-  item.correctAnswer=correctAnswer;
-  const choices=shuffle([...(q.choices||[correctAnswer])]);
-  choices.forEach(c=>{
-    const btn=document.createElement('button');
-    btn.className='choice-btn';
-    btn.textContent=c;
-    btn.onclick=()=>selectChoice(btn,c,correctAnswer,item);
+  var choicesEl=document.getElementById('choices');
+  choicesEl.innerHTML='';
+  var correct=q.meaning||(q.choices&&q.choices[0])||'';
+  item.correctAnswer=correct;
+  var choices=shuffle((q.choices||[correct]).slice());
+  choices.forEach(function(c){
+    var btn=document.createElement('button');
+    btn.className='choice-btn'; btn.textContent=c;
+    btn.onclick=function(){ selectChoice(btn,c,correct,item); };
     choicesEl.appendChild(btn);
   });
 }
 
 function selectChoice(btn,chosen,correct,item){
-  document.querySelectorAll('.choice-btn').forEach(b=>{ b.classList.add('disabled'); b.onclick=null; });
-  const isCorrect=chosen===correct;
-  if(isCorrect){
+  document.querySelectorAll('.choice-btn').forEach(function(b){ b.classList.add('disabled'); b.onclick=null; });
+  var ok=chosen===correct;
+  if(ok){
     btn.classList.add('correct');
     quizCorrect++; quizSessionCorrect++;
     showFeedback(true); spawnLemons();
-    updateSRRecord(item.id,true);
-  }else{
+    updateSR(item.id,true); saveState();
+    document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
+    setTimeout(function(){ nextQuestion(); },600);
+  } else {
     btn.classList.add('wrong');
-    document.querySelectorAll('.choice-btn').forEach(b=>{ if(b.textContent===correct)b.classList.add('show-correct'); });
+    document.querySelectorAll('.choice-btn').forEach(function(b){ if(b.textContent===correct)b.classList.add('show-correct'); });
     showFeedback(false);
-    updateSRRecord(item.id,false);
+    updateSR(item.id,false); saveState();
+    document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
+    var exp=item.q.explanation||('正解は「'+correct+'」です。');
+    document.getElementById('explanation-text').textContent=exp;
+    document.getElementById('explanation-box').classList.add('visible');
+    document.getElementById('next-btn').classList.add('visible');
   }
-  document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
-  document.getElementById('next-btn').classList.add('visible');
-  saveState();
 }
 
-function updateSRRecord(id,correct){
-  const sk=lastSessionSubject;
-  if(!state.history[sk])state.history[sk]={};
-  const h=state.history[sk];
-  if(!h[id])h[id]={attempts:0,correct:0,interval:1,nextDate:getTodayStr()};
-  const rec=h[id];
-  rec.attempts++;
+function updateSR(id,correct){
+  var sk=lastSessionSubject;
+  if(!state.history[sk]) state.history[sk]={};
+  var h=state.history[sk];
+  if(!h[id]) h[id]={attempts:0,correct:0,interval:1,nextDate:todayStr()};
+  var rec=h[id]; rec.attempts++;
   if(correct){
-    rec.correct++;
-    state.totalCorrect++; state.todayCorrect++;
+    rec.correct++; state.totalCorrect++; state.todayCorrect++;
     state.lemons=(state.lemons||0)+1;
-    const intervals=[1,3,7,14,30];
-    rec.interval=intervals[Math.min(rec.correct-1,intervals.length-1)];
-  }else{ rec.interval=1; }
-  const next=new Date();
-  next.setDate(next.getDate()+rec.interval);
+    var ivs=[1,3,7,14,30]; rec.interval=ivs[Math.min(rec.correct-1,ivs.length-1)];
+  } else { rec.interval=1; }
+  var next=new Date(); next.setDate(next.getDate()+rec.interval);
   rec.nextDate=next.toISOString().slice(0,10);
-}
-
-function showFeedback(correct){
-  const el=document.getElementById('feedback-flash');
-  el.className='feedback-flash '+(correct?'correct-flash':'wrong-flash');
-  document.getElementById('feedback-text').textContent=correct?'✓':'✕';
-  el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),400);
-}
-
-function spawnLemons(){
-  for(let i=0;i<2;i++){
-    setTimeout(()=>{
-      const el=document.createElement('div');
-      el.className='lemon-float'; el.textContent='🍋';
-      el.style.left=(20+Math.random()*60)+'%'; el.style.bottom='80px';
-      document.body.appendChild(el);
-      setTimeout(()=>el.remove(),1200);
-    },i*150);
-  }
 }
 
 function nextQuestion(){
@@ -706,11 +722,44 @@ function nextQuestion(){
   else renderQuestion();
 }
 
+function showFeedback(ok){
+  var el=document.getElementById('feedback-flash');
+  el.className='feedback-flash '+(ok?'correct-flash':'wrong-flash');
+  document.getElementById('feedback-text').textContent=ok?'✓':'✕';
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); },400);
+}
+
+function spawnLemons(){
+  for(var i=0;i<2;i++){
+    (function(delay){
+      setTimeout(function(){
+        var el=document.createElement('div');
+        el.className='lemon-float'; el.textContent='🍋';
+        el.style.left=(20+Math.random()*60)+'%'; el.style.bottom='80px';
+        document.body.appendChild(el);
+        setTimeout(function(){ el.remove(); },1200);
+      },delay);
+    })(i*150);
+  }
+}
+
+// ── Result ────────────────────────────────────────────────
+function updateStreak(){
+  var today=todayStr();
+  if(state.todayDate!==today){ state.todayCorrect=0; state.todayDate=today; }
+  if(!state.lastDate){ state.streak=1; }
+  else{
+    var diff=Math.round((new Date(today)-new Date(state.lastDate))/(86400000));
+    if(diff===1) state.streak++; else if(diff>1) state.streak=1;
+  }
+  state.lastDate=today; saveState();
+}
+
 function showResult(){
   updateStreak();
-  const total=quizQueue.length;
-  const rate=Math.round(quizCorrect/total*100);
-  let emoji,title;
+  var total=quizQueue.length, rate=Math.round(quizCorrect/total*100);
+  var emoji,title;
   if(rate>=90){emoji='🌟';title='すごい！パーフェクトに近い！';}
   else if(rate>=70){emoji='🍋';title='よくできました！';}
   else if(rate>=50){emoji='💪';title='もう少し！次はもっといける！';}
@@ -721,37 +770,36 @@ function showResult(){
   document.getElementById('res-total').textContent=total;
   document.getElementById('res-rate').textContent=rate+'%';
   document.getElementById('res-lemons').textContent='🍋×'+quizSessionCorrect;
-  const tl=state.lemons||0;
-  let ls='';
-  for(let i=0;i<Math.min(tl,30);i++)ls+='🍋';
-  if(tl>30)ls+=' +'+(tl-30);
+  var tl=state.lemons||0, ls='';
+  for(var i=0;i<Math.min(tl,30);i++) ls+='🍋';
+  if(tl>30) ls+=' +'+(tl-30);
   document.getElementById('lemons-display').textContent=ls||'まだないよ';
-  showScreen('result');
-  saveState();
+  showScreen('result'); saveState();
 }
 
 function goHome(){ showScreen('home'); }
 
 function restartSame(){
   quizIndex=0; quizCorrect=0; quizSessionCorrect=0;
-  quizQueue=shuffle([...quizQueue]);
+  quizQueue=shuffle(quizQueue);
   document.getElementById('quiz-bg').style.background=SUBJECTS[lastSessionSubject].bg;
   showScreen('quiz'); renderQuestion();
 }
 
+// ── Data ──────────────────────────────────────────────────
 function importData(){
-  const txt=document.getElementById('import-textarea').value.trim();
+  var txt=document.getElementById('import-textarea').value.trim();
   if(!txt){ alert('JSONを貼り付けてください'); return; }
   try{
-    const data=JSON.parse(txt);
+    var data=JSON.parse(txt);
     if(!data.subject||!data.questions){ alert('フォーマットが正しくありません'); return; }
-    const sk=data.subject;
-    if(!state.questions[sk])state.questions[sk]=[];
-    const existing=state.questions[sk].map(q=>q.question);
-    let added=0;
-    data.questions.forEach(q=>{
+    var sk=data.subject;
+    if(!state.questions[sk]) state.questions[sk]=[];
+    var existing=state.questions[sk].map(function(q){ return q.question; });
+    var added=0;
+    data.questions.forEach(function(q){
       q.unit=q.unit||data.unit||'その他';
-      if(!existing.includes(q.question)){ state.questions[sk].push(q); added++; }
+      if(existing.indexOf(q.question)<0){ state.questions[sk].push(q); added++; }
     });
     saveState();
     document.getElementById('import-textarea').value='';
@@ -761,36 +809,107 @@ function importData(){
 }
 
 function updateExportPreview(){
-  const exportData={questions:state.questions,history:state.history,streak:state.streak,lastDate:state.lastDate,totalCorrect:state.totalCorrect,lemons:state.lemons};
-  document.getElementById('export-preview').textContent=JSON.stringify(exportData).slice(0,500)+'...';
+  var d={questions:state.questions,history:state.history,streak:state.streak,
+    lastDate:state.lastDate,totalCorrect:state.totalCorrect,lemons:state.lemons};
+  document.getElementById('export-preview').textContent=JSON.stringify(d).slice(0,500)+'...';
 }
 
-function showExport(){ showScreen('data-screen'); updateExportPreview(); }
+function showExport(){ showScreen('data-screen'); }
 
 function copyExport(){
-  const exportData={questions:state.questions,history:state.history,streak:state.streak,lastDate:state.lastDate,totalCorrect:state.totalCorrect,lemons:state.lemons};
-  const txt=JSON.stringify(exportData);
-  navigator.clipboard.writeText(txt).then(()=>{
-    alert('コピーしました！メモ帳などに貼り付けて保存してください。');
-  }).catch(()=>{
-    const ta=document.createElement('textarea');
-    ta.value=txt; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    alert('コピーしました！');
-  });
+  var d={questions:state.questions,history:state.history,streak:state.streak,
+    lastDate:state.lastDate,totalCorrect:state.totalCorrect,lemons:state.lemons};
+  var txt=JSON.stringify(d);
+  var el=document.getElementById('export-preview');
+  el.textContent=txt;
+  el.style.userSelect='all';
+  el.style.webkitUserSelect='all';
+  el.style.background='#FFFDE0';
+  el.style.border='2px solid #D4C200';
+  document.getElementById('copy-instruction').style.display='block';
+  try{
+    var range=document.createRange();
+    range.selectNodeContents(el);
+    var sel=window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }catch(e){}
+  try{
+    navigator.clipboard.writeText(txt).then(function(){
+      document.getElementById('copy-instruction').textContent='✅ コピーできました！';
+    }).catch(function(){});
+  }catch(e){}
 }
 
 function resetAll(){
-  if(!confirm('全データをリセットしますか？この操作は元に戻せません。'))return;
-  state=DEFAULT_STATE(); saveState(); alert('リセットしました'); showScreen('home');
+  var el=document.getElementById('reset-confirm');
+  el.style.display=el.style.display==='block'?'none':'block';
+}
+function resetAllConfirm(){
+  state=defaultState();
+  saveState();
+  document.getElementById('reset-confirm').style.display='none';
+  document.getElementById('reset-done').style.display='block';
+  setTimeout(function(){ showScreen('home'); },1200);
 }
 
+// ── Settings ──────────────────────────────────────────────
+function showSettingsMenu(){
+  document.getElementById('settings-menu').style.display='block';
+  var goal=state.dailyGoal||20, sz=state.sessionSize||10;
+  [10,20,30,50].forEach(function(g){
+    var b=document.getElementById('goal-'+g);
+    if(b){ b.style.borderColor=g===goal?'var(--text-dark)':'transparent'; b.style.background=g===goal?'rgba(255,255,255,0.95)':'#F5F0D0'; }
+  });
+  var szk=sz===0?'all':sz;
+  [5,10,20,'all'].forEach(function(s){
+    var b=document.getElementById('session-'+s);
+    if(b){ b.style.borderColor=s===szk?'var(--text-dark)':'transparent'; b.style.background=s===szk?'rgba(255,255,255,0.95)':'#F5F0D0'; }
+  });
+}
+
+function setDailyGoal(g){
+  state.dailyGoal=g; saveState(); refreshHome();
+  [10,20,30,50].forEach(function(v){
+    var b=document.getElementById('goal-'+v);
+    if(b){ b.style.borderColor=v===g?'var(--text-dark)':'transparent'; b.style.background=v===g?'rgba(255,255,255,0.95)':'#F5F0D0'; }
+  });
+}
+
+function setSessionSize(s){
+  state.sessionSize=s; saveState();
+  var szk=s===0?'all':s;
+  [5,10,20,'all'].forEach(function(v){
+    var b=document.getElementById('session-'+v);
+    if(b){ b.style.borderColor=v===szk?'var(--text-dark)':'transparent'; b.style.background=v===szk?'rgba(255,255,255,0.95)':'#F5F0D0'; }
+  });
+}
+
+function showFontMenu(){
+  document.getElementById('font-menu').style.display='block';
+  var sz=state.fontSize||'small';
+  ['small','medium','large'].forEach(function(s){
+    var b=document.getElementById('fs-'+s);
+    if(b){ b.style.borderColor=s===sz?'var(--text-dark)':'transparent'; b.style.background=s===sz?'rgba(255,255,255,0.95)':'#F5F0D0'; }
+  });
+}
+
+function setFontSize(sz){
+  state.fontSize=sz; saveState(); applyFontSize();
+  ['small','medium','large'].forEach(function(s){
+    var b=document.getElementById('fs-'+s);
+    if(b){ b.style.borderColor=s===sz?'var(--text-dark)':'transparent'; b.style.background=s===sz?'rgba(255,255,255,0.95)':'#F5F0D0'; }
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────
+applyFontSize();
 refreshHome();
-try{
-  if('serviceWorker' in navigator){
-    window.addEventListener('load',()=>{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); });
-  }
-}catch(e){}
+if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
+}
 </script>
 </body>
 </html>
