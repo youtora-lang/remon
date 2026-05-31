@@ -83,6 +83,13 @@ html{font-size:calc(16px * var(--font-scale))}
 .home-subtitle{font-size:13px;color:var(--text-mid);margin-top:4px}
 .lemon-deco{font-size:28px;margin-bottom:4px}
 
+.daily-mix-btn{margin:0 16px 14px;background:var(--text-dark);border:none;border-radius:22px;padding:20px 22px;display:flex;align-items:center;gap:16px;cursor:pointer;width:calc(100% - 32px);transition:transform 0.12s,opacity 0.12s;box-shadow:0 4px 16px rgba(0,0,0,0.15)}
+.daily-mix-btn:active{transform:scale(0.97);opacity:0.9}
+.daily-mix-icon{font-size:34px;flex-shrink:0}
+.daily-mix-text{flex:1;text-align:left}
+.daily-mix-title{font-family:'Nunito',sans-serif;font-size:1.3rem;font-weight:800;color:var(--lemon-yellow);line-height:1.1}
+.daily-mix-sub{font-size:0.78rem;color:rgba(255,255,255,0.75);margin-top:3px}
+.daily-mix-arrow{font-size:1rem;color:var(--lemon-yellow);flex-shrink:0}
 .streak-bar{margin:0 20px 12px;background:rgba(255,255,255,0.55);border-radius:16px;padding:12px 18px;display:flex;align-items:center;gap:12px}
 .streak-icon{font-size:22px}
 .streak-info{flex:1}
@@ -139,6 +146,10 @@ html{font-size:calc(16px * var(--font-scale))}
 .subject-screen-name{font-size:24px;font-weight:700;color:var(--text-dark)}
 
 .unit-list{padding:0 16px 16px;display:flex;flex-direction:column;gap:8px}
+.unit-row{display:flex;align-items:stretch;gap:8px}
+.unit-row .unit-btn{flex:1}
+.unit-exclude{flex-shrink:0;width:48px;border:none;border-radius:16px;background:rgba(255,255,255,0.6);font-size:1.1rem;cursor:pointer;font-family:var(--font-main);transition:background 0.15s}
+.unit-exclude.is-excluded{background:#FFD9D9;color:#C04040;font-weight:700}
 .unit-btn{background:rgba(255,255,255,0.6);border:none;border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;font-family:var(--font-main);text-align:left;width:100%;transition:transform 0.12s}
 .unit-btn:active{transform:scale(0.97)}
 .unit-info{flex:1}
@@ -254,6 +265,15 @@ html{font-size:calc(16px * var(--font-scale))}
     <div class="home-title">remon</div>
     <div class="home-subtitle">今日もちょっとだけやってみよう</div>
   </div>
+
+  <button class="daily-mix-btn" onclick="startDailyMix()">
+    <div class="daily-mix-icon">🍋</div>
+    <div class="daily-mix-text">
+      <div class="daily-mix-title">今日の20問</div>
+      <div class="daily-mix-sub">全教科からピックアップ</div>
+    </div>
+    <div class="daily-mix-arrow">▶</div>
+  </button>
 
   <div class="streak-bar">
     <div class="streak-icon">🔥</div>
@@ -533,6 +553,7 @@ var state = loadState();
 var currentSubject=null, currentMode='today';
 var selectedUnits=[], quizQueue=[], quizIndex=0;
 var quizCorrect=0, quizSessionCorrect=0, lastSessionSubject=null;
+var isDailyMix=false;
 
 var SUBJECTS={
   kokugo:{name:'国語',icon:'📖',bg:'var(--kokugo-bg)'},
@@ -622,13 +643,28 @@ function renderUnitList(){
   Object.keys(unitMap).forEach(function(unit){
     var ids=unitMap[unit], h=state.history[sk]||{}, today=todayStr();
     var due=ids.filter(function(id){ var r=h[id]; return !r||r.nextDate<=today; }).length;
+    var row=document.createElement('div');
+    row.className='unit-row';
+    var excluded=isUnitExcluded(sk,unit);
     var btn=document.createElement('button');
     btn.className='unit-btn'; btn.dataset.unit=unit;
     btn.style.opacity='0.4';
     btn.innerHTML='<div class="unit-info"><div class="unit-name">'+unit+'</div><div class="unit-meta">'+ids.length+'問</div></div>'
       +'<div class="unit-due'+(due?' has-due':'')+'">'+( due ? due+'問期限' : '最新')+'</div>';
     btn.onclick=function(){ toggleUnit(unit,btn); };
-    el.appendChild(btn);
+    var exBtn=document.createElement('button');
+    exBtn.className='unit-exclude'+(excluded?' is-excluded':'');
+    exBtn.title='今日の20問の対象/除外';
+    exBtn.textContent=excluded?'✕':'🍋';
+    exBtn.onclick=function(){
+      toggleExcludeUnit(sk,unit);
+      var nowEx=isUnitExcluded(sk,unit);
+      exBtn.textContent=nowEx?'✕':'🍋';
+      exBtn.className='unit-exclude'+(nowEx?' is-excluded':'');
+    };
+    row.appendChild(exBtn);
+    row.appendChild(btn);
+    el.appendChild(row);
   });
 }
 
@@ -660,7 +696,7 @@ function startQuiz(){
   var sz=state.sessionSize||10;
   if(sz>0) ids=ids.slice(0,sz);
   quizQueue=ids.map(function(id){ return {id:id,q:qs[id]}; });
-  quizIndex=0; quizCorrect=0; quizSessionCorrect=0; lastSessionSubject=sk;
+  quizIndex=0; quizCorrect=0; quizSessionCorrect=0; lastSessionSubject=sk; isDailyMix=false;
   document.getElementById('quiz-bg').style.background=SUBJECTS[sk].bg;
   showScreen('quiz');
   renderQuestion();
@@ -672,7 +708,7 @@ function renderQuestion(){
   document.getElementById('q-total').textContent=total;
   document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
   document.getElementById('q-progress-fill').style.width=(quizIndex/total*100)+'%';
-  document.getElementById('q-unit-tag').textContent=q.unit||'';
+  document.getElementById('q-unit-tag').textContent=(item.mixSubject?(SUBJECTS[item.mixSubject].name+'・'):'')+(q.unit||'');
   document.getElementById('q-direction-label').textContent='問題';
   document.getElementById('q-text').textContent=q.question;
   document.getElementById('q-hint').textContent='';
@@ -695,18 +731,19 @@ function renderQuestion(){
 function selectChoice(btn,chosen,correct,item){
   document.querySelectorAll('.choice-btn').forEach(function(b){ b.classList.add('disabled'); b.onclick=null; });
   var ok=chosen===correct;
+  var subj=item.mixSubject||lastSessionSubject;
   if(ok){
     btn.classList.add('correct');
     quizCorrect++; quizSessionCorrect++;
     showFeedback(true); spawnLemons();
-    updateSR(item.id,true); saveState();
+    updateSR(item.id,true,subj); saveState();
     document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
     setTimeout(function(){ nextQuestion(); },600);
   } else {
     btn.classList.add('wrong');
     document.querySelectorAll('.choice-btn').forEach(function(b){ if(b.textContent===correct)b.classList.add('show-correct'); });
     showFeedback(false);
-    updateSR(item.id,false); saveState();
+    updateSR(item.id,false,subj); saveState();
     document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
     var exp=item.q.explanation||('正解は「'+correct+'」です。');
     document.getElementById('explanation-text').textContent=exp;
@@ -796,7 +833,8 @@ function goHome(){ showScreen('home'); }
 function restartSame(){
   quizIndex=0; quizCorrect=0; quizSessionCorrect=0;
   quizQueue=shuffle(quizQueue);
-  document.getElementById('quiz-bg').style.background=SUBJECTS[lastSessionSubject].bg;
+  var bg = (isDailyMix||!lastSessionSubject) ? 'var(--lemon-yellow)' : SUBJECTS[lastSessionSubject].bg;
+  document.getElementById('quiz-bg').style.background=bg;
   showScreen('quiz'); renderQuestion();
 }
 
@@ -868,6 +906,51 @@ function resetAllConfirm(){
 }
 
 // ── Settings ──────────────────────────────────────────────
+function unitKey(sk, unit){ return sk + '||' + unit; }
+
+function isUnitExcluded(sk, unit){
+  var ex = state.excludedUnits || {};
+  return ex[unitKey(sk, unit)] === true;
+}
+
+function toggleExcludeUnit(sk, unit){
+  if(!state.excludedUnits) state.excludedUnits = {};
+  var k = unitKey(sk, unit);
+  if(state.excludedUnits[k]) delete state.excludedUnits[k];
+  else state.excludedUnits[k] = true;
+  saveState();
+}
+
+function startDailyMix(){
+  var today = todayStr();
+  var pool0 = [];  // 未着手
+  var pool1 = [];  // 定着していない（期限到来・前回不正解）
+  var pool2 = [];  // その他
+  Object.keys(SUBJECTS).forEach(function(sk){
+    var qs = state.questions[sk] || [];
+    var h = state.history[sk] || {};
+    qs.forEach(function(q, i){
+      var unit = q.unit || 'その他';
+      if(isUnitExcluded(sk, unit)) return;
+      var rec = h[i];
+      var item = {subject:sk, id:i, q:q};
+      if(!rec || rec.attempts === 0){ pool0.push(item); }
+      else if(rec.nextDate <= today || rec.correct === 0){ pool1.push(item); }
+      else { pool2.push(item); }
+    });
+  });
+  var picked = shuffle(pool0).concat(shuffle(pool1)).concat(shuffle(pool2));
+  if(picked.length === 0){ alert('出題できる問題がありません。問題を追加するか、除外を解除してください。'); return; }
+  picked = picked.slice(0, 20);
+  quizQueue = picked.map(function(it){ return {id:it.id, q:it.q, mixSubject:it.subject}; });
+  quizIndex = 0; quizCorrect = 0; quizSessionCorrect = 0;
+  lastSessionSubject = null;
+  isDailyMix = true;
+  document.getElementById('quiz-bg').style.background = 'var(--lemon-yellow)';
+  showScreen('quiz');
+  renderQuestion();
+}
+
 function showSettingsMenu(){
   document.getElementById('settings-menu').style.display='block';
   var goal=state.dailyGoal||20, sz=state.sessionSize||10;
