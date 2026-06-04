@@ -387,6 +387,11 @@ html{font-size:calc(16px * var(--font-scale))}
       <button id="session-20" onclick="setSessionSize(20)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">20問</button>
       <button id="session-all" onclick="setSessionSize(0)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">全問</button>
     </div>
+    <div style="font-size:0.75rem;color:var(--text-mid);margin-bottom:8px">💡 解説を出すタイミング</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button id="explain-wrong" onclick="setExplainMode('wrong')" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">まちがえた時だけ</button>
+      <button id="explain-always" onclick="setExplainMode('always')" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">いつも出す</button>
+    </div>
     <button onclick="document.getElementById('settings-menu').style.display='none'" style="width:100%;padding:14px;border:none;border-radius:14px;background:#EEE;font-family:var(--font-main);font-size:0.9375rem;cursor:pointer">とじる</button>
   </div>
 
@@ -738,7 +743,14 @@ function selectChoice(btn,chosen,correct,item){
     showFeedback(true); spawnLemons();
     updateSR(item.id,true,subj); saveState();
     document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
-    setTimeout(function(){ nextQuestion(); },600);
+    if((state.explainMode||'wrong')==='always'){
+      var expc=item.q.explanation||('正解は「'+correct+'」です。');
+      document.getElementById('explanation-text').textContent=expc;
+      document.getElementById('explanation-box').classList.add('visible');
+      document.getElementById('next-btn').classList.add('visible');
+    } else {
+      setTimeout(function(){ nextQuestion(); },600);
+    }
   } else {
     btn.classList.add('wrong');
     document.querySelectorAll('.choice-btn').forEach(function(b){ if(b.textContent===correct)b.classList.add('show-correct'); });
@@ -962,6 +974,19 @@ function showSettingsMenu(){
   [5,10,20,'all'].forEach(function(s){
     var b=document.getElementById('session-'+s);
     if(b){ b.style.borderColor=s===szk?'var(--text-dark)':'transparent'; b.style.background=s===szk?'rgba(255,255,255,0.95)':'#F5F0D0'; }
+  });
+  var em=state.explainMode||'wrong';
+  ['wrong','always'].forEach(function(m){
+    var b=document.getElementById('explain-'+m);
+    if(b){ b.style.borderColor=m===em?'var(--text-dark)':'transparent'; b.style.background=m===em?'rgba(255,255,255,0.95)':'#F5F0D0'; }
+  });
+}
+
+function setExplainMode(m){
+  state.explainMode=m; saveState();
+  ['wrong','always'].forEach(function(v){
+    var b=document.getElementById('explain-'+v);
+    if(b){ b.style.borderColor=v===m?'var(--text-dark)':'transparent'; b.style.background=v===m?'rgba(255,255,255,0.95)':'#F5F0D0'; }
   });
 }
 
