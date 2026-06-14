@@ -67,11 +67,14 @@ html{font-size:calc(16px * var(--font-scale))}
 }
 .stripe-top{top:0;}
 .stripe-bottom{bottom:0;}
+#app-footer{position:fixed;left:0;right:0;bottom:24px;text-align:center;font-family:'Nunito',sans-serif;font-size:10px;line-height:1.5;color:rgba(120,110,80,0.6);letter-spacing:0.3px;z-index:9001;pointer-events:none}
+#app-footer .footer-updated{display:block}
+#app-footer .footer-made{display:block;font-weight:700}
 
 #app{height:100dvh;width:100%;display:flex;flex-direction:column;overflow:hidden;position:relative}
 
 /* ===== SCREENS ===== */
-.screen{display:none;flex-direction:column;height:100%;width:100%;animation:fadeIn 0.25s ease;padding-top:18px;padding-bottom:18px;}
+.screen{display:none;flex-direction:column;height:100%;width:100%;animation:fadeIn 0.25s ease;padding-top:18px;padding-bottom:60px;}
 .screen.active{display:flex}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
@@ -278,6 +281,12 @@ html{font-size:calc(16px * var(--font-scale))}
 <div class="stripe-bar stripe-top"></div>
 <div class="stripe-bar stripe-bottom"></div>
 
+<!-- 共通フッター（全ページ下部に表示） -->
+<div id="app-footer">
+  <span class="footer-updated">Updated Jun 14, 2026 17:25</span>
+  <span class="footer-made">Made by Chii</span>
+</div>
+
 <!-- HOME -->
 <div id="home" class="screen active">
   <div class="home-header">
@@ -361,7 +370,7 @@ html{font-size:calc(16px * var(--font-scale))}
   </div>
 
   <div class="home-footer">
-    <button class="footer-btn" onclick="showScreen('data-screen')">
+    <button class="footer-btn" onclick="openData()">
       <span>📥</span>問題を追加
     </button>
     <button class="footer-btn" onclick="showExport()">
@@ -374,7 +383,7 @@ html{font-size:calc(16px * var(--font-scale))}
       <span>⚙️</span>設定
     </button>
   </div>
-  <button class="guide-btn" onclick="showScreen('guide-screen')">📖 remonの使い方ガイド</button>
+  <button class="guide-btn" onclick="openGuide()">📖 remonの使い方ガイド</button>
   <div id="font-menu" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-radius:20px 20px 0 0;padding:20px 16px 40px;z-index:999;box-shadow:0 -4px 20px rgba(0,0,0,0.15)">
     <div style="font-size:13px;color:var(--text-mid);margin-bottom:12px;text-align:center">文字サイズ</div>
     <div style="display:flex;gap:10px">
@@ -412,7 +421,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- SUBJECT SCREEN -->
 <div id="subject-screen" class="screen">
-  <button class="back-btn" onclick="showScreen('home')">←</button>
+  <button class="back-btn" onclick="goHomeNav()">←</button>
   <div class="subject-header">
     <div class="subject-screen-icon" id="ss-icon">📖</div>
     <div class="subject-screen-name" id="ss-name">国語</div>
@@ -449,7 +458,7 @@ html{font-size:calc(16px * var(--font-scale))}
   <div class="quiz-bg" id="quiz-bg"></div>
   <div class="quiz-content">
     <div class="quiz-top">
-      <button class="quiz-back" onclick="showScreen('home')">←</button>
+      <button class="quiz-back" onclick="goHomeNav()">←</button>
       <div class="quiz-progress-wrap">
         <div class="quiz-progress-text">
           <span id="q-current">1</span>/<span id="q-total">10</span>
@@ -516,7 +525,7 @@ html{font-size:calc(16px * var(--font-scale))}
 <!-- DATA SCREEN -->
 <div id="data-screen" class="screen" style="background:var(--lemon-yellow)">
   <div class="data-header">
-    <button class="back-btn" style="position:static" onclick="showScreen('home')">←</button>
+    <button class="back-btn" style="position:static" onclick="goHomeNav()">←</button>
     <div class="data-title">問題データ</div>
   </div>
   <div class="data-area">
@@ -549,7 +558,7 @@ html{font-size:calc(16px * var(--font-scale))}
 <!-- STATS SCREEN -->
 <div id="stats-screen" class="screen" style="background:var(--lemon-yellow);overflow-y:auto">
   <div class="data-header">
-    <button class="back-btn" style="position:static" onclick="showScreen('home')">←</button>
+    <button class="back-btn" style="position:static" onclick="goHomeNav()">←</button>
     <div class="data-title">📊 学習の記録</div>
   </div>
   <div style="padding:0 16px 40px">
@@ -583,7 +592,7 @@ html{font-size:calc(16px * var(--font-scale))}
 <!-- GUIDE SCREEN -->
 <div id="guide-screen" class="screen" style="background:var(--lemon-yellow);overflow-y:auto">
   <div class="data-header">
-    <button class="back-btn" style="position:static" onclick="showScreen('home')">←</button>
+    <button class="back-btn" style="position:static" onclick="goHomeNav()">←</button>
     <div class="data-title">📖 remonの使い方</div>
   </div>
   <div style="padding:0 18px 48px;color:var(--text-dark);line-height:1.8">
@@ -681,11 +690,13 @@ var PRELOAD=[{"subject":"sugaku","unit":"1章 正負の数：0より小さい数
 var PRELOAD_STRUCT_VERSION = 26;
 
 function rebuildPreload(){
-  // 問題データを新構造で作り直す。
-  // history は問題のインデックス参照なので、構造が変わるとズレる→クリアする。
-  // 週グラフ用の記録(dailyRecords, totalCorrect, lemons, streak)は保持する。
+  // 履歴は「問題文」をキーに引き継ぐので、構造変更・追加・並べ替えでも残る。
+  var histByText={};
+  Object.keys(state.questions||{}).forEach(function(sk){
+    var qs=state.questions[sk]||[], h=(state.history&&state.history[sk])||{};
+    qs.forEach(function(q,i){ if(h[i]){ histByText[sk+'\u0001'+q.question]=h[i]; } });
+  });
   state.questions = {};
-  state.history = {};
   PRELOAD.forEach(function(set){
     var sk=set.subject;
     if(!state.questions[sk]) state.questions[sk]=[];
@@ -694,6 +705,14 @@ function rebuildPreload(){
     set.questions.forEach(function(q){
       q.unit=q.unit||set.unit||'その他';
       if(!existing[q.question]){ state.questions[sk].push(q); existing[q.question]=1; }
+    });
+  });
+  state.history = {};
+  Object.keys(state.questions).forEach(function(sk){
+    state.history[sk]={};
+    state.questions[sk].forEach(function(q,i){
+      var key=sk+'\u0001'+q.question;
+      if(histByText[key]){ state.history[sk][i]=histByText[key]; }
     });
   });
   state.preloadStructVersion = PRELOAD_STRUCT_VERSION;
@@ -791,6 +810,7 @@ function openStats(){
   statsWeekOffset=0;
   renderStats();
   showScreen('stats-screen');
+  navGo(function(){ statsWeekOffset=0; renderStats(); showScreen('stats-screen'); });
 }
 function shiftWeek(n){
   if(statsWeekOffset+n>0) return;
@@ -853,45 +873,53 @@ function refreshHome(){
 }
 
 // ── Screen ────────────────────────────────────────────────
-var screenStack=['home'];
-var suppressHistory=false;
-
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
   if(id==='home') refreshHome();
   if(id==='data-screen') updateExportPreview();
-
-  if(!suppressHistory){
-    if(id==='home'){
-      screenStack=['home'];
-    } else if(screenStack[screenStack.length-1]!==id){
-      screenStack.push(id);
-    }
-    history.pushState({screen:id}, '');
-  }
 }
 
-// スマホの戻るボタン（popstate）で前の画面へ。
-// ホームに着くまでは必ず1つ前の画面に戻り、アプリを閉じさせない。
+// ── 戻る履歴（動作単位のステップ管理）────────────────────────
+// navStack には「その状態を復元する関数」を積む。ホーム(底)では絶対に閉じない。
+var navStack=[ function(){ showScreen('home'); } ];
+
+// 新しい状態へ進む：復元関数を積み、ブラウザ履歴も1つ積む
+function navGo(restoreFn){
+  navStack.push(restoreFn);
+  history.pushState({d:navStack.length}, '');
+}
+
+// 戻るボタン
 window.addEventListener('popstate', function(){
-  if(screenStack.length>1){
-    screenStack.pop();
-    var prev=screenStack[screenStack.length-1];
-    suppressHistory=true;
-    showScreen(prev);
-    suppressHistory=false;
+  if(navStack.length>1){
+    navStack.pop();                       // 今の状態を捨てる
+    var restore=navStack[navStack.length-1];
+    if(typeof restore==='function') restore();  // 1つ前の状態を復元
+  } else {
+    // ホーム（底）：閉じさせず、ホームを表示したまま待機
+    showScreen('home');
   }
-  // 戻り先がどこであっても（ホーム含め）履歴を1つ積み直して、
-  // 次の「戻る」に必ず反応できる状態を保つ＝ホーム前に閉じない。
-  history.pushState({screen:screenStack[screenStack.length-1]}, '');
+  // 次の「戻る」に必ず反応できるよう履歴を補充（＝アプリは閉じない）
+  history.pushState({d:navStack.length}, '');
 });
 
+// ホームに完全に戻す（←ボタンなどから）：スタックを底まで畳む
+function goHomeNav(){
+  navStack=[ function(){ showScreen('home'); } ];
+  showScreen('home');
+  history.pushState({d:1}, '');
+}
+
+// ガイド・データ画面を開く（戻るで閉じられる）
+function openGuide(){ showScreen('guide-screen'); navGo(function(){ showScreen('guide-screen'); }); }
+function openData(){ showScreen('data-screen'); navGo(function(){ showScreen('data-screen'); }); }
+
 // 起動直後にダミー履歴を1つ積む（最初の戻るで即閉じを防ぐ）
-history.pushState({screen:'home'}, '');
+history.pushState({d:1}, '');
 
 // ── Subject screen ────────────────────────────────────────
-function openSubject(sk){
+function renderSubject(sk){
   currentSubject=sk;
   document.getElementById('ss-icon').textContent=SUBJECTS[sk].icon;
   document.getElementById('ss-name').textContent=SUBJECTS[sk].name;
@@ -902,13 +930,25 @@ function openSubject(sk){
   document.getElementById('unit-section').style.display='none';
   showScreen('subject-screen');
 }
+function openSubject(sk){
+  renderSubject(sk);
+  navGo(function(){ renderSubject(sk); });
+}
 
-function selectMode(m){
+function applyMode(m){
   currentMode=m;
   document.getElementById('mode-today').classList.toggle('selected',m==='today');
   document.getElementById('mode-unit').classList.toggle('selected',m==='unit');
   if(m==='unit'){ document.getElementById('unit-section').style.display='block'; renderUnitList(); }
   else{ document.getElementById('unit-section').style.display='none'; }
+}
+function selectMode(m){
+  var prev=currentMode;
+  applyMode(m);
+  // 「単元を選ぶ」を開く操作は、戻るで閉じられる1ステップとして積む
+  if(m==='unit' && prev!=='unit'){
+    navGo(function(){ applyMode('today'); });
+  }
 }
 
 function getUnits(sk){
@@ -1031,6 +1071,8 @@ function startQuiz(){
   document.getElementById('quiz-bg').style.background=SUBJECTS[sk].bg;
   showScreen('quiz');
   renderQuestion();
+  // クイズに入るのも1ステップ：戻ると教科ページに戻る
+  navGo(function(){ renderSubject(sk); });
 }
 
 function renderQuestion(){
@@ -1175,6 +1217,9 @@ function showResult(){
   var rvBtn=document.getElementById('review-wrong-btn');
   if(rvBtn){ rvBtn.style.display = sessionWrong.length>0 ? 'block' : 'none'; }
   showScreen('result'); saveState();
+  // 結果画面で戻るを押したらホームへ（クイズには戻さない）
+  navStack=[ function(){ showScreen('home'); } ];
+  history.pushState({d:1}, '');
 }
 
 function startReviewWrong(){
@@ -1190,9 +1235,10 @@ function startReviewWrong(){
   lastSessionSubject=null; sessionWrong=[]; isDailyMix=true;
   document.getElementById('quiz-bg').style.background='var(--lemon-yellow)';
   showScreen('quiz'); renderQuestion();
+  navGo(function(){ showScreen('home'); });
 }
 
-function goHome(){ showScreen('home'); }
+function goHome(){ goHomeNav(); }
 
 function restartSame(){
   quizIndex=0; quizCorrect=0; quizSessionCorrect=0;
@@ -1200,6 +1246,7 @@ function restartSame(){
   var bg = (isDailyMix||!lastSessionSubject) ? 'var(--lemon-yellow)' : SUBJECTS[lastSessionSubject].bg;
   document.getElementById('quiz-bg').style.background=bg;
   showScreen('quiz'); renderQuestion();
+  navGo(function(){ showScreen('home'); });
 }
 
 // ── Data ──────────────────────────────────────────────────
@@ -1314,6 +1361,7 @@ function startDailyMix(){
   document.getElementById('quiz-bg').style.background = 'var(--lemon-yellow)';
   showScreen('quiz');
   renderQuestion();
+  navGo(function(){ showScreen('home'); });
 }
 
 function showSettingsMenu(){
