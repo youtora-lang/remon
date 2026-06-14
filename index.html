@@ -289,7 +289,7 @@ html{font-size:calc(16px * var(--font-scale))}
   <button class="daily-mix-btn" onclick="startDailyMix()">
     <div class="daily-mix-icon">🍋</div>
     <div class="daily-mix-text">
-      <div class="daily-mix-title">今日の20問</div>
+      <div class="daily-mix-title">今日の 20 remon</div>
       <div class="daily-mix-sub">全教科からピックアップ</div>
     </div>
     <div class="daily-mix-arrow">▶</div>
@@ -423,7 +423,7 @@ html{font-size:calc(16px * var(--font-scale))}
     <div class="mode-cards">
       <div class="mode-card selected" id="mode-today" onclick="selectMode('today')">
         <div class="mode-card-icon">📅</div>
-        <div class="mode-card-name">今日の分</div>
+        <div class="mode-card-name">今日の remon</div>
         <div class="mode-card-desc">忘却曲線で出題</div>
       </div>
       <div class="mode-card" id="mode-unit" onclick="selectMode('unit')">
@@ -603,7 +603,7 @@ html{font-size:calc(16px * var(--font-scale))}
       <b>① 教科をえらぶ</b><br>ホームで教科をタップ。単元ごとに練習できるよ。
     </div>
     <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
-      <b>② 今日の20問</b><br>ホーム一番上のボタンを押すと、全教科からまだ覚えていない問題を中心に20問出題。まよったらこれ！
+      <b>② 今日の 20 remon</b><br>ホーム一番上のボタンを押すと、全教科からまだ覚えていない問題を中心に20問出題。まよったらこれ！
     </div>
     <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
       <b>③ 4つの中からえらぶ</b><br>正解するとレモンがたまって🍋、まちがえると解説が出るよ。
@@ -620,7 +620,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
     <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🎚️ 単元のオン・オフ</div>
     <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
-      各単元の左にある🍋ボタンで、「今日の20問」に入れる・入れないを切りかえられるよ。タップすると✕に変わって、その単元はおやすみ（対象外）になる。もう一度タップすると🍋にもどるよ。苦手な単元だけにしぼって練習したいときに便利。
+      各単元の左にある🍋ボタンで、「今日の 20 remon」や「今日の remon」に入れる・入れないを切りかえられるよ。タップすると✕に変わって、その単元はおやすみ（対象外）になる。もう一度タップすると🍋にもどるよ。苦手な単元だけにしぼって練習したいときに便利。
     </div>
 
     <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🔁 かしこく覚えるしくみ</div>
@@ -641,7 +641,7 @@ html{font-size:calc(16px * var(--font-scale))}
     <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🌱 つづけるコツ・かしこい使い方</div>
     <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;font-size:0.85rem">
       ・一度に全部やろうとしなくて大丈夫。<b>毎日少しずつ</b>が、いちばん身につくよ。<br>
-      ・まよったら<b>「今日の20問」</b>。今やるとよい問題をえらんで出してくれる。<br>
+      ・まよったら<b>「今日の 20 remon」</b>。今やるとよい問題をえらんで出してくれる。<br>
       ・<b>「おすすめ」バッジ</b>の単元から手をつけると、効率よく復習できる。<br>
       ・テスト前は、出ない単元を🍋ボタンで<b>おやすみ（✕）</b>にして、範囲をしぼろう。<br>
       ・まちがえても大丈夫。それが覚えるチャンス🍋　解説を読んでから次に進もう。
@@ -931,7 +931,9 @@ function getFrameworkUnits(sk){
 function renderUnitList(){
   var sk=currentSubject, unitMap=getUnits(sk), el=document.getElementById('unit-list');
   el.innerHTML='';
-  selectedUnits=[];
+  // 教科ごとの選択を復元（解除するまで保持）
+  if(!state.selectedUnits) state.selectedUnits={};
+  selectedUnits=(state.selectedUnits[sk]||[]).slice();
   // 教科書準拠の枠の順番で全単元を表示（問題が無い枠は「準備中」）
   var order=getFrameworkUnits(sk);
   // state側に枠以外の単元があれば後ろに足す（インポート分など）
@@ -960,7 +962,7 @@ function renderUnitList(){
     var excluded=isUnitExcluded(sk,unit);
     var btn=document.createElement('button');
     btn.className='unit-btn'; btn.dataset.unit=unit;
-    btn.style.opacity='0.4';
+    btn.style.opacity=(selectedUnits.indexOf(unit)>=0)?'1':'0.4';
     function badgeFor(isEx){
       if(isEx) return {cls:' badge-paused', txt:'停止中'};
       if(reviewDue>0) return {cls:' badge-recommend', txt:'おすすめ'};
@@ -995,12 +997,21 @@ function toggleUnit(unit,btn){
   var i=selectedUnits.indexOf(unit);
   if(i>=0){ selectedUnits.splice(i,1); btn.style.opacity='0.4'; }
   else{ selectedUnits.push(unit); btn.style.opacity='1'; }
+  // 教科ごとに選択を保存（解除するまで保持）
+  if(!state.selectedUnits) state.selectedUnits={};
+  state.selectedUnits[currentSubject]=selectedUnits.slice();
+  saveState();
 }
 
 // ── Quiz ──────────────────────────────────────────────────
 function getDueQuestions(sk){
   var qs=state.questions[sk]||[], h=state.history[sk]||{}, today=todayStr();
-  return qs.map(function(_,i){ return i; }).filter(function(id){ var r=h[id]; return !r||r.nextDate<=today; });
+  return qs.map(function(_,i){ return i; }).filter(function(id){
+    // ✕で除外した単元（レモンがついていない単元）は対象外
+    var unit=(qs[id]&&qs[id].unit)||'その他';
+    if(isUnitExcluded(sk,unit)) return false;
+    var r=h[id]; return !r||r.nextDate<=today;
+  });
 }
 
 function startQuiz(){
@@ -1009,7 +1020,7 @@ function startQuiz(){
   var ids=[];
   if(currentMode==='today'){
     ids=getDueQuestions(sk);
-    if(!ids.length){ alert('今日の分は終わっています！また明日来てね 🍋'); return; }
+    if(!ids.length){ alert('今日の remon は終わっています！また来てね 🍋'); return; }
   } else {
     var unitMap=getUnits(sk);
     selectedUnits.forEach(function(u){ if(unitMap[u]) ids=ids.concat(unitMap[u]); });
