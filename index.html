@@ -70,7 +70,8 @@ html{font-size:calc(16px * var(--font-scale))}
 #app-footer{position:fixed;left:0;right:0;bottom:24px;text-align:center;font-family:'Nunito',sans-serif;font-size:10px;line-height:1.5;color:rgba(120,110,80,0.6);letter-spacing:0.3px;z-index:9001;pointer-events:none}
 #app-footer .footer-updated{display:block}
 #app-footer .footer-made{display:block;font-weight:700}
-#home{display:flex;flex-direction:column;overflow:hidden}
+#home{display:none;flex-direction:column;overflow:hidden}
+#home.active{display:flex}
 #home .home-top{flex:0 0 auto}
 #home .home-middle{flex:1 1 auto;overflow-y:auto;min-height:0;-webkit-overflow-scrolling:touch}
 #home .home-bottom{flex:0 0 auto}
@@ -292,7 +293,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jun 14, 2026 18:00</span>
+  <span class="footer-updated">Updated Jun 14, 2026 18:05</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
