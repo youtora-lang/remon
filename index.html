@@ -864,16 +864,16 @@ function showScreen(id){
 
   if(!suppressHistory){
     if(id==='home'){
-      // ホームに戻ったらスタックをリセット
       screenStack=['home'];
     } else if(screenStack[screenStack.length-1]!==id){
       screenStack.push(id);
     }
-    history.pushState({screen:id, depth:screenStack.length}, '');
+    history.pushState({screen:id}, '');
   }
 }
 
-// スマホの戻るボタン（popstate）で前の画面へ
+// スマホの戻るボタン（popstate）で前の画面へ。
+// ホームに着くまでは必ず1つ前の画面に戻り、アプリを閉じさせない。
 window.addEventListener('popstate', function(){
   if(screenStack.length>1){
     screenStack.pop();
@@ -881,18 +881,14 @@ window.addEventListener('popstate', function(){
     suppressHistory=true;
     showScreen(prev);
     suppressHistory=false;
-    // popstateで消費した1つ分の履歴をダミーで積み直す（次回の戻るに備える）
-    history.pushState({screen:prev, depth:screenStack.length}, '');
-  } else {
-    // ホームより前はない：もう一度ダミーを積んでアプリが閉じないようにする
-    history.pushState({screen:'home', depth:1}, '');
   }
+  // 戻り先がどこであっても（ホーム含め）履歴を1つ積み直して、
+  // 次の「戻る」に必ず反応できる状態を保つ＝ホーム前に閉じない。
+  history.pushState({screen:screenStack[screenStack.length-1]}, '');
 });
 
-// 起動時に最初のダミー履歴を積む
-window.addEventListener('load', function(){
-  history.pushState({screen:'home', depth:1}, '');
-});
+// 起動直後にダミー履歴を1つ積む（最初の戻るで即閉じを防ぐ）
+history.pushState({screen:'home'}, '');
 
 // ── Subject screen ────────────────────────────────────────
 function openSubject(sk){
