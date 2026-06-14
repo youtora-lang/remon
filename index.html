@@ -283,7 +283,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jun 14, 2026 17:25</span>
+  <span class="footer-updated">Updated Jun 14, 2026 17:32</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -915,8 +915,12 @@ function goHomeNav(){
 function openGuide(){ showScreen('guide-screen'); navGo(function(){ showScreen('guide-screen'); }); }
 function openData(){ showScreen('data-screen'); navGo(function(){ showScreen('data-screen'); }); }
 
-// 起動直後にダミー履歴を1つ積む（最初の戻るで即閉じを防ぐ）
-history.pushState({d:1}, '');
+// 起動時にダミー履歴を積む（loadイベント後に確実に実行）
+window.addEventListener('load', function(){
+  // 2つ積む：1つ目は現在位置、2つ目は「戻る」の受け皿
+  history.replaceState({d:0}, '');
+  history.pushState({d:1}, '');
+});
 
 // ── Subject screen ────────────────────────────────────────
 function renderSubject(sk){
