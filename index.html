@@ -70,6 +70,10 @@ html{font-size:calc(16px * var(--font-scale))}
 #app-footer{position:fixed;left:0;right:0;bottom:24px;text-align:center;font-family:'Nunito',sans-serif;font-size:10px;line-height:1.5;color:rgba(120,110,80,0.6);letter-spacing:0.3px;z-index:9001;pointer-events:none}
 #app-footer .footer-updated{display:block}
 #app-footer .footer-made{display:block;font-weight:700}
+#home{display:flex;flex-direction:column;overflow:hidden}
+#home .home-top{flex:0 0 auto}
+#home .home-middle{flex:1 1 auto;overflow-y:auto;min-height:0;-webkit-overflow-scrolling:touch}
+#home .home-bottom{flex:0 0 auto}
 
 #app{height:100dvh;width:100%;display:flex;flex-direction:column;overflow:hidden;position:relative}
 
@@ -283,42 +287,45 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jun 14, 2026 17:32</span>
+  <span class="footer-updated">Updated Jun 14, 2026 17:45</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
 <!-- HOME -->
 <div id="home" class="screen active">
-  <div class="home-header">
-    <div class="lemon-deco">🍋</div>
-    <div class="home-title">remon</div>
-    <div class="home-subtitle">今日もちょっとだけやってみよう</div>
+  <div class="home-top">
+    <div class="home-header">
+      <div class="lemon-deco">🍋</div>
+      <div class="home-title">remon</div>
+      <div class="home-subtitle">今日もちょっとだけやってみよう</div>
+    </div>
+
+    <button class="daily-mix-btn" onclick="startDailyMix()">
+      <div class="daily-mix-icon">🍋</div>
+      <div class="daily-mix-text">
+        <div class="daily-mix-title">今日の 20 remon</div>
+        <div class="daily-mix-sub">全教科からピックアップ</div>
+      </div>
+      <div class="daily-mix-arrow">▶</div>
+    </button>
+
+    <div class="week-card" onclick="openStats()">
+      <div class="week-card-head">
+        <div class="week-card-title">📊 今週のがんばり</div>
+        <div class="week-card-link">記録を見る ▶</div>
+      </div>
+      <div class="week-chart" id="week-chart"></div>
+      <div class="week-card-foot">
+        <span id="week-total">今週 0問</span>
+        <span id="today-goal-display">目標 —</span>
+      </div>
+    </div>
   </div>
 
-  <button class="daily-mix-btn" onclick="startDailyMix()">
-    <div class="daily-mix-icon">🍋</div>
-    <div class="daily-mix-text">
-      <div class="daily-mix-title">今日の 20 remon</div>
-      <div class="daily-mix-sub">全教科からピックアップ</div>
-    </div>
-    <div class="daily-mix-arrow">▶</div>
-  </button>
+  <div class="home-middle">
+    <div class="section-label">教科を選ぶ</div>
 
-  <div class="week-card" onclick="openStats()">
-    <div class="week-card-head">
-      <div class="week-card-title">📊 今週のがんばり</div>
-      <div class="week-card-link">記録を見る ▶</div>
-    </div>
-    <div class="week-chart" id="week-chart"></div>
-    <div class="week-card-foot">
-      <span id="week-total">今週 0問</span>
-      <span id="today-goal-display">目標 —</span>
-    </div>
-  </div>
-
-  <div class="section-label">教科を選ぶ</div>
-
-  <div class="subject-list" id="subject-list">
+    <div class="subject-list" id="subject-list">
     <button class="subject-btn kokugo" onclick="openSubject('kokugo')">
       <div class="subject-icon">📖</div>
       <div class="subject-info">
@@ -368,7 +375,9 @@ html{font-size:calc(16px * var(--font-scale))}
       <div class="subject-rate" id="rate-sonota">—</div>
     </button>
   </div>
+  </div>
 
+  <div class="home-bottom">
   <div class="home-footer">
     <button class="footer-btn" onclick="openData()">
       <span>📥</span>問題を追加
@@ -384,6 +393,7 @@ html{font-size:calc(16px * var(--font-scale))}
     </button>
   </div>
   <button class="guide-btn" onclick="openGuide()">📖 remonの使い方ガイド</button>
+  </div>
   <div id="font-menu" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-radius:20px 20px 0 0;padding:20px 16px 40px;z-index:999;box-shadow:0 -4px 20px rgba(0,0,0,0.15)">
     <div style="font-size:13px;color:var(--text-mid);margin-bottom:12px;text-align:center">文字サイズ</div>
     <div style="display:flex;gap:10px">
