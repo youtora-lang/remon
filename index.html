@@ -293,7 +293,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jun 15, 2026 19:25</span>
+  <span class="footer-updated">Updated Jun 15, 2026 19:50</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -908,28 +908,33 @@ var navStack=[ function(){ showScreen('home'); } ];
 // 新しい状態へ進む：復元関数を積み、ブラウザ履歴も1つ積む
 function navGo(restoreFn){
   navStack.push(restoreFn);
-  history.pushState({d:navStack.length}, '');
+  // 履歴を2つ積む：1つは戻るで消費される受け皿、もう1つは現在位置
+  history.pushState({d:navStack.length,buf:1}, '');
+  history.pushState({d:navStack.length,buf:0}, '');
 }
 
 // 戻るボタン
-window.addEventListener('popstate', function(){
+window.addEventListener('popstate', function(e){
+  // 受け皿（buf:1）が戻った場合は、もう1段戻して実際の動作に進める
+  // 通常 buf:0 を消費して buf:1 に着地 → さらに自動で戻すのではなく、ここで処理
   if(navStack.length>1){
-    navStack.pop();                       // 今の状態を捨てる
+    navStack.pop();
     var restore=navStack[navStack.length-1];
-    if(typeof restore==='function') restore();  // 1つ前の状態を復元
+    if(typeof restore==='function') restore();
   } else {
-    // ホーム（底）：閉じさせず、ホームを表示したまま待機
     showScreen('home');
   }
-  // 次の「戻る」に必ず反応できるよう履歴を補充（＝アプリは閉じない）
-  history.pushState({d:navStack.length}, '');
+  // 履歴を2つ補充して、次の戻るに必ず反応できるようにする
+  history.pushState({d:navStack.length,buf:1}, '');
+  history.pushState({d:navStack.length,buf:0}, '');
 });
 
 // ホームに完全に戻す（←ボタンなどから）：スタックを底まで畳む
 function goHomeNav(){
   navStack=[ function(){ showScreen('home'); } ];
   showScreen('home');
-  history.pushState({d:1}, '');
+  history.pushState({d:1,buf:1}, '');
+  history.pushState({d:1,buf:0}, '');
 }
 
 // ガイド・データ画面を開く（戻るで閉じられる）
@@ -938,9 +943,8 @@ function openData(){ showScreen('data-screen'); navGo(function(){ showScreen('da
 
 // 起動時にダミー履歴を積む（loadイベント後に確実に実行）
 window.addEventListener('load', function(){
-  // 2つ積む：1つ目は現在位置、2つ目は「戻る」の受け皿
-  history.replaceState({d:0}, '');
-  history.pushState({d:1}, '');
+  history.replaceState({d:1,buf:1}, '');
+  history.pushState({d:1,buf:0}, '');
 });
 
 // ── Subject screen ────────────────────────────────────────
@@ -957,10 +961,9 @@ function renderSubject(sk){
 }
 function openSubject(sk){
   renderSubject(sk);
-  // navStack 2段（ホーム+教科）に対し、ブラウザ履歴も2段揃える
   navStack=[ function(){ showScreen('home'); }, function(){ renderSubject(sk); } ];
-  history.pushState({d:1}, '');
-  history.pushState({d:2}, '');
+  history.pushState({d:1,buf:1}, '');
+  history.pushState({d:2,buf:0}, '');
 }
 
 function applyMode(m){
@@ -1247,7 +1250,8 @@ function showResult(){
   showScreen('result'); saveState();
   // 結果画面で戻るを押したらホームへ（クイズには戻さない）
   navStack=[ function(){ showScreen('home'); } ];
-  history.pushState({d:1}, '');
+  history.pushState({d:1,buf:1}, '');
+  history.pushState({d:1,buf:0}, '');
 }
 
 function startReviewWrong(){
