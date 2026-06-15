@@ -293,7 +293,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jun 14, 2026 18:05</span>
+  <span class="footer-updated">Updated Jun 15, 2026 19:10</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -381,9 +381,7 @@ html{font-size:calc(16px * var(--font-scale))}
       <div class="subject-rate" id="rate-sonota">—</div>
     </button>
   </div>
-  </div>
 
-  <div class="home-bottom">
   <div class="home-footer">
     <button class="footer-btn" onclick="openData()">
       <span>📥</span>問題を追加
@@ -398,6 +396,9 @@ html{font-size:calc(16px * var(--font-scale))}
       <span>⚙️</span>設定
     </button>
   </div>
+  </div>
+
+  <div class="home-bottom">
   <button class="guide-btn" onclick="openGuide()">📖 remonの使い方ガイド</button>
   </div>
   <div id="font-menu" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-radius:20px 20px 0 0;padding:20px 16px 40px;z-index:999;box-shadow:0 -4px 20px rgba(0,0,0,0.15)">
@@ -956,7 +957,8 @@ function renderSubject(sk){
 }
 function openSubject(sk){
   renderSubject(sk);
-  navGo(function(){ renderSubject(sk); });
+  navStack=[ function(){ showScreen('home'); }, function(){ renderSubject(sk); } ];
+  history.pushState({d:2}, '');
 }
 
 function applyMode(m){
@@ -969,7 +971,7 @@ function applyMode(m){
 function selectMode(m){
   var prev=currentMode;
   applyMode(m);
-  // 「単元を選ぶ」を開く操作は、戻るで閉じられる1ステップとして積む
+  // 「単元を選ぶ」を開く操作は1ステップ積む（戻るで展開を閉じる）
   if(m==='unit' && prev!=='unit'){
     navGo(function(){ applyMode('today'); });
   }
