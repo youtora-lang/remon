@@ -293,7 +293,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jun 15, 2026 19:10</span>
+  <span class="footer-updated">Updated Jun 15, 2026 19:25</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -957,7 +957,9 @@ function renderSubject(sk){
 }
 function openSubject(sk){
   renderSubject(sk);
+  // navStack 2段（ホーム+教科）に対し、ブラウザ履歴も2段揃える
   navStack=[ function(){ showScreen('home'); }, function(){ renderSubject(sk); } ];
+  history.pushState({d:1}, '');
   history.pushState({d:2}, '');
 }
 
