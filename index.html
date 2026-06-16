@@ -293,7 +293,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jun 15, 2026 19:50</span>
+  <span class="footer-updated">Updated Jun 16, 2026 23:35</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -439,7 +439,7 @@ html{font-size:calc(16px * var(--font-scale))}
 <!-- SUBJECT SCREEN -->
 <div id="subject-screen" class="screen">
   <div class="subj-top">
-  <button class="back-btn" onclick="goHomeNav()">←</button>
+  <button class="back-btn" onclick="navBack()">←</button>
   <div class="subject-header">
     <div class="subject-screen-icon" id="ss-icon">📖</div>
     <div class="subject-screen-name" id="ss-name">国語</div>
@@ -479,7 +479,7 @@ html{font-size:calc(16px * var(--font-scale))}
   <div class="quiz-bg" id="quiz-bg"></div>
   <div class="quiz-content">
     <div class="quiz-top">
-      <button class="quiz-back" onclick="goHomeNav()">←</button>
+      <button class="quiz-back" onclick="navBack()">←</button>
       <div class="quiz-progress-wrap">
         <div class="quiz-progress-text">
           <span id="q-current">1</span>/<span id="q-total">10</span>
@@ -913,10 +913,8 @@ function navGo(restoreFn){
   history.pushState({d:navStack.length,buf:0}, '');
 }
 
-// 戻るボタン
-window.addEventListener('popstate', function(e){
-  // 受け皿（buf:1）が戻った場合は、もう1段戻して実際の動作に進める
-  // 通常 buf:0 を消費して buf:1 に着地 → さらに自動で戻すのではなく、ここで処理
+// navBack: ←ボタンとスマホ戻るボタンの共通処理
+function navBack(){
   if(navStack.length>1){
     navStack.pop();
     var restore=navStack[navStack.length-1];
@@ -924,12 +922,14 @@ window.addEventListener('popstate', function(e){
   } else {
     showScreen('home');
   }
-  // 履歴を2つ補充して、次の戻るに必ず反応できるようにする
   history.pushState({d:navStack.length,buf:1}, '');
   history.pushState({d:navStack.length,buf:0}, '');
-});
+}
 
-// ホームに完全に戻す（←ボタンなどから）：スタックを底まで畳む
+// スマホの戻るボタン（navBackと同じ処理）
+window.addEventListener('popstate', function(){ navBack(); });
+
+// ホームに完全に戻す
 function goHomeNav(){
   navStack=[ function(){ showScreen('home'); } ];
   showScreen('home');
@@ -1102,8 +1102,18 @@ function startQuiz(){
   document.getElementById('quiz-bg').style.background=SUBJECTS[sk].bg;
   showScreen('quiz');
   renderQuestion();
-  // クイズに入るのも1ステップ：戻ると教科ページに戻る
-  navGo(function(){ renderSubject(sk); });
+  // 戻ったとき単元一覧が展開された状態で教科ページを表示
+  var savedSk=sk;
+  navGo(function(){
+    // navStackを「ホーム → 教科(単元閉) → 単元展開」の3段に整理
+    navStack=[
+      function(){ showScreen('home'); },
+      function(){ renderSubject(savedSk); },
+      function(){ renderSubject(savedSk); applyMode('unit'); }
+    ];
+    renderSubject(savedSk);
+    applyMode('unit');
+  });
 }
 
 function renderQuestion(){
