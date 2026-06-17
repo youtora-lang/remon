@@ -293,7 +293,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jun 16, 2026 23:35</span>
+  <span class="footer-updated">Updated Jun 17, 2026 19:08</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -908,9 +908,7 @@ var navStack=[ function(){ showScreen('home'); } ];
 // 新しい状態へ進む：復元関数を積み、ブラウザ履歴も1つ積む
 function navGo(restoreFn){
   navStack.push(restoreFn);
-  // 履歴を2つ積む：1つは戻るで消費される受け皿、もう1つは現在位置
-  history.pushState({d:navStack.length,buf:1}, '');
-  history.pushState({d:navStack.length,buf:0}, '');
+  history.pushState({d:navStack.length}, '');
 }
 
 // navBack: ←ボタンとスマホ戻るボタンの共通処理
@@ -922,8 +920,7 @@ function navBack(){
   } else {
     showScreen('home');
   }
-  history.pushState({d:navStack.length,buf:1}, '');
-  history.pushState({d:navStack.length,buf:0}, '');
+  history.pushState({d:navStack.length}, '');
 }
 
 // スマホの戻るボタン（navBackと同じ処理）
@@ -933,8 +930,7 @@ window.addEventListener('popstate', function(){ navBack(); });
 function goHomeNav(){
   navStack=[ function(){ showScreen('home'); } ];
   showScreen('home');
-  history.pushState({d:1,buf:1}, '');
-  history.pushState({d:1,buf:0}, '');
+  history.pushState({d:1}, '');
 }
 
 // ガイド・データ画面を開く（戻るで閉じられる）
@@ -943,8 +939,8 @@ function openData(){ showScreen('data-screen'); navGo(function(){ showScreen('da
 
 // 起動時にダミー履歴を積む（loadイベント後に確実に実行）
 window.addEventListener('load', function(){
-  history.replaceState({d:1,buf:1}, '');
-  history.pushState({d:1,buf:0}, '');
+  history.replaceState({d:0}, '');
+  history.pushState({d:1}, '');
 });
 
 // ── Subject screen ────────────────────────────────────────
