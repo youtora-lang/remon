@@ -1,4 +1,4 @@
-const CACHE_NAME = 'remon-v65';
+const CACHE_NAME = 'remon-v66';
 const ASSETS = [
   './index.html',
   './manifest.json',
