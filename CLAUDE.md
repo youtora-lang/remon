@@ -149,5 +149,6 @@ node validate-questions.js
 ## コミットと push
 
 - コミットは `youtora-lang` 名義で行う
+- **コミットメッセージに `Co-Authored-By` 行は付けない**
 - 内容を確認できたらコミットし、指示があれば `git push origin main` する
 - push すると GitHub Pages のデプロイが走り、数分後にアプリへ反映される
