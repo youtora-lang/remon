@@ -292,7 +292,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jul 28, 2026 19:26</span>
+  <span class="footer-updated">Updated Jul 28, 2026 21:02</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -385,6 +385,10 @@ html{font-size:calc(16px * var(--font-scale))}
     <button class="footer-btn" onclick="showExport()">
       <span>💾</span>データ保存
     </button>
+    <button class="footer-btn" onclick="openRestore()">
+      <span>📂</span>データ読み込み
+    </button>
+    <input type="file" id="restore-file" accept="application/json,.json" style="display:none" onchange="restoreDataFile(this)">
     <button class="footer-btn" onclick="showFontMenu()">
       <span>🔤</span>文字サイズ
     </button>
@@ -547,8 +551,10 @@ html{font-size:calc(16px * var(--font-scale))}
   </div>
   <div class="data-area">
     <div class="data-card">
-      <div class="data-card-title">💾 データをエクスポート</div>
-      <div class="data-export-text" id="export-preview">（ボタンを押すとデータが表示されます）</div>
+      <div class="data-card-title">💾 データをファイルに保存</div>
+      <div style="font-size:12px;color:var(--text-mid);margin-bottom:8px;line-height:1.6">いまの学習の記録をファイルにのこせます。ホームの「📂 データ読み込み」で、このファイルからもとにもどせます。</div>
+      <button class="data-btn" onclick="saveDataFile()">ファイルに保存する 💾</button>
+      <div class="data-export-text" id="export-preview" style="margin-top:12px">（ボタンを押すとデータが表示されます）</div>
       <div id="copy-instruction" style="display:none;font-size:12px;color:#5A7A4A;margin-top:6px;padding:6px 10px;background:#E8F8E8;border-radius:8px">上のテキストを長押しして「すべて選択」→「コピー」してください</div>
       <button class="copy-btn" onclick="copyExport()">データを表示してコピー 📋</button>
     </div>
@@ -1279,18 +1285,89 @@ function restartSame(){
 }
 
 // ── Data ──────────────────────────────────────────────────
-function updateExportPreview(){
-  var d={questions:state.questions,history:state.history,streak:state.streak,
+// 保存・読み込みで受け渡しする中身。ここを変えたら readBackup() の検査も合わせる。
+function backupData(){
+  return {questions:state.questions,history:state.history,streak:state.streak,
     lastDate:state.lastDate,totalCorrect:state.totalCorrect,lemons:state.lemons};
-  document.getElementById('export-preview').textContent=JSON.stringify(d).slice(0,500)+'...';
+}
+
+function updateExportPreview(){
+  document.getElementById('export-preview').textContent=JSON.stringify(backupData()).slice(0,500)+'...';
 }
 
 function showExport(){ showScreen('data-screen'); }
 
+// ── データをファイルに保存 ────────────────────────────────
+function saveDataFile(){
+  try{
+    var txt=JSON.stringify(backupData());
+    var blob=new Blob([txt],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url; a.download='remon-'+todayStr()+'.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); },1000);
+  }catch(e){
+    alert('ファイルに保存できませんでした。\n下の「データを表示してコピー」をつかってね。');
+  }
+}
+
+// ── データをファイルから読み込み ──────────────────────────
+function openRestore(){
+  var el=document.getElementById('restore-file');
+  if(el) el.click();
+}
+
+// 読み込んだ中身が remon の保存ファイルの形かどうかを調べる。
+// 問題なければ null、だめなら子どもに見せる理由を返す。
+function checkBackup(d){
+  if(!d||typeof d!=='object'||Array.isArray(d)) return 'データのかたちがちがいます';
+  if(!d.questions||typeof d.questions!=='object'||Array.isArray(d.questions)) return '問題が入っていません';
+  if(!d.history||typeof d.history!=='object'||Array.isArray(d.history)) return '学習の記録が入っていません';
+  var keys=Object.keys(d.questions), broken=false;
+  keys.forEach(function(k){ if(!Array.isArray(d.questions[k])) broken=true; });
+  if(broken) return '問題のならびがこわれています';
+  return null;
+}
+
+function restoreDataFile(input){
+  var file=input.files&&input.files[0];
+  input.value=''; // 同じファイルをもう一度えらべるようにする
+  if(!file) return;
+  if(!confirm('いまの学習の記録は、えらんだファイルの中身に置きかわります。\nもとにはもどせません。読みこんでいい？')) return;
+  var reader=new FileReader();
+  reader.onerror=function(){ alert('ファイルを読めませんでした。\nもう一度ためしてね。'); };
+  reader.onload=function(){
+    // 中身を全部たしかめてから入れかえる。とちゅうで止まっても今のデータは無事。
+    var data;
+    try{ data=JSON.parse(String(reader.result)); }
+    catch(e){
+      alert('このファイルは読みこめません。\nremon で保存したファイルをえらんでね。\n（中身がこわれています）');
+      return;
+    }
+    var ng=checkBackup(data);
+    if(ng){
+      alert('このファイルは remon のデータではないみたい。\nremon で保存したファイルをえらんでね。\n（'+ng+'）');
+      return;
+    }
+    state.questions=data.questions;
+    state.history=data.history;
+    state.streak=data.streak||0;
+    state.lastDate=data.lastDate||null;
+    state.totalCorrect=data.totalCorrect||0;
+    state.lemons=data.lemons||0;
+    saveState();
+    // その場で画面を描き直してから、念のため読み込み直す
+    // （reload が効かない環境でも、ホームの数字が古いままにならないように）
+    try{ refreshHome(); goHomeNav(); }catch(e){}
+    alert('読みこみました！');
+    try{ location.reload(); }catch(e){}
+  };
+  reader.readAsText(file);
+}
+
 function copyExport(){
-  var d={questions:state.questions,history:state.history,streak:state.streak,
-    lastDate:state.lastDate,totalCorrect:state.totalCorrect,lemons:state.lemons};
-  var txt=JSON.stringify(d);
+  var txt=JSON.stringify(backupData());
   var el=document.getElementById('export-preview');
   el.textContent=txt;
   el.style.userSelect='all';
