@@ -269,7 +269,6 @@ html{font-size:calc(16px * var(--font-scale))}
 .data-area{padding:0 16px 32px;display:flex;flex-direction:column;gap:12px}
 .data-card{background:rgba(255,255,255,0.65);border-radius:18px;padding:18px}
 .data-card-title{font-size:13px;font-weight:600;color:var(--text-mid);margin-bottom:10px}
-.data-textarea{width:100%;min-height:120px;border:1.5px solid rgba(0,0,0,0.12);border-radius:12px;padding:12px;font-family:var(--font-main);font-size:13px;color:var(--text-dark);background:rgba(255,255,255,0.8);resize:vertical;line-height:1.5}
 .data-btn{width:100%;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:14px;padding:14px;font-family:var(--font-main);font-size:15px;font-weight:700;cursor:pointer;margin-top:8px}
 .data-export-text{font-size:12px;color:var(--text-mid);word-break:break-all;background:rgba(255,255,255,0.5);border-radius:10px;padding:10px;max-height:120px;overflow-y:auto;line-height:1.6}
 .copy-btn{width:100%;background:rgba(255,255,255,0.7);border:none;border-radius:12px;padding:12px;font-family:var(--font-main);font-size:14px;font-weight:600;color:var(--text-dark);cursor:pointer;margin-top:8px}
@@ -383,9 +382,6 @@ html{font-size:calc(16px * var(--font-scale))}
   </div>
 
   <div class="home-footer">
-    <button class="footer-btn" onclick="openData()">
-      <span>📥</span>問題を追加
-    </button>
     <button class="footer-btn" onclick="showExport()">
       <span>💾</span>データ保存
     </button>
@@ -547,14 +543,9 @@ html{font-size:calc(16px * var(--font-scale))}
 <div id="data-screen" class="screen" style="background:var(--lemon-yellow)">
   <div class="data-header">
     <button class="back-btn" style="position:static" onclick="goHomeNav()">←</button>
-    <div class="data-title">問題データ</div>
+    <div class="data-title">データ</div>
   </div>
   <div class="data-area">
-    <div class="data-card">
-      <div class="data-card-title">📥 問題をインポート（JSONを貼り付け）</div>
-      <textarea class="data-textarea" id="import-textarea" placeholder='{"subject":"rika","unit":"植物のつくり","questions":[...]}'></textarea>
-      <button class="data-btn" onclick="importData()">インポートする</button>
-    </div>
     <div class="data-card">
       <div class="data-card-title">💾 データをエクスポート</div>
       <div class="data-export-text" id="export-preview">（ボタンを押すとデータが表示されます）</div>
@@ -935,8 +926,6 @@ function goHomeNav(){
 
 // ガイド・データ画面を開く（戻るで閉じられる）
 function openGuide(){ showScreen('guide-screen'); navGo(function(){ showScreen('guide-screen'); }); }
-function openData(){ showScreen('data-screen'); navGo(function(){ showScreen('data-screen'); }); }
-
 // 起動時にダミー履歴を積む（loadイベント後に確実に実行）
 window.addEventListener('load', function(){
   history.replaceState({d:0}, '');
@@ -1079,7 +1068,7 @@ function getDueQuestions(sk){
 
 function startQuiz(){
   var sk=currentSubject, qs=state.questions[sk]||[];
-  if(!qs.length){ alert('問題がありません。データを追加してください。'); return; }
+  if(!qs.length){ alert('この教科の問題がまだありません。'); return; }
   var ids=[];
   if(currentMode==='today'){
     ids=getDueQuestions(sk);
@@ -1290,27 +1279,6 @@ function restartSame(){
 }
 
 // ── Data ──────────────────────────────────────────────────
-function importData(){
-  var txt=document.getElementById('import-textarea').value.trim();
-  if(!txt){ alert('JSONを貼り付けてください'); return; }
-  try{
-    var data=JSON.parse(txt);
-    if(!data.subject||!data.questions){ alert('フォーマットが正しくありません'); return; }
-    var sk=data.subject;
-    if(!state.questions[sk]) state.questions[sk]=[];
-    var existing=state.questions[sk].map(function(q){ return q.question; });
-    var added=0;
-    data.questions.forEach(function(q){
-      q.unit=q.unit||data.unit||'その他';
-      if(existing.indexOf(q.question)<0){ state.questions[sk].push(q); added++; }
-    });
-    saveState();
-    document.getElementById('import-textarea').value='';
-    alert(added+'問追加しました！（重複はスキップ）');
-    updateExportPreview();
-  }catch(e){ alert('JSONの読み込みに失敗しました: '+e.message); }
-}
-
 function updateExportPreview(){
   var d={questions:state.questions,history:state.history,streak:state.streak,
     lastDate:state.lastDate,totalCorrect:state.totalCorrect,lemons:state.lemons};
@@ -1391,7 +1359,7 @@ function startDailyMix(){
     });
   });
   var picked = shuffle(pool0).concat(shuffle(pool1)).concat(shuffle(pool2));
-  if(picked.length === 0){ alert('出題できる問題がありません。問題を追加するか、除外を解除してください。'); return; }
+  if(picked.length === 0){ alert('出題できる問題がありません。単元の🍋をオンにしてみてください。'); return; }
   picked = picked.slice(0, 20);
   quizQueue = picked.map(function(it){ return {id:it.id, q:it.q, mixSubject:it.subject}; });
   quizIndex = 0; quizCorrect = 0; quizSessionCorrect = 0;
