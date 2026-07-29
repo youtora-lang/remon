@@ -74,7 +74,6 @@ html{font-size:calc(16px * var(--font-scale))}
 #home.active{display:flex}
 #home .home-top{flex:0 0 auto}
 #home .home-middle{flex:1 1 auto;overflow-y:auto;min-height:0;-webkit-overflow-scrolling:touch}
-#home .home-bottom{flex:0 0 auto}
 #subject-screen{display:none;flex-direction:column;overflow:hidden}
 #subject-screen.active{display:flex}
 #subject-screen .subj-top{flex:0 0 auto}
@@ -89,9 +88,28 @@ html{font-size:calc(16px * var(--font-scale))}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 /* ===== HOME SCREEN ===== */
-#home{background:var(--lemon-yellow);overflow-y:auto}
+/* 固定するのは上部バー1本だけ。中身はすべて .home-middle 側でスクロールする。
+   固定フッターはホームでは出さないので、下の余白は装飾ストライプ18px分だけ。 */
+#home{background:var(--lemon-yellow);overflow:hidden;padding-bottom:18px}
 
-.home-header{padding:40px 24px 16px;text-align:center;position:relative}
+/* 常時表示の細いバー。高さは書かず、中身に応じて伸ばす */
+.home-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px}
+.home-bar-title{font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text-dark);letter-spacing:-0.5px;line-height:1.2}
+.home-bar-actions{display:flex;gap:8px;flex-shrink:0}
+.icon-btn{background:rgba(255,255,255,0.6);border:none;border-radius:12px;padding:8px 10px;font-family:var(--font-main);font-size:1.1rem;line-height:1;color:var(--text-dark);cursor:pointer;transition:opacity 0.12s}
+.icon-btn:active{opacity:0.7}
+
+/* スクロールすると畳まれる見出し。max-height は文字を大きくしても足りる値にする */
+.home-header{padding:16px 24px 12px;text-align:center;position:relative;overflow:hidden;max-height:480px;opacity:1;transition:max-height 0.28s ease,opacity 0.2s ease,padding 0.28s ease}
+#home.collapsed .home-header{max-height:0;opacity:0;padding-top:0;padding-bottom:0}
+@media (prefers-reduced-motion: reduce){
+  .home-header{transition:none}
+}
+
+/* ホームではスクロールの末尾にフッターを置く（中身は #app-footer から複製する） */
+.home-scroll-footer{padding:8px 20px 24px;text-align:center;font-family:'Nunito',sans-serif;font-size:10px;line-height:1.5;color:rgba(120,110,80,0.6);letter-spacing:0.3px}
+.home-scroll-footer .footer-updated{display:block}
+.home-scroll-footer .footer-made{display:block;font-weight:700}
 .home-title{font-family:'Nunito',sans-serif;font-size:2.625rem;font-weight:800;color:var(--text-dark);letter-spacing:-1px;line-height:1}
 .home-subtitle{font-size:13px;color:var(--text-mid);margin-top:4px}
 .lemon-deco{font-size:28px;margin-bottom:4px}
@@ -118,8 +136,6 @@ html{font-size:calc(16px * var(--font-scale))}
 .wc-bar-val{font-size:0.6rem;color:var(--text-mid);font-weight:700;text-align:center}
 .wc-label{font-size:0.62rem;color:var(--text-mid)}
 .week-card-foot{display:flex;justify-content:space-between;margin-top:8px;font-size:0.72rem;color:var(--text-mid);font-weight:600}
-.guide-btn{margin:0 16px 32px;width:calc(100% - 32px);background:rgba(255,255,255,0.6);border:none;border-radius:16px;padding:14px;font-family:var(--font-main);font-size:0.95rem;font-weight:600;color:var(--text-dark);cursor:pointer}
-.guide-btn:active{opacity:0.7}
 .streak-bar{margin:0 20px 12px;background:rgba(255,255,255,0.55);border-radius:16px;padding:12px 18px;display:flex;align-items:center;gap:12px}
 .streak-icon{font-size:22px}
 .streak-info{flex:1}
@@ -292,19 +308,29 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jul 29, 2026 18:37</span>
+  <span class="footer-updated">Updated Jul 29, 2026 19:12</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
 <!-- HOME -->
 <div id="home" class="screen active">
   <div class="home-top">
+    <div class="home-bar">
+      <div class="home-bar-title">remon</div>
+      <div class="home-bar-actions">
+        <button class="icon-btn" onclick="openGuide()" title="使い方ガイド" aria-label="使い方ガイド">📖</button>
+        <button class="icon-btn" onclick="showSettingsMenu()" title="設定" aria-label="設定">⚙️</button>
+      </div>
+    </div>
+
     <div class="home-header">
       <div class="lemon-deco">🍋</div>
       <div class="home-title">remon</div>
       <div class="home-subtitle">今日もちょっとだけやってみよう</div>
     </div>
+  </div>
 
+  <div class="home-middle">
     <button class="daily-mix-btn" onclick="startDailyMix()">
       <div class="daily-mix-icon">🍋</div>
       <div class="daily-mix-text">
@@ -314,20 +340,6 @@ html{font-size:calc(16px * var(--font-scale))}
       <div class="daily-mix-arrow">▶</div>
     </button>
 
-    <div class="week-card" onclick="openStats()">
-      <div class="week-card-head">
-        <div class="week-card-title">📊 今週のがんばり</div>
-        <div class="week-card-link">記録を見る ▶</div>
-      </div>
-      <div class="week-chart" id="week-chart"></div>
-      <div class="week-card-foot">
-        <span id="week-total">今週 0問</span>
-        <span id="today-goal-display">目標 —</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="home-middle">
     <div class="section-label">教科を選ぶ</div>
 
     <div class="subject-list" id="subject-list">
@@ -381,6 +393,18 @@ html{font-size:calc(16px * var(--font-scale))}
     </button>
   </div>
 
+  <div class="week-card" onclick="openStats()">
+    <div class="week-card-head">
+      <div class="week-card-title">📊 今週のがんばり</div>
+      <div class="week-card-link">記録を見る ▶</div>
+    </div>
+    <div class="week-chart" id="week-chart"></div>
+    <div class="week-card-foot">
+      <span id="week-total">今週 0問</span>
+      <span id="today-goal-display">目標 —</span>
+    </div>
+  </div>
+
   <div class="home-footer">
     <button class="footer-btn" onclick="showExport()">
       <span>💾</span>データ保存
@@ -396,10 +420,9 @@ html{font-size:calc(16px * var(--font-scale))}
       <span>⚙️</span>設定
     </button>
   </div>
-  </div>
 
-  <div class="home-bottom">
-  <button class="guide-btn" onclick="openGuide()">📖 remonの使い方ガイド</button>
+  <!-- 更新日時は #app-footer が唯一の情報源。起動時にここへ中身を複製する -->
+  <div class="home-scroll-footer" id="home-scroll-footer"></div>
   </div>
   <div id="font-menu" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-radius:20px 20px 0 0;padding:20px 16px 40px;z-index:999;box-shadow:0 -4px 20px rgba(0,0,0,0.15)">
     <div style="font-size:13px;color:var(--text-mid);margin-bottom:12px;text-align:center">文字サイズ</div>
@@ -896,9 +919,31 @@ function refreshHome(){
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
+  // ホームはスクロールの末尾にフッターを置くので、固定フッターは出さない
+  var af=document.getElementById('app-footer');
+  if(af) af.style.display = (id==='home') ? 'none' : '';
   if(id==='home') refreshHome();
   if(id==='data-screen') updateExportPreview();
 }
+
+// ── ホームの見出しの畳み込み ──────────────────────────────
+// 更新日時はフッターを増やさず、#app-footer の中身をスクロール末尾に複製する。
+(function(){
+  var home=document.getElementById('home');
+  var mid=home&&home.querySelector('.home-middle');
+  var af=document.getElementById('app-footer');
+  var slot=document.getElementById('home-scroll-footer');
+  if(slot&&af) slot.innerHTML=af.innerHTML;
+  // 起動直後はホームが表示されている（showScreen を通らない）
+  if(af&&home&&home.classList.contains('active')) af.style.display='none';
+  if(!home||!mid) return;
+  // 付ける／外す閾値をずらして、境目でのちらつきを防ぐ
+  mid.addEventListener('scroll', function(){
+    var t=mid.scrollTop;
+    if(t>24) home.classList.add('collapsed');
+    else if(t<8) home.classList.remove('collapsed');
+  }, {passive:true});
+})();
 
 // ── 戻る履歴（動作単位のステップ管理）────────────────────────
 // navStack には「その状態を復元する関数」を積む。ホーム(底)では絶対に閉じない。
