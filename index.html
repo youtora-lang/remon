@@ -292,7 +292,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jul 28, 2026 21:02</span>
+  <span class="footer-updated">Updated Jul 29, 2026 18:14</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -861,9 +861,11 @@ function shuffle(arr){
   return a;
 }
 
+// 文字サイズの倍率。バックアップの検査でも「使えるキーの一覧」として使う。
+var FONT_SCALES={small:1,medium:1.2,large:1.45};
+
 function applyFontSize(){
-  var scales={small:1,medium:1.2,large:1.45};
-  document.documentElement.style.setProperty('--font-scale', scales[state.fontSize||'small']);
+  document.documentElement.style.setProperty('--font-scale', FONT_SCALES[state.fontSize||'small']);
 }
 
 // ── Home ──────────────────────────────────────────────────
@@ -1285,10 +1287,16 @@ function restartSame(){
 }
 
 // ── Data ──────────────────────────────────────────────────
-// 保存・読み込みで受け渡しする中身。ここを変えたら readBackup() の検査も合わせる。
+// 保存・読み込みで受け渡しする中身。ここを変えたら checkBackup() の検査も合わせる。
+// 単元の選択状態（selectedUnits）は作業中の一時的なものなので入れない。
+// PRELOAD_STRUCT_VERSION は復元先の問題データ側の値なので入れない。
 function backupData(){
-  return {questions:state.questions,history:state.history,streak:state.streak,
-    lastDate:state.lastDate,totalCorrect:state.totalCorrect,lemons:state.lemons};
+  return {backupVersion:2,
+    questions:state.questions,history:state.history,streak:state.streak,
+    lastDate:state.lastDate,totalCorrect:state.totalCorrect,lemons:state.lemons,
+    dailyRecords:state.dailyRecords,excludedUnits:state.excludedUnits,
+    fontSize:state.fontSize,dailyGoal:state.dailyGoal,
+    sessionSize:state.sessionSize,explainMode:state.explainMode};
 }
 
 function updateExportPreview(){
@@ -1327,7 +1335,28 @@ function checkBackup(d){
   var keys=Object.keys(d.questions), broken=false;
   keys.forEach(function(k){ if(!Array.isArray(d.questions[k])) broken=true; });
   if(broken) return '問題のならびがこわれています';
+  // ここから下はあとから増やした項目。入っていれば形をたしかめ、
+  // 入っていなければ何もしない（6項目だけの古いファイルもそのまま読める）。
+  if(!isPlainObject(d.dailyRecords,true)) return '週間の記録のかたちがちがいます';
+  if(!isPlainObject(d.excludedUnits,true)) return 'おやすみ中の単元のかたちがちがいます';
+  if(d.fontSize!==undefined && !FONT_SCALES.hasOwnProperty(d.fontSize)) return '文字サイズの書き方がちがいます';
+  if(d.dailyGoal!==undefined && !isCount(d.dailyGoal,1)) return '1日の目標が数字になっていません';
+  // 1回の出題数は「すべて」を選ぶと 0 になるので、0 も正しい値として通す。
+  if(d.sessionSize!==undefined && !isCount(d.sessionSize,0)) return '1回の出題数が数字になっていません';
+  if(d.explainMode!==undefined && d.explainMode!=='wrong' && d.explainMode!=='always') return '解説の出し方の書き方がちがいます';
+  if(d.backupVersion!==undefined && typeof d.backupVersion!=='number') return 'ファイルの版が数字になっていません';
   return null;
+}
+
+// 入っていない（undefined）ならOK、入っているなら「配列でないオブジェクト」かを見る
+function isPlainObject(v,allowMissing){
+  if(v===undefined) return !!allowMissing;
+  return typeof v==='object' && v!==null && !Array.isArray(v);
+}
+
+// 入っているなら min 以上の数値かを見る
+function isCount(v,min){
+  return typeof v==='number' && isFinite(v) && v>=min;
 }
 
 function restoreDataFile(input){
@@ -1356,10 +1385,14 @@ function restoreDataFile(input){
     state.lastDate=data.lastDate||null;
     state.totalCorrect=data.totalCorrect||0;
     state.lemons=data.lemons||0;
+    // 記録と設定は、バックアップに入っていたときだけ入れかえる。
+    // 入っていなければ今の値をそのまま残す（|| で既定値に書きもどさない）。
+    ['dailyRecords','excludedUnits','fontSize','dailyGoal','sessionSize','explainMode']
+      .forEach(function(k){ if(data[k]!==undefined) state[k]=data[k]; });
     saveState();
     // その場で画面を描き直してから、念のため読み込み直す
     // （reload が効かない環境でも、ホームの数字が古いままにならないように）
-    try{ refreshHome(); goHomeNav(); }catch(e){}
+    try{ applyFontSize(); refreshHome(); goHomeNav(); }catch(e){}
     alert('読みこみました！');
     try{ location.reload(); }catch(e){}
   };

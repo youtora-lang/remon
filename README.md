@@ -44,10 +44,14 @@
 - **データ保存**：学習状況をJSONファイルとして書き出す（クリップボードへのコピーも可）
 - **データ読み込み**：書き出したファイルから復元する。読み込む前に中身を検証し、
   壊れていれば途中で中断して現在の状態を変更しない
-- バックアップに入るのは次の6項目：
-  `questions` / `history` / `streak` / `lastDate` / `totalCorrect` / `lemons`
-- 入らないもの（読み込んでも戻らない）：週間記録・除外単元・単元の選択状態・
-  フォントサイズ・1日の目標・1回の出題数・解説の表示設定・`PRELOAD_STRUCT_VERSION`
+- バックアップに入るもの：
+  `questions` / `history` / `streak` / `lastDate` / `totalCorrect` / `lemons` /
+  `dailyRecords`（週間記録）/ `excludedUnits`（除外単元）/ `fontSize` /
+  `dailyGoal` / `sessionSize` / `explainMode`
+- 入らないもの：単元の選択状態（作業中の一時状態のため）と
+  `PRELOAD_STRUCT_VERSION`（復元先の問題データに属する値のため）
+- ファイルには `backupVersion` を持たせる。読み込み時、バックアップに無いキーは
+  現在の値のままにするので、旧形式（6項目のみ）のファイルもそのまま読み込める
 
 ### 学習履歴の堅牢性
 
