@@ -122,20 +122,23 @@ html{font-size:calc(16px * var(--font-scale))}
 .daily-mix-sub{font-size:0.78rem;color:rgba(255,255,255,0.75);margin-top:3px}
 .daily-mix-arrow{font-size:1rem;color:var(--lemon-yellow);flex-shrink:0}
 
-.week-card{margin:0 16px 14px;background:rgba(255,255,255,0.7);border-radius:18px;padding:14px 16px;cursor:pointer;transition:transform .1s}
+/* 高さは rem で持たせる（文字サイズに応じて伸びる）。px 直書きにすると
+   文字サイズ「大」で中身がはみ出す。 */
+.week-card{margin:0 16px 12px;background:rgba(255,255,255,0.7);border-radius:18px;padding:0.4rem 0.75rem;cursor:pointer;transition:transform .1s}
 .week-card:active{transform:scale(0.98)}
-.week-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+/* 見出しと数値（今週◯問／目標◯問）は1行にまとめる。
+   文字サイズ「大」で入りきらないときだけ折り返す。 */
+.week-card-head{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px;row-gap:2px;margin-bottom:4px;font-size:0.72rem;color:var(--text-mid);font-weight:600}
 .week-card-title{font-size:0.9rem;font-weight:700;color:var(--text-dark)}
-.week-card-link{font-size:0.72rem;color:var(--text-mid)}
-.week-chart{display:flex;align-items:flex-end;justify-content:space-between;gap:6px;height:84px;padding:0 2px}
-.wc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.week-card-link{font-size:0.72rem;color:var(--text-mid);margin-left:auto}
+.week-chart{display:flex;align-items:flex-end;justify-content:space-between;gap:6px;height:3rem;padding:0 2px}
+.wc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end}
 .wc-bar-wrap{width:100%;flex:1;display:flex;align-items:flex-end}
 .wc-bar{width:100%;background:#E8923C;border-radius:6px 6px 3px 3px;min-height:3px;transition:height .4s ease;position:relative}
 .wc-bar.reached{background:#5CB85C}
 .wc-bar.today{box-shadow:0 0 0 2px var(--text-dark)}
 .wc-bar-val{font-size:0.6rem;color:var(--text-mid);font-weight:700;text-align:center}
 .wc-label{font-size:0.62rem;color:var(--text-mid)}
-.week-card-foot{display:flex;justify-content:space-between;margin-top:8px;font-size:0.72rem;color:var(--text-mid);font-weight:600}
 .streak-bar{margin:0 20px 12px;background:rgba(255,255,255,0.55);border-radius:16px;padding:12px 18px;display:flex;align-items:center;gap:12px}
 .streak-icon{font-size:22px}
 .streak-info{flex:1}
@@ -308,7 +311,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jul 29, 2026 19:12</span>
+  <span class="footer-updated">Updated Jul 29, 2026 19:46</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -339,6 +342,16 @@ html{font-size:calc(16px * var(--font-scale))}
       </div>
       <div class="daily-mix-arrow">▶</div>
     </button>
+
+    <div class="week-card" onclick="openStats()">
+      <div class="week-card-head">
+        <div class="week-card-title">📊 今週のがんばり</div>
+        <span id="week-total">今週 0問</span>
+        <span id="today-goal-display">目標 —</span>
+        <div class="week-card-link">記録を見る ▶</div>
+      </div>
+      <div class="week-chart" id="week-chart"></div>
+    </div>
 
     <div class="section-label">教科を選ぶ</div>
 
@@ -391,18 +404,6 @@ html{font-size:calc(16px * var(--font-scale))}
       </div>
       <div class="subject-rate" id="rate-sonota">—</div>
     </button>
-  </div>
-
-  <div class="week-card" onclick="openStats()">
-    <div class="week-card-head">
-      <div class="week-card-title">📊 今週のがんばり</div>
-      <div class="week-card-link">記録を見る ▶</div>
-    </div>
-    <div class="week-chart" id="week-chart"></div>
-    <div class="week-card-foot">
-      <span id="week-total">今週 0問</span>
-      <span id="today-goal-display">目標 —</span>
-    </div>
   </div>
 
   <div class="home-footer">
