@@ -8,7 +8,9 @@
 - `index.html` … 本体。全ロジックと問題データ（PRELOAD 配列）を内包
 - `sw.js` … Service Worker（キャッシュ管理）
 - `validate-questions.js` … 問題データの検証スクリプト（Node、依存なし）
-- `manifest.json` / `manifest-3.json` / `icon-192.png` / `icon-512.png` / `README.md`
+- `manifest.json` / `manifest-3.json` / `icon-192.png` / `icon-512.png`
+- `README.md` … リポジトリの説明（人が最初に読む1枚）
+- `CLAUDE.md` … このファイル
 
 問題データはすべて `index.html` の `PRELOAD` の1行に埋め込まれています。
 この1行だけで約244KB、ファイル全体の約76%です。整形して改行を入れないでください。
@@ -119,7 +121,16 @@ node validate-questions.js
 2. `index.html` フッターの `Updated ...` を現在の日本時間（UTC+9）に更新する
 3. `sw.js` のキャッシュ名（`remon-vNN`）を1つ上げる。
    **上げないと Service Worker の更新が発火せず、端末に反映されません**
-4. どの教科のどの単元を埋めたか、単元数・問題数とあわせて報告する
+4. 次のいずれかを伴う変更をしたときは、`README.md` も同じコミットで直す。
+   - 機能を追加・削除した
+   - ファイルが増えた・減った
+   - データ構造や保存キーを変えた
+   - 検証・デプロイの手順を変えた
+
+   **問題を追加しただけのときは `README.md` を触らない。**
+   問題数や単元の埋まり具合は、古くなるので README には書かない方針です
+   （最新の内訳は `node validate-questions.js` の出力で確認します）
+5. どの教科のどの単元を埋めたか、単元数・問題数とあわせて報告する
 
 ## PRELOAD_STRUCT_VERSION の扱い
 
@@ -127,8 +138,9 @@ node validate-questions.js
 `mergePreload()` が差分を追加するので不要です。
 
 上げるのは、単元枠の追加・削除・名称変更をしたときだけです。
-上げると `state.questions` が `PRELOAD` から作り直されるため、
-**画面から取り込んだ問題（importData）が失われます。**
+上げると `state.questions` が `PRELOAD` から作り直されます。
+学習履歴は問題文をキーに保存されているため引き継がれますが、
+単元の選択状態など `PRELOAD` 由来でない状態は影響を受けます。
 
 ## 学習履歴の仕組み（壊さないこと）
 
