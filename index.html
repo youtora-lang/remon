@@ -77,7 +77,9 @@ html{font-size:calc(16px * var(--font-scale))}
 #subject-screen{display:none;flex-direction:column;overflow:hidden}
 #subject-screen.active{display:flex}
 #subject-screen .subj-top{flex:0 0 auto}
-#subject-screen .subj-middle{flex:1 1 auto;overflow-y:auto;min-height:0;-webkit-overflow-scrolling:touch}
+/* 下パディングは「はじめる」に最後の単元が接しないための余白。
+   固定側の高さは文字サイズで変わるので rem で持つ */
+#subject-screen .subj-middle{flex:1 1 auto;overflow-y:auto;min-height:0;-webkit-overflow-scrolling:touch;padding-bottom:0.75rem}
 #subject-screen .subj-bottom{flex:0 0 auto}
 
 #app{height:100dvh;width:100%;display:flex;flex-direction:column;overflow:hidden;position:relative}
@@ -92,18 +94,22 @@ html{font-size:calc(16px * var(--font-scale))}
    固定フッターはホームでは出さないので、下の余白は装飾ストライプ18px分だけ。 */
 #home{background:var(--lemon-yellow);overflow:hidden;padding-bottom:18px}
 
-/* 常時表示の細いバー。高さは書かず、中身に応じて伸ばす */
-.home-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px}
-.home-bar-title{font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text-dark);letter-spacing:-0.5px;line-height:1.2}
+/* 常時表示の細いバー。高さは書かず、中身に応じて伸ばす。
+   ホームと教科ページで同じものを使う */
+.home-bar,.subj-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px}
+/* 教科ページは「戻る＋教科名」を左に並べるだけ */
+.subj-bar{justify-content:flex-start}
+.home-bar-title,.subj-bar-title{font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text-dark);letter-spacing:-0.5px;line-height:1.2}
 .home-bar-actions{display:flex;gap:8px;flex-shrink:0}
 .icon-btn{background:rgba(255,255,255,0.6);border:none;border-radius:12px;padding:8px 10px;font-family:var(--font-main);font-size:1.1rem;line-height:1;color:var(--text-dark);cursor:pointer;transition:opacity 0.12s}
 .icon-btn:active{opacity:0.7}
 
-/* スクロールすると畳まれる見出し。max-height は文字を大きくしても足りる値にする */
-.home-header{padding:16px 24px 12px;text-align:center;position:relative;overflow:hidden;max-height:480px;opacity:1;transition:max-height 0.28s ease,opacity 0.2s ease,padding 0.28s ease}
-#home.collapsed .home-header{max-height:0;opacity:0;padding-top:0;padding-bottom:0}
+/* スクロールすると畳まれる見出し。max-height は文字を大きくしても足りる値にする。
+   畳み込みは bindCollapsingHeader() が画面を問わず同じ閾値で付け外しする */
+.home-header,.subject-header{padding:16px 24px 12px;text-align:center;position:relative;overflow:hidden;max-height:480px;opacity:1;transition:max-height 0.28s ease,opacity 0.2s ease,padding 0.28s ease}
+#home.collapsed .home-header,#subject-screen.collapsed .subject-header{max-height:0;opacity:0;padding-top:0;padding-bottom:0}
 @media (prefers-reduced-motion: reduce){
-  .home-header{transition:none}
+  .home-header,.subject-header{transition:none}
 }
 
 /* ホームではスクロールの末尾にフッターを置く（中身は #app-footer から複製する） */
@@ -188,11 +194,12 @@ html{font-size:calc(16px * var(--font-scale))}
 .footer-btn span{font-size:20px}
 
 /* ===== SUBJECT SCREEN ===== */
-#subject-screen{overflow-y:auto}
-.subject-header{padding:48px 24px 20px;text-align:center}
+/* スクロールするのは .subj-middle だけ。画面全体は動かさない
+   （#subject-screen 側の overflow は上の #subject-screen{overflow:hidden} が持つ） */
 .back-btn{position:absolute;top:48px;left:20px;background:rgba(255,255,255,0.5);border:none;border-radius:12px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;color:var(--text-dark)}
-.subject-screen-icon{font-size:48px;margin-bottom:8px}
-.subject-screen-name{font-size:24px;font-weight:700;color:var(--text-dark)}
+/* 教科名は細いバーにも出るので、畳まれる見出し側は控えめにする */
+.subject-screen-icon{font-size:40px;margin-bottom:6px}
+.subject-screen-name{font-size:22px;font-weight:700;color:var(--text-dark)}
 
 .unit-list{padding:0 16px 16px;display:flex;flex-direction:column;gap:8px}
 .unit-row{display:flex;align-items:stretch;gap:8px}
@@ -210,19 +217,22 @@ html{font-size:calc(16px * var(--font-scale))}
 .unit-due.badge-done{background:#D8F0D8;color:#3A7D3A}
 .unit-due.badge-paused{background:#E2E2E2;color:#888}
 
-.mode-section{padding:12px 16px 24px}
-.mode-label{font-size:12px;color:var(--text-mid);margin-bottom:8px;padding:0 4px}
-.mode-cards{display:flex;gap:10px}
-.mode-card{flex:1;background:rgba(255,255,255,0.6);border:2px solid transparent;border-radius:16px;padding:14px 12px;cursor:pointer;text-align:center;transition:border-color 0.15s,background 0.15s;font-family:var(--font-main)}
-.mode-card.selected{background:rgba(255,255,255,0.95);border-color:var(--text-dark)}
-.mode-card-icon{font-size:22px;margin-bottom:4px}
-.mode-card-name{font-size:13px;font-weight:600;color:var(--text-dark)}
-.mode-card-desc{font-size:11px;color:var(--text-mid);margin-top:2px}
+/* 学習モードは横並びのセグメント1本。高さは書かず、中身に応じて伸ばす。
+   セグメント自体が見出しの役目をするので「学習モード」のラベルは置かない */
+.mode-section{padding:8px 16px 12px}
+.mode-seg{display:flex;gap:4px;background:rgba(255,255,255,0.45);border-radius:14px;padding:4px}
+.mode-seg-btn{flex:1;background:transparent;border:none;border-radius:11px;padding:0.5rem 0.4rem;font-family:var(--font-main);font-size:0.8125rem;font-weight:600;line-height:1.2;color:var(--text-mid);cursor:pointer;transition:background 0.15s,color 0.15s}
+.mode-seg-btn.selected{background:rgba(255,255,255,0.95);color:var(--text-dark)}
+/* 説明は選んでいるモードの分だけ1行出す */
+.mode-desc{margin-top:6px;padding:0 4px;font-size:0.72rem;color:var(--text-mid)}
 
 
 
-.start-btn{margin:0 16px 32px;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:18px;width:calc(100% - 32px);font-family:var(--font-main);font-size:1.0625rem;font-weight:700;cursor:pointer;transition:opacity 0.12s;letter-spacing:0.3px}
+.start-btn{margin:0 16px 10px;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:0.85rem 1rem;width:calc(100% - 32px);font-family:var(--font-main);font-size:1.0625rem;font-weight:700;cursor:pointer;transition:opacity 0.12s;letter-spacing:0.3px}
 .start-btn:active{opacity:0.8}
+/* 単元未選択のときは押せないことを見た目でも示す */
+.start-btn:disabled{opacity:0.45;cursor:default}
+.start-btn:disabled:active{opacity:0.45}
 
 /* ===== QUIZ SCREEN ===== */
 #quiz{position:relative}
@@ -311,7 +321,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jul 31, 2026 04:23</span>
+  <span class="footer-updated">Updated Jul 31, 2026 04:48</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -463,38 +473,34 @@ html{font-size:calc(16px * var(--font-scale))}
 <!-- SUBJECT SCREEN -->
 <div id="subject-screen" class="screen">
   <div class="subj-top">
-  <button class="back-btn" onclick="navBack()">←</button>
-  <div class="subject-header">
-    <div class="subject-screen-icon" id="ss-icon">📖</div>
-    <div class="subject-screen-name" id="ss-name">国語</div>
-  </div>
-
-  <div class="section-label">学習モード</div>
-  <div class="mode-section">
-    <div class="mode-cards">
-      <div class="mode-card selected" id="mode-today" onclick="selectMode('today')">
-        <div class="mode-card-icon">📅</div>
-        <div class="mode-card-name">今日の remon</div>
-        <div class="mode-card-desc">忘却曲線で出題</div>
-      </div>
-      <div class="mode-card" id="mode-unit" onclick="selectMode('unit')">
-        <div class="mode-card-icon">📚</div>
-        <div class="mode-card-name">単元を選ぶ</div>
-        <div class="mode-card-desc">まとめて練習</div>
-      </div>
+    <div class="subj-bar">
+      <button class="icon-btn" onclick="navBack()" title="戻る" aria-label="戻る">←</button>
+      <div class="subj-bar-title" id="ss-bar-name">国語</div>
     </div>
-  </div>
+
+    <div class="subject-header">
+      <div class="subject-screen-icon" id="ss-icon">📖</div>
+      <div class="subject-screen-name" id="ss-name">国語</div>
+    </div>
   </div>
 
   <div class="subj-middle">
+  <div class="mode-section">
+    <div class="mode-seg">
+      <button class="mode-seg-btn selected" id="mode-today" onclick="selectMode('today')">📅 今日の remon</button>
+      <button class="mode-seg-btn" id="mode-unit" onclick="selectMode('unit')">📚 単元を選ぶ</button>
+    </div>
+    <div class="mode-desc" id="mode-desc">忘却曲線で出題</div>
+  </div>
+
+  <!-- 見出しの「単元」はセグメントの選択と重なるので置かない -->
   <div id="unit-section" style="display:none">
-    <div class="section-label">単元</div>
     <div class="unit-list" id="unit-list"></div>
   </div>
   </div>
 
   <div class="subj-bottom">
-  <button class="start-btn" onclick="startQuiz()">はじめる 🍋</button>
+  <button class="start-btn" id="start-btn" onclick="startQuiz()">はじめる 🍋</button>
   </div>
 </div>
 
@@ -927,23 +933,38 @@ function showScreen(id){
   if(id==='data-screen') updateExportPreview();
 }
 
-// ── ホームの見出しの畳み込み ──────────────────────────────
+// ── 見出しの畳み込み（ホーム・教科ページ共通）──────────────
+// 画面ごとに別の仕組みを作らず、この1つを使い回す。
+// 付ける／外す閾値をずらして、境目でのちらつきを防ぐ。
+function bindCollapsingHeader(screenId, scrollSelector){
+  var scr=document.getElementById(screenId);
+  var mid=scr&&scr.querySelector(scrollSelector);
+  if(!scr||!mid) return;
+  mid.addEventListener('scroll', function(){
+    var t=mid.scrollTop;
+    if(t>24) scr.classList.add('collapsed');
+    else if(t<8) scr.classList.remove('collapsed');
+  }, {passive:true});
+}
+// 見出しを開いた状態に戻す（画面に入り直したとき用）
+function resetCollapsingHeader(screenId, scrollSelector){
+  var scr=document.getElementById(screenId);
+  var mid=scr&&scr.querySelector(scrollSelector);
+  if(!scr) return;
+  scr.classList.remove('collapsed');
+  if(mid) mid.scrollTop=0;
+}
+bindCollapsingHeader('home','.home-middle');
+bindCollapsingHeader('subject-screen','.subj-middle');
+
 // 更新日時はフッターを増やさず、#app-footer の中身をスクロール末尾に複製する。
 (function(){
   var home=document.getElementById('home');
-  var mid=home&&home.querySelector('.home-middle');
   var af=document.getElementById('app-footer');
   var slot=document.getElementById('home-scroll-footer');
   if(slot&&af) slot.innerHTML=af.innerHTML;
   // 起動直後はホームが表示されている（showScreen を通らない）
   if(af&&home&&home.classList.contains('active')) af.style.display='none';
-  if(!home||!mid) return;
-  // 付ける／外す閾値をずらして、境目でのちらつきを防ぐ
-  mid.addEventListener('scroll', function(){
-    var t=mid.scrollTop;
-    if(t>24) home.classList.add('collapsed');
-    else if(t<8) home.classList.remove('collapsed');
-  }, {passive:true});
 })();
 
 // ── 戻る履歴（動作単位のステップ管理）────────────────────────
@@ -991,11 +1012,12 @@ function renderSubject(sk){
   currentSubject=sk;
   document.getElementById('ss-icon').textContent=SUBJECTS[sk].icon;
   document.getElementById('ss-name').textContent=SUBJECTS[sk].name;
+  document.getElementById('ss-bar-name').textContent=SUBJECTS[sk].name;
   document.getElementById('subject-screen').style.background=SUBJECTS[sk].bg;
   currentMode='today';
-  document.getElementById('mode-today').classList.add('selected');
-  document.getElementById('mode-unit').classList.remove('selected');
-  document.getElementById('unit-section').style.display='none';
+  applyMode('today');
+  // 入り直したときは見出しを開いた状態から始める
+  resetCollapsingHeader('subject-screen','.subj-middle');
   showScreen('subject-screen');
 }
 function openSubject(sk){
@@ -1005,12 +1027,36 @@ function openSubject(sk){
   history.pushState({d:2,buf:0}, '');
 }
 
+var MODE_DESC={today:'忘却曲線で出題', unit:'まとめて練習'};
+
 function applyMode(m){
   currentMode=m;
   document.getElementById('mode-today').classList.toggle('selected',m==='today');
   document.getElementById('mode-unit').classList.toggle('selected',m==='unit');
+  document.getElementById('mode-desc').textContent=MODE_DESC[m]||'';
   if(m==='unit'){ document.getElementById('unit-section').style.display='block'; renderUnitList(); }
   else{ document.getElementById('unit-section').style.display='none'; }
+  updateStartBtn();
+}
+
+// 「はじめる」に選んだ単元数と問題数を出す。単元未選択なら押せなくする
+function updateStartBtn(){
+  var btn=document.getElementById('start-btn');
+  if(!btn) return;
+  if(currentMode!=='unit'){
+    btn.disabled=false;
+    btn.textContent='はじめる 🍋';
+    return;
+  }
+  if(!selectedUnits.length){
+    btn.disabled=true;
+    btn.textContent='単元を選んでください';
+    return;
+  }
+  var unitMap=getUnits(currentSubject), n=0;
+  selectedUnits.forEach(function(u){ if(unitMap[u]) n+=unitMap[u].length; });
+  btn.disabled=false;
+  btn.textContent=selectedUnits.length+'単元・'+n+'問 はじめる';
 }
 function selectMode(m){
   var prev=currentMode;
@@ -1097,6 +1143,8 @@ function renderUnitList(){
     row.appendChild(btn);
     el.appendChild(row);
   });
+  // 復元した選択を「はじめる」の表記に反映する
+  updateStartBtn();
 }
 
 function toggleUnit(unit,btn){
@@ -1107,6 +1155,7 @@ function toggleUnit(unit,btn){
   if(!state.selectedUnits) state.selectedUnits={};
   state.selectedUnits[currentSubject]=selectedUnits.slice();
   saveState();
+  updateStartBtn();
 }
 
 // ── Quiz ──────────────────────────────────────────────────
