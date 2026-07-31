@@ -323,7 +323,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jul 31, 2026 19:16</span>
+  <span class="footer-updated">Updated Jul 31, 2026 21:11</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -971,14 +971,23 @@ bindCollapsingHeader('subject-screen','.subj-middle');
 })();
 
 // ── 戻る履歴（動作単位のステップ管理）────────────────────────
-// navStack には「その状態を復元する関数」を積む。ホーム(底)では絶対に閉じない。
+// 【規約】navStack の1段は1つの状態で、積むのは必ず「その段自身を復元する関数」。
+//   ・一番上の段 ＝ いま見えている状態
+//   ・一番下の段 ＝ ホーム（底なので絶対に閉じない）
+//   ・navBack は「上を1段捨てて、新しい上の段を実行する」だけ
+// したがって navGo に渡すのは “進んだ先” の復元関数であって、戻り先ではない。
+// 戻り先を渡すと navBack がそれを捨ててしまい、1つ下の段が動いて状態が壊れる。
+// 下の段を組み替えたいときは、進む前に navStack を作ってから navGo すること。
 var navStack=[ function(){ showScreen('home'); } ];
 
-// 新しい状態へ進む：復元関数を積み、ブラウザ履歴も1つ積む
+// 新しい状態へ進む：その状態の復元関数を積み、ブラウザ履歴も1つ積む
 function navGo(restoreFn){
   navStack.push(restoreFn);
   history.pushState({d:navStack.length}, '');
 }
+
+// クイズの段の復元関数（規約どおり「クイズ画面そのもの」を復元する）
+function restoreQuiz(){ showScreen('quiz'); renderQuestion(); }
 
 // navBack: ←ボタンとスマホ戻るボタンの共通処理
 function navBack(){
@@ -1061,13 +1070,26 @@ function updateStartBtn(){
   btn.disabled=false;
   btn.textContent=selectedUnits.length+'単元・'+n+'問 はじめる';
 }
+// selectMode が積んだ「単元展開」の段。自分で積んだ段だけを戻すために覚えておく
+var unitModeLevel=null;
 function selectMode(m){
   var prev=currentMode;
-  applyMode(m);
-  // 「単元を選ぶ」を開く操作は1ステップ積む（戻るで展開を閉じる）
+  // 「単元を選ぶ」を開く操作は1ステップ積む（戻るで展開を閉じる）。
+  // 積むのは進んだ先＝単元一覧を開いた状態の復元関数
   if(m==='unit' && prev!=='unit'){
-    navGo(function(){ applyMode('today'); });
+    applyMode(m);
+    unitModeLevel=function(){ applyMode('unit'); };
+    navGo(unitModeLevel);
+    return;
   }
+  // 「今日の remon」に戻す操作は、自分で積んだ段を1つ戻す。
+  // 戻さないと段が積み残り、あとで戻るを押したとき単元一覧が開き直してしまう
+  if(m==='today' && prev==='unit' && unitModeLevel && navStack[navStack.length-1]===unitModeLevel){
+    unitModeLevel=null;
+    navBack();
+    return;
+  }
+  applyMode(m);
 }
 
 function getUnits(sk){
@@ -1195,21 +1217,17 @@ function startQuiz(){
   quizQueue=ids.map(function(id){ return {id:id,q:qs[id]}; });
   quizIndex=0; quizCorrect=0; quizSessionCorrect=0; lastSessionSubject=sk; isDailyMix=false;
   sessionWrong=[];
+  // 進む前に下の段を組み立てる。モードを行き来しても段が積み残らないよう作り直す。
+  // 単元モードなら戻り先は「単元一覧を開いた教科ページ」（選択は state から復元される）
+  var savedSk=sk, unitMode=(currentMode==='unit');
+  navStack=[ function(){ showScreen('home'); } ];
+  navStack.push(unitMode
+    ? function(){ renderSubject(savedSk); applyMode('unit'); }
+    : function(){ renderSubject(savedSk); });
   document.getElementById('quiz-bg').style.background=SUBJECTS[sk].bg;
   showScreen('quiz');
   renderQuestion();
-  // 戻ったとき単元一覧が展開された状態で教科ページを表示
-  var savedSk=sk;
-  navGo(function(){
-    // navStackを「ホーム → 教科(単元閉) → 単元展開」の3段に整理
-    navStack=[
-      function(){ showScreen('home'); },
-      function(){ renderSubject(savedSk); },
-      function(){ renderSubject(savedSk); applyMode('unit'); }
-    ];
-    renderSubject(savedSk);
-    applyMode('unit');
-  });
+  navGo(restoreQuiz);
 }
 
 function renderQuestion(){
@@ -1356,8 +1374,9 @@ function showResult(){
   var rvBtn=document.getElementById('review-wrong-btn');
   if(rvBtn){ rvBtn.style.display = sessionWrong.length>0 ? 'block' : 'none'; }
   showScreen('result'); saveState();
-  // 結果画面で戻るを押したらホームへ（クイズには戻さない）
-  navStack=[ function(){ showScreen('home'); } ];
+  // 結果画面で戻るを押したらホームへ（クイズには戻さない）。
+  // 規約どおり、上の段には結果画面そのものの復元関数を置く
+  navStack=[ function(){ showScreen('home'); }, function(){ showScreen('result'); } ];
   history.pushState({d:1,buf:1}, '');
   history.pushState({d:1,buf:0}, '');
 }
@@ -1374,8 +1393,10 @@ function startReviewWrong(){
   quizQueue=q; quizIndex=0; quizCorrect=0; quizSessionCorrect=0;
   lastSessionSubject=null; sessionWrong=[]; isDailyMix=true;
   document.getElementById('quiz-bg').style.background='var(--lemon-yellow)';
+  // 結果画面から始めるので、下はホーム1段に戻してからクイズの段を積む
+  navStack=[ function(){ showScreen('home'); } ];
   showScreen('quiz'); renderQuestion();
-  navGo(function(){ showScreen('home'); });
+  navGo(restoreQuiz);
 }
 
 function goHome(){ goHomeNav(); }
@@ -1385,8 +1406,10 @@ function restartSame(){
   quizQueue=shuffle(quizQueue);
   var bg = (isDailyMix||!lastSessionSubject) ? 'var(--lemon-yellow)' : SUBJECTS[lastSessionSubject].bg;
   document.getElementById('quiz-bg').style.background=bg;
+  // 結果画面から始めるので、下はホーム1段に戻してからクイズの段を積む
+  navStack=[ function(){ showScreen('home'); } ];
   showScreen('quiz'); renderQuestion();
-  navGo(function(){ showScreen('home'); });
+  navGo(restoreQuiz);
 }
 
 // ── Data ──────────────────────────────────────────────────
@@ -1580,9 +1603,11 @@ function startDailyMix(){
   sessionWrong = [];
   isDailyMix = true;
   document.getElementById('quiz-bg').style.background = 'var(--lemon-yellow)';
+  // ホームから始めるので、下はホーム1段にしてからクイズの段を積む
+  navStack=[ function(){ showScreen('home'); } ];
   showScreen('quiz');
   renderQuestion();
-  navGo(function(){ showScreen('home'); });
+  navGo(restoreQuiz);
 }
 
 function showSettingsMenu(){
