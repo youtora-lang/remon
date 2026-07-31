@@ -12,7 +12,7 @@ var path = require('path');
 
 var SUBJECT_NAMES = {
   kokugo: '国語', sugaku: '数学', rika: '理科',
-  shakai: '社会', eigo: '英語', sonota: '技・保・音・美'
+  chiri: '地理', rekishi: '歴史', eigo: '英語', sonota: '技・保・音・美'
 };
 
 var target = process.argv[2] || path.join(__dirname, 'index.html');
