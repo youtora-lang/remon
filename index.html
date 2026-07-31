@@ -208,14 +208,16 @@ html{font-size:calc(16px * var(--font-scale))}
 .unit-exclude.is-excluded{background:#FFD9D9;color:#C04040;font-weight:700}
 .unit-btn{background:rgba(255,255,255,0.6);border:none;border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;font-family:var(--font-main);text-align:left;width:100%;transition:transform 0.12s}
 .unit-btn:active{transform:scale(0.97)}
-.unit-info{flex:1}
+/* 単元名は1行目の幅を丸ごと使う。状態は2行目に問題数と並べる */
+.unit-info{flex:1;min-width:0}
 .unit-name{font-size:0.9375rem;font-weight:600;color:var(--text-dark)}
 .unit-meta{font-size:12px;color:var(--text-mid);margin-top:2px}
-.unit-due{font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,0.7);color:var(--text-dark)}
-.unit-due.badge-recommend{background:#FFE0E0;color:#C04040}
-.unit-due.badge-new{background:#FFF3C4;color:#9A7B00}
-.unit-due.badge-done{background:#D8F0D8;color:#3A7D3A}
-.unit-due.badge-paused{background:#E2E2E2;color:#888}
+/* 復習どきの単元は押してほしいので、2行目の文字に埋めない。
+   色だけに頼らないよう、左の帯（形）と単元名の太さ（文字）を併せて変える */
+.unit-btn.is-recommend{box-shadow:inset 4px 0 0 #C04040}
+.unit-btn.is-recommend .unit-name{font-weight:800}
+.unit-btn.is-recommend .unit-meta{color:#C04040;font-weight:700}
+.unit-flag{flex-shrink:0;font-size:1rem;line-height:1}
 
 /* 学習モードは横並びのセグメント1本。高さは書かず、中身に応じて伸ばす。
    セグメント自体が見出しの役目をするので「学習モード」のラベルは置かない */
@@ -321,7 +323,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jul 31, 2026 04:48</span>
+  <span class="footer-updated">Updated Jul 31, 2026 18:21</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -666,13 +668,14 @@ html{font-size:calc(16px * var(--font-scale))}
       <b>③ 4つの中からえらぶ</b><br>正解するとレモンがたまって🍋、まちがえると解説が出るよ。
     </div>
 
-    <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🏷️ 単元のバッジの色</div>
+    <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🏷️ 単元の2行目の見かた</div>
     <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
-      単元の右はしのバッジは、今の状態を色で教えてくれるよ。<br><br>
-      <span style="display:inline-block;background:#FFF3C4;color:#9A7B00;font-weight:700;padding:2px 10px;border-radius:20px">未学習</span>　まだといていない問題があるよ<br><br>
-      <span style="display:inline-block;background:#FFE0E0;color:#C04040;font-weight:700;padding:2px 10px;border-radius:20px">おすすめ</span>　今が復習どきの問題があるよ<br><br>
-      <span style="display:inline-block;background:#D8F0D8;color:#3A7D3A;font-weight:700;padding:2px 10px;border-radius:20px">完了</span>　今のところ全部おぼえている状態！<br><br>
-      <span style="display:inline-block;background:#E2E2E2;color:#888;font-weight:700;padding:2px 10px;border-radius:20px">停止中</span>　🍋ボタンで✕にした、おやすみ中の単元
+      単元名の下に「問題数・今の状態」が出るよ。<br><br>
+      <b>7問・未学習</b>　まだといていない問題があるよ<br><br>
+      <b>7問・完了</b>　今のところ全部おぼえている状態！<br><br>
+      <b>7問・おやすみ中</b>　🍋ボタンで✕にした単元<br><br>
+      <b>準備中</b>　まだ問題が入っていない単元<br><br>
+      今が<b>復習どき</b>の単元は、単元名が太字になって左に赤い帯がつき、右に🔔が出るよ。そこから始めるのがおすすめ！
     </div>
 
     <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🎚️ 単元のオン・オフ</div>
@@ -1080,6 +1083,19 @@ function getFrameworkUnits(sk){
   return order;
 }
 
+// 単元行の状態表示。右はしのバッジはやめ、2行目に「7問・未学習」の形で出す。
+// 「復習どき（旧おすすめ）」だけは2行目の文字にせず、左の帯・単元名の太さ・右の🔔で示す。
+// 押してほしい単元が一覧の中で埋もれないようにするため。
+function applyUnitState(btn,count,unlearned,reviewDue,excluded){
+  var recommend=!excluded&&reviewDue>0;
+  var label=excluded?'おやすみ中':(unlearned>0?'未学習':'完了');
+  var meta=btn.querySelector('.unit-meta');
+  if(meta) meta.textContent=count+'問・'+label;
+  btn.classList.toggle('is-recommend',recommend);
+  var flag=btn.querySelector('.unit-flag');
+  if(flag) flag.style.display=recommend?'':'none';
+}
+
 function renderUnitList(){
   var sk=currentSubject, unitMap=getUnits(sk), el=document.getElementById('unit-list');
   el.innerHTML='';
@@ -1105,8 +1121,7 @@ function renderUnitList(){
       ph.className='unit-btn';
       ph.style.opacity='0.5';
       ph.style.cursor='default';
-      ph.innerHTML='<div class="unit-info"><div class="unit-name">'+unit+'</div><div class="unit-meta">準備中</div></div>'
-        +'<div class="unit-due">－</div>';
+      ph.innerHTML='<div class="unit-info"><div class="unit-name">'+unit+'</div><div class="unit-meta">準備中</div></div>';
       row.appendChild(ph);
       el.appendChild(row);
       return;
@@ -1115,15 +1130,9 @@ function renderUnitList(){
     var btn=document.createElement('button');
     btn.className='unit-btn'; btn.dataset.unit=unit;
     btn.style.opacity=(selectedUnits.indexOf(unit)>=0)?'1':'0.4';
-    function badgeFor(isEx){
-      if(isEx) return {cls:' badge-paused', txt:'停止中'};
-      if(reviewDue>0) return {cls:' badge-recommend', txt:'おすすめ'};
-      if(unlearned>0) return {cls:' badge-new', txt:'未学習'};
-      return {cls:' badge-done', txt:'完了'};
-    }
-    var bg=badgeFor(excluded);
-    btn.innerHTML='<div class="unit-info"><div class="unit-name">'+unit+'</div><div class="unit-meta">'+ids.length+'問</div></div>'
-      +'<div class="unit-due'+bg.cls+'">'+bg.txt+'</div>';
+    btn.innerHTML='<div class="unit-info"><div class="unit-name">'+unit+'</div><div class="unit-meta"></div></div>'
+      +'<span class="unit-flag" aria-hidden="true">🔔</span>';
+    applyUnitState(btn,ids.length,unlearned,reviewDue,excluded);
     btn.onclick=function(){ toggleUnit(unit,btn); };
     var exBtn=document.createElement('button');
     exBtn.className='unit-exclude'+(excluded?' is-excluded':'');
@@ -1134,10 +1143,8 @@ function renderUnitList(){
       var nowEx=isUnitExcluded(sk,unit);
       exBtn.textContent=nowEx?'✕':'🍋';
       exBtn.className='unit-exclude'+(nowEx?' is-excluded':'');
-      // バッジも更新
-      var nb=badgeFor(nowEx);
-      var dueEl=btn.querySelector('.unit-due');
-      if(dueEl){ dueEl.className='unit-due'+nb.cls; dueEl.textContent=nb.txt; }
+      // 2行目の状態表示も更新する
+      applyUnitState(btn,ids.length,unlearned,reviewDue,nowEx);
     };
     row.appendChild(exBtn);
     row.appendChild(btn);
