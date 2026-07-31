@@ -323,7 +323,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Jul 31, 2026 18:21</span>
+  <span class="footer-updated">Updated Jul 31, 2026 19:16</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -672,7 +672,7 @@ html{font-size:calc(16px * var(--font-scale))}
     <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
       単元名の下に「問題数・今の状態」が出るよ。<br><br>
       <b>7問・未学習</b>　まだといていない問題があるよ<br><br>
-      <b>7問・完了</b>　今のところ全部おぼえている状態！<br><br>
+      <b>7問・学習済み</b>　一度は全部といたよ。いまは落ち着いている状態<br><br>
       <b>7問・おやすみ中</b>　🍋ボタンで✕にした単元<br><br>
       <b>準備中</b>　まだ問題が入っていない単元<br><br>
       今が<b>復習どき</b>の単元は、単元名が太字になって左に赤い帯がつき、右に🔔が出るよ。そこから始めるのがおすすめ！
@@ -1088,7 +1088,8 @@ function getFrameworkUnits(sk){
 // 押してほしい単元が一覧の中で埋もれないようにするため。
 function applyUnitState(btn,count,unlearned,reviewDue,excluded){
   var recommend=!excluded&&reviewDue>0;
-  var label=excluded?'おやすみ中':(unlearned>0?'未学習':'完了');
+  // 「学習済み」は“一度は全部といた”の意味。復習どき（🔔）と重なっても矛盾しない言い方にしている
+  var label=excluded?'おやすみ中':(unlearned>0?'未学習':'学習済み');
   var meta=btn.querySelector('.unit-meta');
   if(meta) meta.textContent=count+'問・'+label;
   btn.classList.toggle('is-recommend',recommend);
