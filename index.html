@@ -332,7 +332,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Aug 01, 2026 06:40</span>
+  <span class="footer-updated">Updated Aug 01, 2026 23:33</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -465,7 +465,8 @@ html{font-size:calc(16px * var(--font-scale))}
   </div>
 </div>
 
-  <div id="settings-menu" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-radius:20px 20px 0 0;padding:20px 16px 40px;z-index:999;box-shadow:0 -4px 20px rgba(0,0,0,0.15)">
+  <!-- 危険な操作を開くと縦に伸びるので、画面からはみ出す分はシートの中でスクロールさせる -->
+  <div id="settings-menu" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-radius:20px 20px 0 0;padding:20px 16px 40px;z-index:999;box-shadow:0 -4px 20px rgba(0,0,0,0.15);max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch">
     <div style="font-size:1rem;color:var(--text-mid);margin-bottom:16px;text-align:center">設定</div>
     <div style="font-size:0.75rem;color:var(--text-mid);margin-bottom:8px">📅 一日の目標正解数</div>
     <div style="display:flex;gap:8px;margin-bottom:16px">
@@ -486,7 +487,35 @@ html{font-size:calc(16px * var(--font-scale))}
       <button id="explain-wrong" onclick="setExplainMode('wrong')" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">まちがえた時だけ</button>
       <button id="explain-always" onclick="setExplainMode('always')" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">いつも出す</button>
     </div>
-    <button onclick="document.getElementById('settings-menu').style.display='none'" style="width:100%;padding:14px;border:none;border-radius:14px;background:#EEE;font-family:var(--font-main);font-size:0.9375rem;cursor:pointer">とじる</button>
+    <!-- 危険な操作。既定は閉じていて、開かないとリセットのボタンは見えない -->
+    <div style="border:1px solid #F0D4D4;border-radius:14px;margin-bottom:16px;overflow:hidden">
+      <button id="danger-toggle" onclick="toggleDangerZone()" style="width:100%;padding:12px 14px;border:none;background:#FFF4F4;font-family:var(--font-main);font-size:0.8125rem;font-weight:700;color:#7A1A1A;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span>⚠️ 危険な操作</span><span id="danger-arrow">▼</span>
+      </button>
+      <div id="danger-body" style="display:none;padding:14px;background:#FFF9F9">
+        <!-- 1段目：警告とバックアップの案内 -->
+        <div id="reset-step1">
+          <div style="font-size:0.8125rem;color:#7A1A1A;line-height:1.6;margin-bottom:10px">学習の記録がすべて消えます。元に戻せません。</div>
+          <button onclick="saveDataFile()" style="width:100%;padding:12px;margin-bottom:8px;border:none;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;font-weight:700;color:var(--text-dark);cursor:pointer">先にバックアップを取る 💾</button>
+          <div style="display:flex;gap:8px">
+            <button onclick="resetGoStep2()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#C04040;color:white;font-family:var(--font-main);font-size:0.8125rem;font-weight:700;cursor:pointer">リセットへ進む</button>
+            <button onclick="closeDangerZone()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#EEE;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">やめる</button>
+          </div>
+        </div>
+        <!-- 2段目：合いことばを打たないと押せない -->
+        <div id="reset-confirm" style="display:none">
+          <div style="font-size:0.8125rem;color:#7A1A1A;line-height:1.6;margin-bottom:10px">本当に消す場合は、下の欄に リセット と入力してください。</div>
+          <input id="reset-typed" type="text" autocomplete="off" oninput="resetTypeCheck()" placeholder="リセット" style="width:100%;padding:12px;margin-bottom:8px;border:2px solid #E8C0C0;border-radius:12px;background:white;font-family:var(--font-main);font-size:0.9375rem;color:var(--text-dark)">
+          <div style="display:flex;gap:8px">
+            <button id="reset-do" disabled onclick="runReset()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#C04040;color:white;font-family:var(--font-main);font-size:0.8125rem;font-weight:700;cursor:default;opacity:0.4">リセットする</button>
+            <button onclick="closeDangerZone()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#EEE;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">やめる</button>
+          </div>
+        </div>
+        <div id="reset-done" style="display:none;margin-top:10px;text-align:center;font-size:0.8125rem;color:#3A7A28">✅ リセットしました</div>
+      </div>
+    </div>
+
+    <button onclick="closeSettingsMenu()" style="width:100%;padding:14px;border:none;border-radius:14px;background:#EEE;font-family:var(--font-main);font-size:0.9375rem;cursor:pointer">とじる</button>
   </div>
 
 <!-- SUBJECT SCREEN -->
@@ -606,18 +635,6 @@ html{font-size:calc(16px * var(--font-scale))}
       <div class="data-export-text" id="export-preview" style="margin-top:12px">（ボタンを押すとデータが表示されます）</div>
       <div id="copy-instruction" style="display:none;font-size:12px;color:#5A7A4A;margin-top:6px;padding:6px 10px;background:#E8F8E8;border-radius:8px">上のテキストを長押しして「すべて選択」→「コピー」してください</div>
       <button class="copy-btn" onclick="copyExport()">データを表示してコピー 📋</button>
-    </div>
-    <div class="data-card">
-      <div class="data-card-title">🗑 全データをリセット</div>
-      <button class="data-btn" style="background:#C04040" onclick="resetAll()">リセットする</button>
-      <div id="reset-confirm" style="display:none;margin-top:10px;background:#FFE8E8;border-radius:12px;padding:14px;text-align:center">
-        <div style="font-size:13px;color:#7A1A1A;margin-bottom:10px">本当にリセットしますか？<br>この操作は元に戻せません。</div>
-        <div style="display:flex;gap:8px">
-          <button onclick="resetAllConfirm()" style="flex:1;padding:10px;background:#C04040;color:white;border:none;border-radius:10px;font-family:var(--font-main);font-size:14px;font-weight:700;cursor:pointer">はい、リセット</button>
-          <button onclick="document.getElementById('reset-confirm').style.display='none'" style="flex:1;padding:10px;background:#EEE;border:none;border-radius:10px;font-family:var(--font-main);font-size:14px;cursor:pointer">キャンセル</button>
-        </div>
-      </div>
-      <div id="reset-done" style="display:none;margin-top:10px;text-align:center;font-size:14px;color:#3A7A28">✅ リセットしました</div>
     </div>
   </div>
 </div>
@@ -1617,10 +1634,58 @@ function copyExport(){
   }catch(e){}
 }
 
-function resetAll(){
-  var el=document.getElementById('reset-confirm');
-  el.style.display=el.style.display==='block'?'none':'block';
+// ── リセット（設定シートの「⚠️ 危険な操作」の中）──────────────
+// 誤爆しにくいよう3重にしてある：枠を開く → 警告 → 合いことばの入力。
+// 確認はすべてこのブロックで行い、confirm() は使わない。
+var RESET_WORD='リセット';
+
+function toggleDangerZone(){
+  var body=document.getElementById('danger-body');
+  var open=body.style.display!=='block';
+  if(open){ body.style.display='block'; }
+  else { closeDangerZone(); return; }
+  document.getElementById('danger-arrow').textContent='▲';
 }
+
+// 枠を畳んで、確認の段階と入力欄を初期状態に戻す
+function closeDangerZone(){
+  document.getElementById('danger-body').style.display='none';
+  document.getElementById('danger-arrow').textContent='▼';
+  document.getElementById('reset-step1').style.display='block';
+  document.getElementById('reset-confirm').style.display='none';
+  document.getElementById('reset-done').style.display='none';
+  var t=document.getElementById('reset-typed');
+  if(t) t.value='';
+  resetTypeCheck();
+}
+
+// 1段目 → 2段目。「先にバックアップを取る」は saveDataFile() を呼ぶだけで、ここへは進まない
+function resetGoStep2(){
+  document.getElementById('reset-step1').style.display='none';
+  document.getElementById('reset-confirm').style.display='block';
+  var t=document.getElementById('reset-typed');
+  if(t){ t.value=''; t.focus(); }
+  resetTypeCheck();
+}
+
+// 合いことばと完全に一致するまで「リセットする」は押せない
+function resetTypeCheck(){
+  var t=document.getElementById('reset-typed'), b=document.getElementById('reset-do');
+  if(!t||!b) return;
+  var ok=(t.value===RESET_WORD);
+  b.disabled=!ok;
+  b.style.opacity=ok?'1':'0.4';
+  b.style.cursor=ok?'pointer':'default';
+}
+
+function runReset(){
+  var t=document.getElementById('reset-typed');
+  if(!t||t.value!==RESET_WORD) return;   // 押せない状態での呼び出しを防ぐ
+  resetAllConfirm();
+  // resetAllConfirm() がホームに戻すのに合わせて、設定シートも閉じる
+  setTimeout(closeSettingsMenu,1200);
+}
+
 function resetAllConfirm(){
   state=defaultState();
   saveState();
@@ -1679,8 +1744,15 @@ function startDailyMix(){
   navGo(restoreQuiz);
 }
 
+// 閉じるときは危険な操作の枠も畳み、確認の段階と入力欄を初期状態に戻す
+function closeSettingsMenu(){
+  document.getElementById('settings-menu').style.display='none';
+  closeDangerZone();
+}
+
 function showSettingsMenu(){
   document.getElementById('settings-menu').style.display='block';
+  closeDangerZone();
   var goal=state.dailyGoal||20, sz=state.sessionSize||10;
   [10,20,30,50].forEach(function(g){
     var b=document.getElementById('goal-'+g);
