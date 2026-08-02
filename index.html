@@ -53,10 +53,6 @@
   --rekishi-bg:#D98C6A;
   --rekishi-card:#F6D5C4;
   --rekishi-accent:#8A3A16;
-
-  --ongaku-bg:#FBF5C8;
-  --ongaku-card:#FEFAE0;
-  --ongaku-accent:#7A6A00;
 }
 
 html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:var(--font-main)}
@@ -193,9 +189,6 @@ html{font-size:calc(16px * var(--font-scale))}
 .subject-btn.rekishi{background:var(--rekishi-card)}
 .subject-btn.rekishi .subject-icon{background:#EDB79C}
 .subject-btn.rekishi .subject-rate{color:var(--rekishi-accent)}
-.subject-btn.ongaku{background:var(--ongaku-card)}
-.subject-btn.ongaku .subject-icon{background:#F5EE90}
-.subject-btn.ongaku .subject-rate{color:var(--ongaku-accent)}
 
 .home-footer{padding:16px 20px 32px;display:flex;gap:10px}
 .footer-btn{flex:1;background:rgba(255,255,255,0.6);border:none;border-radius:14px;padding:12px 8px;font-family:var(--font-main);font-size:13px;font-weight:500;color:var(--text-dark);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:opacity 0.12s}
@@ -336,7 +329,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Aug 02, 2026 20:28</span>
+  <span class="footer-updated">Updated Aug 02, 2026 21:10</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -428,14 +421,6 @@ html{font-size:calc(16px * var(--font-scale))}
         <div class="subject-count" id="count-eigo">問題なし</div>
       </div>
       <div class="subject-rate" id="rate-eigo">—</div>
-    </button>
-    <button class="subject-btn ongaku" onclick="openSubject('sonota')">
-      <div class="subject-icon">🎨</div>
-      <div class="subject-info">
-        <div class="subject-name">技・保・音・美</div>
-        <div class="subject-count" id="count-sonota">問題なし</div>
-      </div>
-      <div class="subject-rate" id="rate-sonota">—</div>
     </button>
   </div>
 
@@ -893,8 +878,7 @@ var SUBJECTS={
   rika:{name:'理科',icon:'🔬',bg:'var(--rika-bg)'},
   chiri:{name:'地理',icon:'🌏',bg:'var(--chiri-bg)'},
   rekishi:{name:'歴史',icon:'📜',bg:'var(--rekishi-bg)'},
-  eigo:{name:'英語',icon:'🔤',bg:'var(--gijutsu-bg)'},
-  sonota:{name:'技・保・音・美',icon:'🎨',bg:'var(--ongaku-bg)'}
+  eigo:{name:'英語',icon:'🔤',bg:'var(--gijutsu-bg)'}
 };
 
 // ── Helpers ───────────────────────────────────────────────
