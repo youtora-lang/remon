@@ -239,11 +239,15 @@ html{font-size:calc(16px * var(--font-scale))}
 
 
 
-.start-btn{margin:0 16px 10px;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:0.85rem 1rem;width:calc(100% - 32px);font-family:var(--font-main);font-size:1.0625rem;font-weight:700;cursor:pointer;transition:opacity 0.12s;letter-spacing:0.3px}
-.start-btn:active{opacity:0.8}
-/* 単元未選択のときは押せないことを見た目でも示す */
-.start-btn:disabled{opacity:0.45;cursor:default}
-.start-btn:disabled:active{opacity:0.45}
+/* 下部の固定バーは「クリア」と「はじめる」の2つ。幅は 1:2 で、はじめるを主役にする。
+   両モードで同じ構成にして、モードを切り替えても位置と大きさが動かないようにする */
+.start-row{display:flex;gap:10px;margin:0 16px 10px}
+.start-btn{flex:2;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:0.85rem 1rem;font-family:var(--font-main);font-size:1.0625rem;font-weight:700;cursor:pointer;transition:opacity 0.12s;letter-spacing:0.3px}
+.clear-btn{flex:1;background:rgba(255,255,255,0.7);color:var(--text-dark);border:none;border-radius:18px;padding:0.85rem 0.5rem;font-family:var(--font-main);font-size:0.9375rem;font-weight:700;cursor:pointer;transition:opacity 0.12s}
+.start-btn:active,.clear-btn:active{opacity:0.8}
+/* 選ばれていないときは押せないことを見た目でも示す（背景・文字とも薄いグレー） */
+.start-btn:disabled,.clear-btn:disabled{background:#E2E2E2;color:#9A9A9A;cursor:default}
+.start-btn:disabled:active,.clear-btn:disabled:active{opacity:1}
 
 /* ===== QUIZ SCREEN ===== */
 #quiz{position:relative}
@@ -332,7 +336,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Aug 02, 2026 15:09</span>
+  <span class="footer-updated">Updated Aug 02, 2026 20:04</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -548,7 +552,10 @@ html{font-size:calc(16px * var(--font-scale))}
   </div>
 
   <div class="subj-bottom">
-  <button class="start-btn" id="start-btn" onclick="startQuiz()">はじめる 🍋</button>
+  <div class="start-row">
+    <button class="clear-btn" id="clear-btn" onclick="clearSelection()">クリア</button>
+    <button class="start-btn" id="start-btn" onclick="startQuiz()">はじめる 🍋</button>
+  </div>
   </div>
 </div>
 
@@ -1123,24 +1130,45 @@ function applyMode(m){
   updateStartBtn();
 }
 
-// 「はじめる」に選んだ単元数と問題数を出す。単元未選択なら押せなくする
+// いま表示しているモードで「選ばれている」単元の数。
+//   単元を選ぶ … selectedUnits（教科ごとに保存している選択）
+//   今日の remon … 🍋がついている（＝おやすみにしていない）単元
+// モードごとに状態の持ち方が違うので、数え方もここで分ける。
+function selectedUnitCount(){
+  if(currentMode==='unit') return selectedUnits.length;
+  var map=getUnits(currentSubject), n=0;
+  Object.keys(map).forEach(function(u){ if(!isUnitExcluded(currentSubject,u)) n++; });
+  return n;
+}
+
+// 表示中のモードの選択だけを空にする。もう一方のモードや他教科には触れない。
+// 学習記録は変わらないので確認ダイアログは出さない。
+function clearSelection(){
+  if(selectedUnitCount()===0) return;
+  if(currentMode==='unit'){
+    selectedUnits=[];
+    if(!state.selectedUnits) state.selectedUnits={};
+    state.selectedUnits[currentSubject]=[];
+    saveState();
+    renderUnitList();
+    return;
+  }
+  // 今日の remon は「🍋を全部はずす」＝この教科の単元をすべて✕にする
+  if(!state.excludedUnits) state.excludedUnits={};
+  var map=getUnits(currentSubject);
+  Object.keys(map).forEach(function(u){ state.excludedUnits[unitKey(currentSubject,u)]=true; });
+  saveState();
+  if(currentMode==='unit') renderUnitList();
+  updateStartBtn();
+}
+
+// 下部の2ボタンの有効・無効。選択が0件ならどちらも押せない
 function updateStartBtn(){
-  var btn=document.getElementById('start-btn');
-  if(!btn) return;
-  if(currentMode!=='unit'){
-    btn.disabled=false;
-    btn.textContent='はじめる 🍋';
-    return;
-  }
-  if(!selectedUnits.length){
-    btn.disabled=true;
-    btn.textContent='単元を選んでください';
-    return;
-  }
-  var unitMap=getUnits(currentSubject), n=0;
-  selectedUnits.forEach(function(u){ if(unitMap[u]) n+=unitMap[u].length; });
-  btn.disabled=false;
-  btn.textContent=selectedUnits.length+'単元・'+n+'問 はじめる';
+  var start=document.getElementById('start-btn'), clear=document.getElementById('clear-btn');
+  if(!start||!clear) return;
+  var none=(selectedUnitCount()===0);
+  start.disabled=none;
+  clear.disabled=none;
 }
 // selectMode が積んだ「単元展開」の段。自分で積んだ段だけを戻すために覚えておく
 var unitModeLevel=null;
@@ -1240,6 +1268,8 @@ function renderUnitList(){
       exBtn.className='unit-exclude'+(nowEx?' is-excluded':'');
       // 2行目の状態表示も更新する
       applyUnitState(btn,ids.length,unlearned,reviewDue,nowEx);
+      // 🍋の付け外しは「今日の remon」の選択そのものなので、下のボタンも即座に反映する
+      updateStartBtn();
     };
     row.appendChild(exBtn);
     row.appendChild(btn);
