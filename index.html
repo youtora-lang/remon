@@ -336,7 +336,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Aug 02, 2026 20:04</span>
+  <span class="footer-updated">Updated Aug 02, 2026 20:28</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -555,6 +555,16 @@ html{font-size:calc(16px * var(--font-scale))}
   <div class="start-row">
     <button class="clear-btn" id="clear-btn" onclick="clearSelection()">クリア</button>
     <button class="start-btn" id="start-btn" onclick="startQuiz()">はじめる 🍋</button>
+  </div>
+  <!-- 今日の remon のクリアだけ、実行前に案内を出す（🍋はこの画面から戻せないため）。
+       確認は設定シートのリセットと同じく自前のブロックで作る -->
+  <!-- z-index は #app-footer(9001) より上。教科ページでは更新日時が固定表示されていて、下に敷くと文字が重なる -->
+  <div id="clear-confirm" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-radius:20px 20px 0 0;padding:20px 16px 40px;z-index:9002;box-shadow:0 -4px 20px rgba(0,0,0,0.15)">
+    <div style="font-size:0.8125rem;color:#7A1A1A;line-height:1.6;margin-bottom:12px">これは「今日のremon」の🍋のクリアです。復活させるときは「単元を選ぶ」のモードから選び直してください</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="clearTodayConfirmed()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#C04040;color:white;font-family:var(--font-main);font-size:0.8125rem;font-weight:700;cursor:pointer">クリアする</button>
+      <button onclick="closeClearConfirm()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#EEE;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">やめる</button>
+    </div>
   </div>
   </div>
 </div>
@@ -1008,6 +1018,8 @@ function refreshHome(){
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
+  // 画面を移るときは、開いたままの案内を閉じる
+  closeClearConfirm();
   // ホームはスクロールの末尾にフッターを置くので、固定フッターは出さない
   var af=document.getElementById('app-footer');
   if(af) af.style.display = (id==='home') ? 'none' : '';
@@ -1122,6 +1134,7 @@ var MODE_DESC={today:'忘却曲線で出題', unit:'まとめて練習'};
 
 function applyMode(m){
   currentMode=m;
+  closeClearConfirm();
   document.getElementById('mode-today').classList.toggle('selected',m==='today');
   document.getElementById('mode-unit').classList.toggle('selected',m==='unit');
   document.getElementById('mode-desc').textContent=MODE_DESC[m]||'';
@@ -1142,7 +1155,8 @@ function selectedUnitCount(){
 }
 
 // 表示中のモードの選択だけを空にする。もう一方のモードや他教科には触れない。
-// 学習記録は変わらないので確認ダイアログは出さない。
+// 学習記録は変わらないので、単元を選ぶ側は確認なしで消す。
+// 今日の remon 側は、この画面から🍋を戻せないので実行前に案内をはさむ。
 function clearSelection(){
   if(selectedUnitCount()===0) return;
   if(currentMode==='unit'){
@@ -1153,12 +1167,23 @@ function clearSelection(){
     renderUnitList();
     return;
   }
-  // 今日の remon は「🍋を全部はずす」＝この教科の単元をすべて✕にする
+  document.getElementById('clear-confirm').style.display='block';
+}
+
+function closeClearConfirm(){
+  var el=document.getElementById('clear-confirm');
+  if(el) el.style.display='none';
+}
+
+// 案内で「クリアする」を押したときだけ実行する。
+// 今日の remon は「🍋を全部はずす」＝この教科の単元をすべて✕にする
+function clearTodayConfirmed(){
+  closeClearConfirm();
+  if(currentMode!=='today') return;
   if(!state.excludedUnits) state.excludedUnits={};
   var map=getUnits(currentSubject);
   Object.keys(map).forEach(function(u){ state.excludedUnits[unitKey(currentSubject,u)]=true; });
   saveState();
-  if(currentMode==='unit') renderUnitList();
   updateStartBtn();
 }
 
