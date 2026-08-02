@@ -329,7 +329,7 @@ html{font-size:calc(16px * var(--font-scale))}
 
 <!-- 共通フッター（全ページ下部に表示） -->
 <div id="app-footer">
-  <span class="footer-updated">Updated Aug 02, 2026 21:10</span>
+  <span class="footer-updated">Updated Aug 03, 2026 04:11</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -862,8 +862,24 @@ function splitShakai(st){
   }
 }
 
+// おやすみ（excludedUnits）のうち、PRELOAD にもう無いものを捨てる。
+//   ・教科ごと無くなったもの（例：旧 sonota）
+//   ・教科は残っているが単元枠が無くなったもの（例：旧 巻末文法1、季節のしおり 春）
+// キーは "教科キー||単元名" なので、PRELOAD の枠から作った同じ形の一覧と突き合わせれば
+// 両方まとめて判定できる。PRELOAD を正本にした状態で判定するため syncPreload() の直後に呼ぶ。
+function pruneExcludedUnits(){
+  var ex=state.excludedUnits;
+  if(!ex||typeof ex!=='object'||Array.isArray(ex)) return;
+  var known={};
+  PRELOAD.forEach(function(s){ known[unitKey(s.subject,s.unit)]=1; });
+  var removed=0;
+  Object.keys(ex).forEach(function(k){ if(!known[k]){ delete ex[k]; removed++; } });
+  if(removed) saveState();
+}
+
 splitShakai(state);
 syncPreload();
+pruneExcludedUnits();
 
 // ── Quiz vars ─────────────────────────────────────────────
 var currentSubject=null, currentMode='today';
@@ -1632,6 +1648,9 @@ function restoreDataFile(input){
     // 入っていなければ今の値をそのまま残す（|| で既定値に書きもどさない）。
     ['dailyRecords','excludedUnits','fontSize','dailyGoal','sessionSize','explainMode']
       .forEach(function(k){ if(data[k]!==undefined) state[k]=data[k]; });
+    // おやすみはこの行で入れかわるので、掃除はここまで待ってから行う
+    // （syncPreload() の直後に呼ぶと、そのあとに古い設定が上書きで戻ってしまう）
+    pruneExcludedUnits();
     saveState();
     // その場で画面を描き直してから、念のため読み込み直す
     // （reload が効かない環境でも、ホームの数字が古いままにならないように）
