@@ -6,6 +6,7 @@
 // index.html の PRELOAD を取り出して、問題を追加したあとに壊れやすい点を検査する。
 // 使い方:  node validate-questions.js  [index.htmlのパス]
 // 終了コード: 全項目パス=0 / 違反あり=1 / 読み込み失敗=2
+// 警告（全角の式記号）は終了コードに影響しない。
 
 var fs = require('fs');
 var path = require('path');
@@ -65,6 +66,64 @@ function report(name, violations) {
   checks.push({ name: name, violations: violations });
 }
 
+// 警告は違反として数えない（終了コードを変えない）
+var warnings = [];
+function warn(name, items) {
+  warnings.push({ name: name, items: items });
+}
+
+// ── 想定外の文字種 ───────────────────────────────────────
+// ひらがな・カタカナ・漢字・英数字・一般的な記号・ギリシャ文字（π など）を許す。
+// キリル文字やハングル、半角カタカナのように、見た目では気づきにくい混入を見つける。
+var ALLOWED_CHAR = new RegExp('[' + [
+  '\\u0020-\\u007E',  // 半角の英数字・記号
+  '\\u00A0-\\u00FF',  // ° ± ² ³ × ÷ など
+  '\\u0370-\\u03FF',  // ギリシャ文字（π α など）
+  '\\u2000-\\u206F',  // … ‥ “ ” などの約物
+  '\\u2100-\\u214F',  // ℓ ℃ № など
+  '\\u2190-\\u21FF',  // → ← などの矢印
+  '\\u2200-\\u22FF',  // ∠ ⊥ ∥ √ ≠ などの数学記号
+  '\\u25A0-\\u25FF',  // △ ○ □ などの図形
+  '\\u2700-\\u27BF',  // ✕ など
+  '\\u3000-\\u303F',  // 全角空白・、。「」など
+  '\\u3041-\\u309F',  // ひらがな
+  '\\u30A0-\\u30FF',  // カタカナ
+  '\\u3400-\\u4DBF',  // 漢字（拡張A）
+  '\\u4E00-\\u9FFF',  // 漢字
+  '\\uF900-\\uFAFF',  // 漢字（互換）
+  '\\uFF01-\\uFF60'   // 全角の英数字・記号
+].join('') + ']');
+
+// サロゲートペアを1文字として数えるため Array.from を使う
+function oddChars(text) {
+  var found = [];
+  Array.from(String(text)).forEach(function (ch) {
+    if (ALLOWED_CHAR.test(ch)) return;
+    if (found.indexOf(ch) < 0) found.push(ch);
+  });
+  return found;
+}
+function charLabel(ch) {
+  return '「' + ch + '」(U+' + ch.codePointAt(0).toString(16).toUpperCase() + ')';
+}
+
+// 数式・座標に使う記号の全角（＝ － ＋ （ ））。
+// 日本語の文章としての使用は許すので、式や座標として使われている疑いのあるものだけを拾う。
+//   拾う:   y＝3x / x＋4 / （3, 6）
+//   拾わない: 面積＝底辺×高さ÷2 / （正）×（負） / 適地適作（てきちてきさく）
+// 判定は、全角記号が半角の英数字と隣り合っているか、
+// 全角かっこの中身が半角の英数字だけでできているかで見る。
+function fullwidthMathChars(text) {
+  var s = String(text);
+  var found = [];
+  ['＝', '＋', '－'].forEach(function (ch) {
+    var re = new RegExp('[0-9A-Za-z]\\s*' + ch + '|' + ch + '\\s*[0-9A-Za-z]');
+    if (re.test(s)) found.push(ch);
+  });
+  if (/（[\s0-9A-Za-z,.+\-]+）/.test(s)) { found.push('（'); found.push('）'); }
+  return found;
+}
+
 // ── 検査 ─────────────────────────────────────────────────
 var loaded = extractPreload(target);
 
@@ -98,6 +157,8 @@ var badChoiceCount = [];
 var dupChoiceInQuestion = [];
 var dupQuestionInSubject = [];
 var dupUnitName = [];
+var badCharType = [];
+var fullwidthMath = [];
 
 var seenQuestion = Object.create(null); // 教科 -> 問題文 -> 初出の場所
 var seenUnit = Object.create(null);     // 教科 -> 単元名 -> 初出の位置
@@ -175,6 +236,27 @@ preload.forEach(function (set, setIndex) {
     } else {
       texts[q.question] = where(set, qi);
     }
+
+    // 問題文・選択肢・解説をまとめて見る
+    var whole = q.question + ' ' + q.choices.join(' ') + ' ' + q.explanation;
+
+    // 想定外の文字が混じっていない
+    var odd = oddChars(whole);
+    if (odd.length) {
+      badCharType.push({
+        at: where(set, qi),
+        note: '想定外の文字: ' + odd.map(charLabel).join(' ') + ' / ' + clip(q.question, 40)
+      });
+    }
+
+    // 全角の式記号（警告）
+    var fw = fullwidthMathChars(whole);
+    if (fw.length) {
+      fullwidthMath.push({
+        at: where(set, qi),
+        note: '全角: ' + fw.map(function (c) { return '「' + c + '」'; }).join(' ') + ' / ' + clip(q.question, 40)
+      });
+    }
   });
 });
 
@@ -183,6 +265,9 @@ report('choices がちょうど4個', badChoiceCount);
 report('同一問題内で選択肢が重複していない', dupChoiceInQuestion);
 report('同一教科内で問題文が重複していない', dupQuestionInSubject);
 report('単元名が重複していない', dupUnitName);
+report('想定外の文字が混じっていない', badCharType);
+
+warn('数式・座標に使う記号に全角が混じっている', fullwidthMath);
 
 // ── 出力 ─────────────────────────────────────────────────
 console.log('remon 問題データ検証');
@@ -209,6 +294,19 @@ checks.forEach(function (c) {
     console.log('      ' + v.note);
   });
   if (n > MAX_SHOW) console.log('    …ほか ' + (n - MAX_SHOW) + '件');
+});
+
+// 警告は違反として数えない。日本語の文章として全角を使うこともあるため、
+// 直すかどうかは中身を見て判断する。
+warnings.forEach(function (w) {
+  if (w.items.length === 0) return;
+  console.log('');
+  console.log('警告  ' + w.name + '  ' + w.items.length + '件');
+  w.items.slice(0, MAX_SHOW).forEach(function (v) {
+    console.log('    - ' + v.at);
+    console.log('      ' + v.note);
+  });
+  if (w.items.length > MAX_SHOW) console.log('    …ほか ' + (w.items.length - MAX_SHOW) + '件');
 });
 
 console.log('');
