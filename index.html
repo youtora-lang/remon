@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>remon</title>
+<title>dango</title>
 <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="remon">
+<meta name="apple-mobile-web-app-title" content="dango">
 <meta name="theme-color" content="#FFE9F3">
 <link rel="apple-touch-icon" href="icon-192.png">
 <!-- 書体は Google Fonts。Service Worker が一度読んだものをキャッシュする。
@@ -251,6 +251,16 @@ button{cursor:pointer}
 .data-export-text{font-size:0.75rem;color:var(--text-sub);word-break:break-all;background:var(--dot-base);border-radius:16px;padding:12px;max-height:140px;overflow-y:auto;line-height:1.6;margin-top:12px}
 .data-export-text.is-open{user-select:all;-webkit-user-select:all}
 
+/* ===== 使い方ガイド ===== */
+.guide{line-height:1.8}
+.guide p{font-size:0.875rem}
+.guide p+p{margin-top:8px}
+.guide h3{font-size:0.9375rem;font-weight:700;margin-bottom:4px}
+.guide-card+.guide-card{margin-top:10px}
+.guide-hero{text-align:center;padding:12px 8px 0}
+.guide-hero svg{width:84px;height:48px;margin-bottom:6px}
+.guide-hero p{text-align:left;margin-top:8px}
+
 /* ===== 設定シート ===== */
 .sheet-scrim{display:none;position:fixed;inset:0;background:var(--scrim);z-index:50}
 .sheet{display:none;position:fixed;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;background:var(--white);border-radius:var(--r-card) var(--r-card) 0 0;padding:20px 16px 28px;z-index:60;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -301,14 +311,14 @@ button{cursor:pointer}
 
 <!-- 共通フッター（ホーム以外で画面の下に固定。ホームではスクロールの末尾に複製する） -->
 <div id="app-footer" class="foot">
-  <span class="footer-updated">Updated Aug 06, 2026 06:00</span>
+  <span class="footer-updated">Updated Oct 18, 2026 01:26</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
 <!-- HOME -->
 <div id="home" class="screen active">
   <div class="bar">
-    <div class="logo"><svg aria-hidden="true"><use href="#logo-dots"/></svg><span>remon</span></div>
+    <div class="logo"><svg aria-hidden="true"><use href="#logo-dots"/></svg><span>dango</span></div>
     <button class="round-btn" onclick="showSettingsMenu()" title="設定" aria-label="設定"><svg class="ic"><use href="#i-gear"/></svg></button>
   </div>
 
@@ -531,72 +541,86 @@ button{cursor:pointer}
 </div>
 
 <!-- GUIDE SCREEN -->
-<!-- 文章はコミット5で書き直す。ここでは器と色だけを新しい形に合わせている -->
+<!-- リセットの場所とデータ保存のしかたは、ガイドに載せない方針 -->
 <div id="guide-screen" class="screen">
   <div class="bar">
     <button class="round-btn" onclick="goHomeNav()" title="戻る" aria-label="戻る"><svg class="ic"><use href="#i-back"/></svg></button>
-    <div class="bar-title">remonの使い方</div>
+    <div class="bar-title">dangoの使い方</div>
   </div>
-  <div class="scroll" style="line-height:1.8">
-    <div style="background:var(--white);border-radius:18px;padding:18px;margin-bottom:14px;text-align:center">
-      <div style="font-size:2.2rem">🍋</div>
-      <div style="font-size:1.1rem;font-weight:800;margin-top:4px">remon って？</div>
-      <div style="font-size:0.85rem;color:var(--text-sub);margin-top:8px">教科書に合わせた4択クイズで、楽しく暗記できるアプリ。<br>まちがえた問題は忘れたころにまた出てくるから、くり返すうちに自然と身につくよ。</div>
+  <div class="scroll guide">
+    <div class="guide-hero">
+      <svg aria-hidden="true"><use href="#logo-dots"/></svg>
+      <div class="card-title">dango って？</div>
+      <p>教科書に合わせた4択クイズで、楽しく暗記できるアプリ。まちがえた問題は忘れたころにまた出てくるから、くり返すうちに自然と身につくよ。</p>
+      <p>dango（だんご）の名前は、ピンク・白・緑の三色だんごの色から。正解をひとつずつ重ねて、ドットを集めていくアプリです。</p>
     </div>
 
-    <div style="background:var(--white);border:2px dashed var(--pink);border-radius:16px;padding:16px;margin-bottom:16px">
-      <div style="font-size:0.95rem;font-weight:800;margin-bottom:6px">💡 名前のひみつ</div>
-      <div style="font-size:0.85rem">「remon」は…<br><b>re</b>＝くり返し（repeat）<br><b>mon</b>＝問題の「問（もん）」<br>を合わせた名前なんだ。<br>くり返し問題をといて覚えよう、という意味だよ。<br><br>でも、本当のレモンの英語のつづりは <b>Lemon</b>！<br>テストで書くときは気をつけてね🍋</div>
+    <div class="label">HOW TO</div>
+    <div class="card guide-card">
+      <h3>① 今日の20</h3>
+      <p>ホームのいちばん上のピンクのカード。全教科から、まだといていない問題と復習どきの問題を中心に20問出すよ。まよったらこれ！</p>
+    </div>
+    <div class="card guide-card">
+      <h3>② 単元を選んで出題</h3>
+      <p>ホームで教科をタップして、やりたい単元の左の丸をタップ（緑のチェックがつくよ）。いくつでも選べるよ。下の「はじめる」で出題、「クリア」で選んだものをまとめて消せるよ。</p>
+    </div>
+    <div class="card guide-card">
+      <h3>③ 4つの中からえらぶ</h3>
+      <p>正解すると緑の面に「✓ 正解」、まちがえるとピーチ色の面に「✕ まちがい」が出るよ。まちがえたときは解説を読んでから次へ進もう。</p>
     </div>
 
-    <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🎯 基本の使い方</div>
-    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
-      <b>① 教科をえらぶ</b><br>ホームで教科をタップ。単元ごとに練習できるよ。
+    <div class="label">UNITS</div>
+    <div class="card guide-card">
+      <h3>単元の2行目の見かた</h3>
+      <p>単元名の下に「問題数・今の状態」が出るよ。</p>
+      <p><b>7問・未学習</b>　まだといていない問題があるよ<br>
+      <b>7問・学習済み</b>　一度は全部といたよ<br>
+      <b>7問・おやすみ中</b>　月のボタンでおやすみにした単元<br>
+      <b>準備中</b>　まだ問題が入っていない単元</p>
+      <p>今が復習どきの単元は、緑の「復習どき」のラベルがついて、単元名が太字になるよ。そこから始めるのがおすすめ！</p>
     </div>
-    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
-      <b>② 今日の 20 remon</b><br>ホーム一番上のボタンを押すと、全教科からまだ覚えていない問題を中心に20問出題。まよったらこれ！
-    </div>
-    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
-      <b>③ 4つの中からえらぶ</b><br>正解するとレモンがたまって🍋、まちがえると解説が出るよ。
-    </div>
-
-    <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🏷️ 単元の2行目の見かた</div>
-    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
-      単元名の下に「問題数・今の状態」が出るよ。<br><br>
-      <b>7問・未学習</b>　まだといていない問題があるよ<br><br>
-      <b>7問・学習済み</b>　一度は全部といたよ。いまは落ち着いている状態<br><br>
-      <b>7問・おやすみ中</b>　🍋ボタンで✕にした単元<br><br>
-      <b>準備中</b>　まだ問題が入っていない単元<br><br>
-      今が<b>復習どき</b>の単元は、単元名が太字になって左に赤い帯がつき、右に🔔が出るよ。そこから始めるのがおすすめ！
+    <div class="card guide-card">
+      <h3>おやすみ（月のボタン）</h3>
+      <p>単元の右にある月のボタンをタップすると、その単元はおやすみになって「今日の20」に出なくなるよ。月がぬりつぶされて、行がうすくなるよ。もう一度タップするともとにもどるよ。</p>
+      <p>テスト前に、範囲に入らない単元をおやすみにしておくと便利。おやすみ中の単元も、自分で選べば練習できるよ。</p>
     </div>
 
-    <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🎚️ 単元のオン・オフ</div>
-    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
-      各単元の左にある🍋ボタンで、「今日の 20 remon」や「今日の remon」に入れる・入れないを切りかえられるよ。🍋ボタンは、教科ページで<b>「単元を選ぶ」</b>に切りかえると出てくるよ。タップすると✕に変わって、その単元はおやすみ（対象外）になる。もう一度タップすると🍋にもどるよ。苦手な単元だけにしぼって練習したいときに便利。<br><br>下の<b>「クリア」</b>をおすと、選んだものをまとめて消せるよ。
+    <div class="label">COLLECTION</div>
+    <div class="card guide-card">
+      <h3>ドットコレクション</h3>
+      <p>正解を10問重ねるごとに、ドットが1つ増えるよ。ドットが30個そろうと、ボードが1枚完成！ ドットは少しずつ濃いピンクになっていくよ。</p>
+      <p>次のドットの輪は、正解するたびに少しずつ埋まっていくよ。完成したボードの枚数も、ボードの下に出るよ。</p>
     </div>
 
-    <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🔁 かしこく覚えるしくみ</div>
-    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
-      remon は「間隔をあけてくり返す」と覚えやすい、という勉強のコツを使っているよ。<br><br>正解した問題は、次は少し先にもう一度出てくる。まちがえた問題は、近いうちにまた出てくる。<br><br>このくり返しで、忘れたころにちょうど復習できて、しっかり身につくんだ。
+    <div class="label">REVIEW</div>
+    <div class="card guide-card">
+      <h3>かしこく覚えるしくみ</h3>
+      <p>dango は「間隔をあけてくり返す」と覚えやすい、という勉強のコツを使っているよ。正解した問題は、次は少し先にもう一度出てくる。まちがえた問題は、近いうちにまた出てくる。忘れたころにちょうど復習できて、しっかり身につくんだ。</p>
     </div>
 
-    <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">📈 記録とグラフ</div>
-    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
-      ホームの「今週のがんばり」グラフで、毎日の正解数が見られるよ。タップすると記録画面がひらいて、過去の週もさかのぼれるよ。たまったレモン🍋も結果画面で確認できるよ。
+    <div class="label">THIS WEEK</div>
+    <div class="card guide-card">
+      <h3>今週のがんばり</h3>
+      <p>1日の目標に届いた日は緑の丸、今日は緑の輪（目標に届いたら丸）になるよ。右上には続けて学習した日数が出るよ。カードをタップすると記録の画面がひらいて、前の週もさかのぼれるよ。</p>
     </div>
 
-    <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">⚙️ 便利な設定</div>
-    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
-      ・<b>文字サイズ</b>：小・中・大から選べる<br>・<b>解説の出し方</b>：いつも出す／まちがえた時だけ<br>・<b>今日の目標</b>：1日の目標問題数を設定<br>・<b>一回の出題数</b>：1回に出す問題数（5問・10問・20問・全問）
+    <div class="label">SETTINGS</div>
+    <div class="card guide-card">
+      <h3>便利な設定</h3>
+      <p>ホームの右上の歯車から。<br>
+      ・<b>文字サイズ</b>：小・中・大から選べる<br>
+      ・<b>1日の目標</b>：1日に正解したい問題数<br>
+      ・<b>1回の出題数</b>：単元を選んだときに出す問題数<br>
+      ・<b>解説の出し方</b>：いつも出す／まちがえた時だけ</p>
     </div>
 
-    <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🌱 つづけるコツ・かしこい使い方</div>
-    <div style="background:var(--white);border-radius:14px;padding:14px;font-size:0.85rem">
-      ・一度に全部やろうとしなくて大丈夫。<b>毎日少しずつ</b>が、いちばん身につくよ。<br>
-      ・まよったら<b>「今日の 20 remon」</b>。今やるとよい問題をえらんで出してくれる。<br>
-      ・<b>🔔がついた単元</b>から手をつけると、効率よく復習できるよ。<br>
-      ・テスト前は、出ない単元を🍋ボタンで<b>おやすみ（✕）</b>にして、範囲をしぼろう。<br>
-      ・まちがえても大丈夫。それが覚えるチャンス🍋　解説を読んでから次に進もう。
+    <div class="label">TIPS</div>
+    <div class="card guide-card">
+      <h3>つづけるコツ</h3>
+      <p>・一度に全部やろうとしなくて大丈夫。<b>毎日少しずつ</b>が、いちばん身につくよ。<br>
+      ・まよったら<b>「今日の20」</b>。今やるとよい問題をえらんで出してくれる。<br>
+      ・<b>「復習どき」</b>の単元から手をつけると、効率よく復習できるよ。<br>
+      ・まちがえても大丈夫。それが覚えるチャンス。解説を読んでから次に進もう。</p>
     </div>
   </div>
 </div>
@@ -1327,7 +1351,7 @@ function saveDataFile(){
     var blob=new Blob([txt],{type:'application/json'});
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
-    a.href=url; a.download='remon-'+todayStr()+'.json';
+    a.href=url; a.download='dango-'+todayStr()+'.json';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); },1000);
   }catch(e){
@@ -1341,7 +1365,8 @@ function openRestore(){
   if(el) el.click();
 }
 
-// 読み込んだ中身が remon の保存ファイルの形かどうかを調べる。
+// 読み込んだ中身が保存ファイルの形かどうかを調べる。ファイル名は見ないので、
+// remon 時代の remon-日付.json も dango-日付.json と同じように読める。
 // 問題なければ null、だめなら子どもに見せる理由を返す。
 function checkBackup(d){
   if(!d||typeof d!=='object'||Array.isArray(d)) return 'データのかたちがちがいます';
@@ -1386,12 +1411,12 @@ function restoreDataFile(input){
     var data;
     try{ data=JSON.parse(String(reader.result)); }
     catch(e){
-      alert('このファイルは読みこめません。\nremon で保存したファイルをえらんでね。\n（中身がこわれています）');
+      alert('このファイルは読みこめません。\ndango で保存したファイルをえらんでね。\n（中身がこわれています）');
       return;
     }
     var ng=checkBackup(data);
     if(ng){
-      alert('このファイルは remon のデータではないみたい。\nremon で保存したファイルをえらんでね。\n（'+ng+'）');
+      alert('このファイルは dango のデータではないみたい。\ndango で保存したファイルをえらんでね。\n（'+ng+'）');
       return;
     }
     // バックアップの questions はそのまま採用しない。いったん受けてから

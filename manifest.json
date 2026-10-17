@@ -1,13 +1,13 @@
 {
-  "name": "remon",
-  "short_name": "remon",
+  "name": "dango",
+  "short_name": "dango",
   "description": "暗記カードアプリ",
   "start_url": "/remon/index.html",
   "scope": "/remon/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#F5E642",
-  "theme_color": "#F5E642",
+  "background_color": "#FFE9F3",
+  "theme_color": "#FFE9F3",
   "icons": [
     {
       "src": "icon-192.png",

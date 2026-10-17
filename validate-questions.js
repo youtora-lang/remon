@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-// remon 問題データ検証スクリプト
+// dango 問題データ検証スクリプト
 //
 // questions.js の PRELOAD を取り出して、問題を追加したあとに壊れやすい点を検査する。
 // 使い方:  node validate-questions.js  [questions.jsのパス]
@@ -128,7 +128,7 @@ function fullwidthMathChars(text) {
 var loaded = extractPreload(target);
 
 if (loaded.error) {
-  console.log('remon 問題データ検証');
+  console.log('dango 問題データ検証');
   console.log('対象: ' + target);
   console.log('');
   console.log('NG  PRELOAD が JSON として正しく読める');
@@ -141,7 +141,7 @@ if (loaded.error) {
 var preload = loaded.data;
 
 if (!Array.isArray(preload)) {
-  console.log('remon 問題データ検証');
+  console.log('dango 問題データ検証');
   console.log('対象: ' + target);
   console.log('');
   console.log('NG  PRELOAD が配列ではありません（' + typeof preload + '）');
@@ -270,7 +270,7 @@ report('想定外の文字が混じっていない', badCharType);
 warn('数式・座標に使う記号に全角が混じっている', fullwidthMath);
 
 // ── 出力 ─────────────────────────────────────────────────
-console.log('remon 問題データ検証');
+console.log('dango 問題データ検証');
 console.log('対象: ' + target + '（' + loaded.line + '行目の PRELOAD）');
 console.log('単元枠 ' + preload.length + '（問題あり ' + filledUnits + '） 問題 ' + totalQuestions + '問');
 
