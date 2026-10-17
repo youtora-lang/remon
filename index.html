@@ -213,6 +213,11 @@ button{cursor:pointer}
 @media (prefers-reduced-motion: reduce){ .board i.pop{animation:none} }
 .coll-info{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px;margin-top:12px;font-size:0.8125rem;color:var(--text-sub)}
 .coll-info b{color:var(--text);font-size:1rem}
+/* 完成したボード。枚数分の小さな四角を並べる（0枚のときは出さない） */
+.coll-done{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:12px;font-size:0.8125rem;color:var(--text-sub)}
+.coll-done i{display:block;width:12px;height:12px;border-radius:3px;background:var(--pink-d)}
+.coll-done span{margin-left:4px}
+.coll-done b{color:var(--text);font-size:1rem}
 
 /* ===== 結果 ===== */
 .result-content{display:flex;flex-direction:column;align-items:center;text-align:center;padding:32px 4px 12px}
@@ -872,7 +877,15 @@ function renderCollection(el){
     +'<div class="coll-board-no">'+d.board+'枚目</div></div>'
     +'<div class="board" role="img" aria-label="'+d.board+'枚目のボード、'+d.inBoard+'個のドット">'+html+'</div>'
     +'<div class="coll-info"><span>あと <b>'+d.toNext+'</b> 問で次のドット</span>'
-    +'<span>'+d.board+'枚目まで あと <b>'+(BOARD_DOTS-d.inBoard)+'</b> ドット</span></div>';
+    +'<span>'+d.board+'枚目まで あと <b>'+(BOARD_DOTS-d.inBoard)+'</b> ドット</span></div>'
+    +doneBoardsHtml(d.board-1);
+}
+// 完成したボードの印と「完成 ○枚」。これも累計正解から計算するだけ
+function doneBoardsHtml(n){
+  if(n<=0) return '';
+  var marks='';
+  for(var i=0;i<n;i++) marks+='<i></i>';
+  return '<div class="coll-done" aria-label="完成したボード '+n+'枚">'+marks+'<span>完成 <b>'+n+'</b>枚</span></div>';
 }
 function updateCollections(){
   renderCollection(document.getElementById('home-collection'));
