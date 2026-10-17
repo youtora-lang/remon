@@ -26,13 +26,19 @@ self.addEventListener('activate', function(e) {
   self.clients.claim();
 });
 
+// ネットワーク優先。取れたものはキャッシュを上書きし、オフラインのときはキャッシュを返す。
+// Google Fonts（CSS と字形のファイル）もここで同じようにキャッシュされるので、
+// 一度表示した書体はオフラインでも使える。キャッシュにない書体は端末のフォントで表示する。
+// clone() は応答を返す前に取ること（返したあとだと本文が読まれていて失敗する）。
 self.addEventListener('fetch', function(e) {
+  if (e.request.method !== 'GET') return;
   e.respondWith(
-    caches.match(e.request).then(function(cached) {
-      return fetch(e.request).then(function(fresh) {
-        var cache = caches.open(CACHE_NAME).then(function(c) { c.put(e.request, fresh.clone()); });
-        return fresh;
-      }).catch(function() { return cached; });
+    fetch(e.request).then(function(fresh) {
+      var copy = fresh.clone();
+      caches.open(CACHE_NAME).then(function(c) { return c.put(e.request, copy); }).catch(function() {});
+      return fresh;
+    }).catch(function() {
+      return caches.match(e.request);
     })
   );
 });
