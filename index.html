@@ -16,14 +16,15 @@
      読めないときは --font の後ろにある端末のフォントで表示される -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* ===== 色と書体 =====
    色はすべてここの変数で持つ。画面の中で色を直書きしない。
    使い方のルールは CLAUDE.md の「色の使い方」を参照（1つの面には1色、文字は茶系だけ） */
 :root{
   --font-scale:1;
-  --font:'Poppins','Noto Sans JP',system-ui,-apple-system,'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
+  /* 数字と英字は Poppins、日本語は Zen Maru Gothic（Poppins に日本語の字がないので、並び順でこう分かれる） */
+  --font:'Poppins','Zen Maru Gothic',system-ui,-apple-system,'Hiragino Maru Gothic ProN','Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
 
   --bg:#FFE9F3;        /* 背景 */
   --white:#FFFFFF;     /* 白 */
@@ -312,7 +313,7 @@ button{cursor:pointer}
 
 <!-- 共通フッター（ホーム以外で画面の下に固定。ホームではスクロールの末尾に複製する） -->
 <div id="app-footer" class="foot">
-  <span class="footer-updated">Updated Oct 18, 2026 01:57</span>
+  <span class="footer-updated">Updated Oct 18, 2026 08:58</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
