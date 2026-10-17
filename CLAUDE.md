@@ -211,6 +211,18 @@ node validate-questions.js
 
 濃い緑（`--green-d`）はドットにだけ使う。
 
+### 端末のバーの色（Android にインストールしたとき）
+
+- 上のステータスバー：`index.html` の `meta theme-color`（#FFE9F3、背景と同じピンク）
+- 下のナビゲーションバー：manifest 2点の `theme_color`（#A5532A、締め色の茶）
+- 起動画面の背景：manifest の `background_color`（#FFE9F3）
+
+`meta theme-color` はページが読み込まれたあとの上のバーを決める。manifest の `theme_color` は
+下のバーと、ページが読み込まれるまでの上のバー（起動画面の間）を決める。
+端末にインストール済みのアプリは manifest の変更をすぐには取りこまない。
+Chrome が manifest を見直すのは前回から24時間以上たって起動したときで、
+アプリの画面をすべて閉じ、充電中かつ Wi-Fi のときに作り直す。
+
 ### 形
 
 - 角はたっぷり丸く（カード 28px前後、ボタンは丸型）。線や影はほとんど使わない
