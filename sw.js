@@ -7,9 +7,14 @@ const ASSETS = [
   './icon-512.png'
 ];
 
+// インストール時はブラウザの HTTP キャッシュを通さずに取りに行く（cache: 'reload'）。
+// GitHub Pages はファイルを10分ほどブラウザにキャッシュさせるので、通すと
+// CACHE_NAME を上げた直後に古いファイルが新しいキャッシュに入ることがある。
 self.addEventListener('install', function(e) {
   e.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) { return cache.addAll(ASSETS); })
+    caches.open(CACHE_NAME).then(function(cache) {
+      return cache.addAll(ASSETS.map(function(url) { return new Request(url, { cache: 'reload' }); }));
+    })
   );
   self.skipWaiting();
 });
