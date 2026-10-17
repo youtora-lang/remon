@@ -1,6 +1,7 @@
 const CACHE_NAME = 'remon-v105';
 const ASSETS = [
   './index.html',
+  './questions.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'

@@ -5,15 +5,17 @@
 
 ## ファイル構成
 
-- `index.html` … 本体。全ロジックと問題データ（PRELOAD 配列）を内包
+- `index.html` … 本体。画面と全ロジック
+- `questions.js` … 問題データ（PRELOAD 配列）。`index.html` より先に読み込まれる
 - `sw.js` … Service Worker（キャッシュ管理）
 - `validate-questions.js` … 問題データの検証スクリプト（Node、依存なし）
 - `manifest.json` / `manifest-3.json` / `icon-192.png` / `icon-512.png`
 - `README.md` … リポジトリの説明（人が最初に読む1枚）
 - `CLAUDE.md` … このファイル
 
-問題データはすべて `index.html` の `PRELOAD` の1行に埋め込まれています。
-この1行だけで約244KB、ファイル全体の約76%です。整形して改行を入れないでください。
+問題データはすべて `questions.js` の `PRELOAD` の1行に入っています。
+先頭のコメント2行のあとの `var PRELOAD=[...];` の1行がデータの全部です。
+整形して改行を入れないでください（検証スクリプトはこの1行を読みます）。
 
 ## 問題データの形式
 

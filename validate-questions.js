@@ -3,8 +3,8 @@
 
 // remon 問題データ検証スクリプト
 //
-// index.html の PRELOAD を取り出して、問題を追加したあとに壊れやすい点を検査する。
-// 使い方:  node validate-questions.js  [index.htmlのパス]
+// questions.js の PRELOAD を取り出して、問題を追加したあとに壊れやすい点を検査する。
+// 使い方:  node validate-questions.js  [questions.jsのパス]
 // 終了コード: 全項目パス=0 / 違反あり=1 / 読み込み失敗=2
 // 警告（全角の式記号）は終了コードに影響しない。
 
@@ -16,10 +16,10 @@ var SUBJECT_NAMES = {
   chiri: '地理', rekishi: '歴史', eigo: '英語'
 };
 
-var target = process.argv[2] || path.join(__dirname, 'index.html');
+var target = process.argv[2] || path.join(__dirname, 'questions.js');
 
 // ── PRELOAD の取り出し ───────────────────────────────────
-// PRELOAD は index.html 内の1行にまるごと入っている（整形して改行を入れないこと）。
+// PRELOAD は questions.js 内の1行にまるごと入っている（整形して改行を入れないこと）。
 function extractPreload(file) {
   var src;
   try {

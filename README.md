@@ -3,7 +3,7 @@
 中学1年生向けの5教科テスト対策学習アプリ（PWA）。
 教科書に準拠した4択クイズを、間隔反復（忘れたころに復習）で出題する。
 
-ビルド不要の静的サイト。index.html にUI・ロジック・問題データがすべて入っている。
+ビルド不要の静的サイト。index.html にUIとロジック、questions.js に問題データが入っている。
 
 ## 名前の由来
 
@@ -76,7 +76,8 @@
 ## ファイル構成
 
 ```
-index.html             本体（UI・全ロジック・問題データを内包）
+index.html             本体（UI・全ロジック）
+questions.js           問題データ（PRELOAD）
 sw.js                  Service Worker（キャッシュ管理）
 manifest.json          PWAマニフェスト
 icon-192.png           アイコン
@@ -88,7 +89,7 @@ README.md              このファイル
 
 ## データの仕組み
 
-- `PRELOAD`：index.html 内の1行に埋め込まれた問題データ。
+- `PRELOAD`：questions.js 内の1行に入っている問題データ。
   `{ subject, unit, questions: [{ question, choices, explanation }] }` の配列で、
   **`choices` の先頭が正解**（正解フラグは持たない）
 - `PRELOAD_STRUCT_VERSION`：単元構成を変更したら上げる。上げても学習履歴は
@@ -99,7 +100,7 @@ README.md              このファイル
 
 ## 問題を追加するとき
 
-1. index.html の `PRELOAD` を編集する（既存単元への追加は末尾に足す。
+1. questions.js の `PRELOAD` を編集する（既存単元への追加は末尾に足す。
    末尾追加なら既存の学習履歴に影響しない）
 2. `node validate-questions.js` を実行して検証する
 3. フッターの更新日時を直す
