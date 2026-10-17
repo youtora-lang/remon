@@ -82,7 +82,7 @@ CLAUDE.md 項目7・8 に従う。要点は次の2つ。
 5. commit する。メッセージは40文字以内、`Co-Authored-By` 行は入れない（公開リポジトリのため）
 6. push は指示があってから。自分の判断で push しない
 
-`PRELOAD_STRUCT_VERSION` は上げない（上げるのは単元枠の増減・改名のときだけ）。README には問題数や単元の埋まり具合のような変動する数字を書かない。
+`PRELOAD_STRUCT_VERSION` は上げる必要がない（問題の追加でも単元枠の増減・改名でも同じ。syncPreload が起動のたびに PRELOAD から作り直すため。詳しくは CLAUDE.md）。README には問題数や単元の埋まり具合のような変動する数字を書かない。
 
 ## 完了時に報告すること
 
