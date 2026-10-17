@@ -188,6 +188,31 @@ button{cursor:pointer}
 .explanation-label{font-size:0.75rem;font-weight:700;color:var(--text-sub);margin-bottom:4px}
 .next-btn{display:none}
 .next-btn.visible{display:flex}
+/* 正解したときの小さな知らせ（解説を出さない設定で、次へ進むまでの0.6秒だけ出す） */
+.correct-note{display:none;align-items:center;gap:8px;background:var(--green-l);border-radius:999px;min-height:44px;padding:8px 18px;margin-bottom:12px;font-size:0.8125rem;font-weight:700}
+.correct-note.visible{display:flex}
+.correct-note .dot-left{font-weight:500}
+.explanation-dots{display:none;align-items:center;gap:6px;margin-top:10px;font-size:0.75rem;color:var(--text-sub)}
+.explanation-dots.visible{display:flex}
+.explanation-dots i{width:10px;height:10px;border-radius:50%;background:var(--pink-d);flex-shrink:0}
+
+/* ===== ドットコレクション =====
+   累計正解（totalCorrect）から計算するだけで、保存データは増やさない。
+   正解10問で1ドット、30ドット（10個×3行）で1枚のボード */
+.coll-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px}
+.coll-board-no{font-size:0.8125rem;color:var(--text-sub);font-weight:600;flex-shrink:0}
+.board{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;background:var(--dot-base);border-radius:20px;padding:12px}
+.board i{display:block;aspect-ratio:1;border-radius:50%;position:relative}
+/* まだのドット：点線の輪 */
+.board i.rest{border:2px dashed var(--pink)}
+/* 次のドット：進み具合に応じて輪が埋まる。中は台の色で抜く */
+.board i.next{background:conic-gradient(var(--fill) var(--p), var(--pink-l) 0)}
+.board i.next::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--dot-base)}
+.board i.pop{animation:dotPop 0.45s ease-out}
+@keyframes dotPop{0%{transform:scale(0.2)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){ .board i.pop{animation:none} }
+.coll-info{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px;margin-top:12px;font-size:0.8125rem;color:var(--text-sub)}
+.coll-info b{color:var(--text);font-size:1rem}
 
 /* ===== 結果 ===== */
 .result-content{display:flex;flex-direction:column;align-items:center;text-align:center;padding:32px 4px 12px}
@@ -199,9 +224,9 @@ button{cursor:pointer}
 .result-score{font-size:3.5rem;font-weight:700;line-height:1.1;margin-top:8px}
 .result-score-label{font-size:0.875rem;color:var(--text-sub);margin-bottom:20px}
 .result-stats{display:flex;gap:12px;width:100%;margin-bottom:20px}
-.result-stat{flex:1;background:var(--white);border-radius:var(--r-tile);padding:14px 10px}
+.result-stat{flex:1;min-width:0;background:var(--white);border-radius:var(--r-tile);padding:14px 4px}
 .result-stat-num{font-size:1.5rem;font-weight:700}
-.result-stat-label{font-size:0.75rem;color:var(--text-sub);margin-top:2px}
+.result-stat-label{font-size:0.75rem;color:var(--text-sub);margin-top:2px;white-space:nowrap}
 .result-btns{display:flex;flex-direction:column;gap:10px;width:100%}
 
 /* ===== 記録・データ ===== */
@@ -302,6 +327,9 @@ button{cursor:pointer}
       </div>
       <div class="week-dots" id="week-chart"></div>
     </button>
+
+    <div class="label">COLLECTION</div>
+    <div class="card" id="home-collection"></div>
 
     <div class="label">SUBJECTS</div>
     <div class="subj-grid" id="subject-list"></div>
@@ -411,9 +439,11 @@ button{cursor:pointer}
       <div class="question-text" id="q-text">問題文がここに入ります</div>
     </div>
     <div class="choices" id="choices"></div>
+    <div class="correct-note" id="correct-note"><svg class="ic ic-s"><use href="#i-check"/></svg>正解<span class="dot-left" id="correct-note-dots"></span></div>
     <div class="explanation-box" id="explanation-box">
       <div class="explanation-label">解説</div>
       <div id="explanation-text"></div>
+      <div class="explanation-dots" id="explanation-dots"><i></i><span></span></div>
     </div>
     <button class="btn btn-pink next-btn" id="next-btn" onclick="nextQuestion()">つぎへ<svg class="ic"><use href="#i-arrow"/></svg></button>
   </div>
@@ -436,7 +466,12 @@ button{cursor:pointer}
           <div class="result-stat-num" id="res-rate">0%</div>
           <div class="result-stat-label">正答率</div>
         </div>
+        <div class="result-stat">
+          <div class="result-stat-num" id="res-dots">0</div>
+          <div class="result-stat-label">ふえたドット</div>
+        </div>
       </div>
+      <div class="card" id="result-collection" style="width:100%;text-align:left;margin-bottom:20px"></div>
       <div class="result-btns">
         <button class="btn btn-peach" id="review-wrong-btn" style="display:none" onclick="startReviewWrong()"><svg class="ic"><use href="#i-x"/></svg>まちがえた問題を復習</button>
         <button class="btn btn-pink" onclick="goHome()"><svg class="ic"><use href="#i-home"/></svg>ホームへ</button>
@@ -773,6 +808,7 @@ function refreshHome(){
   var goal=state.dailyGoal||20;
   document.getElementById('today-goal-display').textContent='今日 '+(state.todayCorrect||0)+'/'+goal+'問';
   renderSubjectTiles();
+  updateCollections();
 }
 
 // 今週のがんばり。やった日の基準は以前の棒グラフと同じ「その日の正解数が1日の目標以上」。
@@ -795,6 +831,58 @@ function shownStreak(){
   if(!state.lastDate) return 0;
   var diff=Math.round((new Date(todayStr())-new Date(state.lastDate))/86400000);
   return diff<=1 ? (state.streak||0) : 0;
+}
+
+// ── ドットコレクション ───────────────────────────────────
+// 累計正解から計算するだけ。保存データは増やさない。
+var DOT_PER=10, BOARD_DOTS=30;
+function dotStats(total){
+  total=Math.max(0,Math.floor(total||0));
+  var dots=Math.floor(total/DOT_PER);
+  return {
+    dots:dots,                                 // これまでに集めたドット
+    board:Math.floor(dots/BOARD_DOTS)+1,       // いま埋めているボードの番号（1から）
+    inBoard:dots%BOARD_DOTS,                   // そのボードで埋まっているドット
+    progress:total%DOT_PER,                    // 次のドットまでに解いた問題（0〜9）
+    toNext:DOT_PER-total%DOT_PER               // 次のドットまであと何問
+  };
+}
+// ボードの i 番目（0〜29）の色。淡いピンクから濃いピンクへ順に濃くする
+function dotColor(i){
+  var t=Math.round(i/(BOARD_DOTS-1)*100);
+  return 'color-mix(in srgb, var(--pink-d) '+t+'%, var(--pink))';
+}
+// 1つ前に描いたときのドット数（画面の上だけで覚える。保存しない）。増えていたら最新のドットだけ動かす
+var lastShownDots=null;
+function renderCollection(el){
+  if(!el) return;
+  var d=dotStats(state.totalCorrect), html='';
+  var grew=(lastShownDots!==null && d.dots>lastShownDots);
+  for(var i=0;i<BOARD_DOTS;i++){
+    if(i<d.inBoard){
+      // color-mix が使えない端末では、前に書いた濃いピンクのまま表示される
+      html+='<i class="'+(grew&&i===d.inBoard-1?'pop':'')+'" style="background:var(--pink-d);background:'+dotColor(i)+'"></i>';
+    } else if(i===d.inBoard){
+      html+='<i class="next" style="--p:'+(d.progress*100/DOT_PER)+'%;--fill:var(--pink-d);--fill:'+dotColor(i)+'"></i>';
+    } else {
+      html+='<i class="rest"></i>';
+    }
+  }
+  el.innerHTML='<div class="coll-head"><div class="card-title">ドットコレクション</div>'
+    +'<div class="coll-board-no">'+d.board+'枚目</div></div>'
+    +'<div class="board" role="img" aria-label="'+d.board+'枚目のボード、'+d.inBoard+'個のドット">'+html+'</div>'
+    +'<div class="coll-info"><span>あと <b>'+d.toNext+'</b> 問で次のドット</span>'
+    +'<span>'+d.board+'枚目まで あと <b>'+(BOARD_DOTS-d.inBoard)+'</b> ドット</span></div>';
+}
+function updateCollections(){
+  renderCollection(document.getElementById('home-collection'));
+  renderCollection(document.getElementById('result-collection'));
+  lastShownDots=dotStats(state.totalCorrect).dots;
+}
+// 正解したときに出す一言。ちょうどドットが増えたときはそれを知らせる
+function dotNoteText(){
+  var d=dotStats(state.totalCorrect);
+  return d.progress===0 ? 'ドットが1つ増えた！' : 'あと'+d.toNext+'問で次のドット';
 }
 
 // 教科のタイル。10個のドットと % は「一度でも解いた問題」の割合
@@ -1033,6 +1121,8 @@ function renderQuestion(){
   document.getElementById('q-text').textContent=q.question;
   document.getElementById('explanation-box').classList.remove('visible');
   document.getElementById('explanation-text').textContent='';
+  document.getElementById('explanation-dots').classList.remove('visible');
+  document.getElementById('correct-note').classList.remove('visible');
   document.getElementById('next-btn').classList.remove('visible');
   var choicesEl=document.getElementById('choices');
   choicesEl.innerHTML='';
@@ -1078,9 +1168,15 @@ function selectChoice(btn,chosen,correct,item){
     if((state.explainMode||'wrong')==='always'){
       var expc=item.q.explanation||('正解は「'+correct+'」です。');
       document.getElementById('explanation-text').textContent=expc;
+      var ed=document.getElementById('explanation-dots');
+      ed.querySelector('span').textContent=dotNoteText();
+      ed.classList.add('visible');
       document.getElementById('explanation-box').classList.add('visible');
       document.getElementById('next-btn').classList.add('visible');
     } else {
+      // 解説を出さない設定でも、次へ進むまでの0.6秒だけ次のドットまでの残りを出す
+      document.getElementById('correct-note-dots').textContent=dotNoteText();
+      document.getElementById('correct-note').classList.add('visible');
       setTimeout(function(){ nextQuestion(); },600);
     }
   } else {
@@ -1147,12 +1243,16 @@ function showResult(){
   document.getElementById('result-score').textContent=quizCorrect;
   document.getElementById('res-total').textContent=total;
   document.getElementById('res-rate').textContent=rate+'%';
+  // 今回増えたドット。この回の正解はすべて累計正解に足されている
+  var tc=state.totalCorrect||0;
+  document.getElementById('res-dots').textContent='+'+(dotStats(tc).dots-dotStats(tc-quizSessionCorrect).dots);
   // 間違えた問題を保存（復習用）
   state.lastWrong = sessionWrong.slice();
   // 復習ボタンの表示
   var rvBtn=document.getElementById('review-wrong-btn');
-  if(rvBtn){ rvBtn.style.display = sessionWrong.length>0 ? 'block' : 'none'; }
+  if(rvBtn){ rvBtn.style.display = sessionWrong.length>0 ? 'flex' : 'none'; }
   showScreen('result'); saveState();
+  updateCollections();
   // 結果画面で戻るを押したらホームへ（クイズには戻さない）。
   // 規約どおり、上の段には結果画面そのものの復元関数を置く
   navStack=[ function(){ showScreen('home'); }, function(){ showScreen('result'); } ];
