@@ -9,651 +9,519 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="remon">
-<meta name="theme-color" content="#F5E642">
+<meta name="theme-color" content="#FFE9F3">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- 書体は Google Fonts。Service Worker が一度読んだものをキャッシュする。
+     読めないときは --font の後ろにある端末のフォントで表示される -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* ===== 色と書体 =====
+   色はすべてここの変数で持つ。画面の中で色を直書きしない。
+   使い方のルールは CLAUDE.md の「色の使い方」を参照（1つの面には1色、文字は茶系だけ） */
 :root{
   --font-scale:1;
-  --lemon-yellow:#F5E642;
-  --lemon-dark:#D4C200;
-  --leaf:#5A7A4A;
-  --white:#FDFEF8;
-  --text-dark:#2C2A1A;
-  --text-mid:#5C5A3C;
-  --text-soft:#8C8A6C;
-  --correct:#4CAF6A;
-  --wrong:#E85C5C;
-  --radius:20px;
-  --font-main:'Zen Maru Gothic',sans-serif;
+  --font:'Poppins','Noto Sans JP',system-ui,-apple-system,'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
 
-  --kokugo-bg:#FAFAF7;
-  --kokugo-card:#FFFFFF;
-  --kokugo-accent:#3A3A3A;
+  --bg:#FFE9F3;        /* 背景 */
+  --white:#FFFFFF;     /* 白 */
+  --dot-base:#FFF4F9;  /* ドットの台 */
+  --line:#FFE3EF;      /* 線 */
 
-  --gijutsu-bg:#D4F0EC;
-  --gijutsu-card:#EAF8F6;
-  --gijutsu-accent:#1A6B63;
+  --pink-l:#FFE3EF;    /* ピンク 淡 */
+  --pink:#FFC4DD;      /* ピンク 標準 */
+  --pink-d:#FF86B7;    /* ピンク 濃 */
 
-  --rika-bg:#D8F0CC;
-  --rika-card:#EAF7E0;
-  --rika-accent:#3A7A28;
+  --green-l:#E6FBD8;   /* 緑 淡 */
+  --green:#C2F2A4;     /* 緑 標準 */
+  --green-d:#2FAE1B;   /* 緑 濃（ドットにだけ使う） */
 
-  --sugaku-bg:#C8E4F5;
-  --sugaku-card:#DFF0FA;
-  --sugaku-accent:#1A5A8A;
+  --text:#3D2B22;      /* 文字 本文 */
+  --text-sub:#A5532A;  /* 文字 補助 */
 
-  /* 地理は旧「社会」の色をそのまま引き継ぐ */
-  --chiri-bg:#F5C84A;
-  --chiri-card:#FDDCA0;
-  --chiri-accent:#8A5A00;
+  --peach:#FFF0E3;     /* 不正解の面 */
 
-  /* 歴史は地理と見分けがつくよう、落ち着いた赤茶を新しく用意する */
-  --rekishi-bg:#D98C6A;
-  --rekishi-card:#F6D5C4;
-  --rekishi-accent:#8A3A16;
+  --scrim:rgba(61,43,34,0.28); /* シートの下に敷く幕（本文の茶を透かしたもの） */
+
+  --r-card:28px;
+  --r-tile:24px;
 }
 
-html,body{height:100%;width:100%;overflow:hidden;background:#F5F0D0;font-family:var(--font-main)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font)}
 html{font-size:calc(16px * var(--font-scale))}
+button,input{font-family:inherit;color:inherit}
+button{cursor:pointer}
 
-.stripe-bar{
-  position:fixed;left:0;right:0;height:18px;z-index:9000;
-  background:repeating-linear-gradient(
-    90deg,
-    #F5E642 0px, #F5E642 14px,
-    #ffffff 14px, #ffffff 22px
-  );
-  flex-shrink:0;
-}
-.stripe-top{top:0;}
-.stripe-bottom{bottom:0;}
-#app-footer{position:fixed;left:0;right:0;bottom:24px;text-align:center;font-family:'Nunito',sans-serif;font-size:10px;line-height:1.5;color:rgba(120,110,80,0.6);letter-spacing:0.3px;z-index:9001;pointer-events:none}
-#app-footer .footer-updated{display:block}
-#app-footer .footer-made{display:block;font-weight:700}
-#home{display:none;flex-direction:column;overflow:hidden}
-#home.active{display:flex}
-#home .home-top{flex:0 0 auto}
-#home .home-middle{flex:1 1 auto;overflow-y:auto;min-height:0;-webkit-overflow-scrolling:touch}
-#subject-screen{display:none;flex-direction:column;overflow:hidden}
-#subject-screen.active{display:flex}
-#subject-screen .subj-top{flex:0 0 auto}
-/* 下パディングは「はじめる」に最後の単元が接しないための余白。
-   固定側の高さは文字サイズで変わるので rem で持つ */
-#subject-screen .subj-middle{flex:1 1 auto;overflow-y:auto;min-height:0;-webkit-overflow-scrolling:touch;padding-bottom:0.75rem}
-#subject-screen .subj-bottom{flex:0 0 auto}
+/* 線のアイコン。<svg class="ic"><use href="#i-..."/></svg> で使う */
+.ic{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ic-s{width:18px;height:18px}
 
-#app{height:100dvh;width:100%;display:flex;flex-direction:column;overflow:hidden;position:relative}
+#app{height:100dvh;width:100%;max-width:560px;margin:0 auto;position:relative;overflow:hidden}
 
-/* ===== SCREENS ===== */
-.screen{display:none;flex-direction:column;height:100%;width:100%;animation:fadeIn 0.25s ease;padding-top:18px;padding-bottom:60px;}
+/* ===== 画面 ===== */
+.screen{display:none;flex-direction:column;height:100%;width:100%;animation:fadeIn 0.2s ease}
 .screen.active{display:flex}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* ホーム以外は固定フッター（更新日時）の分だけ下をあける */
+.screen:not(#home){padding-bottom:44px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){ .screen{animation:none} }
 
-/* ===== HOME SCREEN ===== */
-/* 固定するのは上部バー1本だけ。中身はすべて .home-middle 側でスクロールする。
-   固定フッターはホームでは出さないので、下の余白は装飾ストライプ18px分だけ。 */
-#home{background:var(--lemon-yellow);overflow:hidden;padding-bottom:18px}
+.scroll{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;min-height:0;-webkit-overflow-scrolling:touch;padding:0 16px 20px}
 
-/* 常時表示の細いバー。高さは書かず、中身に応じて伸ばす。
-   ホームと教科ページで同じものを使う */
-.home-bar,.subj-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px}
-/* 教科ページは「戻る＋教科名」を左に並べるだけ */
-.subj-bar{justify-content:flex-start}
-.home-bar-title,.subj-bar-title{font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text-dark);letter-spacing:-0.5px;line-height:1.2}
-.home-bar-actions{display:flex;gap:8px;flex-shrink:0}
-.icon-btn{background:rgba(255,255,255,0.6);border:none;border-radius:12px;padding:8px 10px;font-family:var(--font-main);font-size:1.1rem;line-height:1;color:var(--text-dark);cursor:pointer;transition:opacity 0.12s}
-.icon-btn:active{opacity:0.7}
+/* 上部のバー（全画面共通） */
+.bar{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:10px 16px;min-height:64px}
+.bar-title{font-size:1.125rem;font-weight:700;line-height:1.3;min-width:0;flex:1}
+.round-btn{width:44px;height:44px;border-radius:50%;border:none;background:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text)}
+.round-btn:active{opacity:0.75}
+.round-btn:disabled{opacity:0.35;cursor:default}
+.logo{display:flex;align-items:center;gap:8px;flex:1;min-width:0;font-weight:700;font-size:1.375rem;letter-spacing:-0.3px}
+.logo svg{width:42px;height:24px;flex-shrink:0}
 
-/* スクロールすると畳まれる見出し。max-height は文字を大きくしても足りる値にする。
-   畳み込みは bindCollapsingHeader() が画面を問わず同じ閾値で付け外しする */
-.home-header,.subject-header{padding:16px 24px 12px;text-align:center;position:relative;overflow:hidden;max-height:480px;opacity:1;transition:max-height 0.28s ease,opacity 0.2s ease,padding 0.28s ease}
-#home.collapsed .home-header,#subject-screen.collapsed .subject-header{max-height:0;opacity:0;padding-top:0;padding-bottom:0}
-@media (prefers-reduced-motion: reduce){
-  .home-header,.subject-header{transition:none}
-}
+/* カードの上の小さな英字ラベル */
+.label{font-size:0.6875rem;font-weight:600;letter-spacing:0.14em;color:var(--text-sub);margin:20px 6px 8px}
+.label:first-child{margin-top:4px}
 
-/* ホームではスクロールの末尾にフッターを置く（中身は #app-footer から複製する） */
-.home-scroll-footer{padding:8px 20px 24px;text-align:center;font-family:'Nunito',sans-serif;font-size:10px;line-height:1.5;color:rgba(120,110,80,0.6);letter-spacing:0.3px}
-.home-scroll-footer .footer-updated{display:block}
-.home-scroll-footer .footer-made{display:block;font-weight:700}
-.home-title{font-family:'Nunito',sans-serif;font-size:2.625rem;font-weight:800;color:var(--text-dark);letter-spacing:-1px;line-height:1}
-.home-subtitle{font-size:13px;color:var(--text-mid);margin-top:4px}
+.card{background:var(--white);border-radius:var(--r-card);padding:18px}
+.card-title{font-size:1rem;font-weight:700;line-height:1.4}
+.sub{font-size:0.8125rem;color:var(--text-sub);line-height:1.5}
 
-.daily-mix-btn{margin:0 16px 14px;background:var(--text-dark);border:none;border-radius:22px;padding:20px 22px;display:flex;align-items:center;gap:16px;cursor:pointer;width:calc(100% - 32px);transition:transform 0.12s,opacity 0.12s;box-shadow:0 4px 16px rgba(0,0,0,0.15)}
-.daily-mix-btn:active{transform:scale(0.97);opacity:0.9}
-.daily-mix-icon{font-size:34px;flex-shrink:0}
-.daily-mix-text{flex:1;text-align:left}
-.daily-mix-title{font-family:'Nunito',sans-serif;font-size:1.3rem;font-weight:800;color:var(--lemon-yellow);line-height:1.1}
-.daily-mix-sub{font-size:0.78rem;color:rgba(255,255,255,0.75);margin-top:3px}
-.daily-mix-arrow{font-size:1rem;color:var(--lemon-yellow);flex-shrink:0}
+/* ボタン（丸型） */
+.btn{border:none;border-radius:999px;min-height:52px;padding:0 20px;font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;color:var(--text)}
+.btn:active{opacity:0.8}
+.btn:disabled{opacity:0.4;cursor:default}
+.btn-pink{background:var(--pink)}
+.btn-white{background:var(--white)}
+.btn-peach{background:var(--peach)}
+.btn-base{background:var(--dot-base)}
 
-/* 高さは rem で持たせる（文字サイズに応じて伸びる）。px 直書きにすると
-   文字サイズ「大」で中身がはみ出す。 */
-.week-card{margin:0 16px 12px;background:rgba(255,255,255,0.7);border-radius:18px;padding:0.4rem 0.75rem;cursor:pointer;transition:transform .1s}
-.week-card:active{transform:scale(0.98)}
-/* 見出しと数値（今週◯問／目標◯問）は1行にまとめる。
-   文字サイズ「大」で入りきらないときだけ折り返す。 */
-.week-card-head{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px;row-gap:2px;margin-bottom:4px;font-size:0.72rem;color:var(--text-mid);font-weight:600}
-.week-card-title{font-size:0.9rem;font-weight:700;color:var(--text-dark)}
-.week-card-link{font-size:0.72rem;color:var(--text-mid);margin-left:auto}
-.week-chart{display:flex;align-items:flex-end;justify-content:space-between;gap:6px;height:3rem;padding:0 2px}
-.wc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end}
-.wc-bar-wrap{width:100%;flex:1;display:flex;align-items:flex-end}
-.wc-bar{width:100%;background:#E8923C;border-radius:6px 6px 3px 3px;min-height:3px;transition:height .4s ease;position:relative}
-.wc-bar.reached{background:#5CB85C}
-.wc-bar.today{box-shadow:0 0 0 2px var(--text-dark)}
-.wc-bar-val{font-size:0.6rem;color:var(--text-mid);font-weight:700;text-align:center}
-.wc-label{font-size:0.62rem;color:var(--text-mid)}
-.streak-bar{margin:0 20px 12px;background:rgba(255,255,255,0.55);border-radius:16px;padding:12px 18px;display:flex;align-items:center;gap:12px}
-.streak-icon{font-size:22px}
-.streak-info{flex:1}
-.streak-label{font-size:11px;color:var(--text-mid)}
-.streak-num{font-family:'Nunito',sans-serif;font-size:1.25rem;font-weight:800;color:var(--text-dark)}
-.total-correct{text-align:right}
-.total-label{font-size:11px;color:var(--text-mid)}
-.total-num{font-family:'Nunito',sans-serif;font-size:20px;font-weight:800;color:var(--text-dark)}
+/* フッター。ホームはスクロールの末尾、それ以外は画面の下に固定 */
+.foot{text-align:center;font-size:0.625rem;line-height:1.6;color:var(--text-sub);letter-spacing:0.3px}
+.foot span{display:block}
+.foot .footer-made{font-weight:600}
+#app-footer{position:absolute;left:0;right:0;bottom:4px;z-index:10;pointer-events:none}
+.home-scroll-footer{padding:28px 0 12px}
 
-.today-badge{margin:0 20px 16px;background:rgba(255,255,255,0.7);border-radius:12px;padding:8px 16px;display:flex;align-items:center;justify-content:space-between}
-.today-label{font-size:12px;color:var(--text-mid)}
-.today-count{font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:var(--text-dark)}
+/* ===== ホーム ===== */
+.today-card{position:relative;overflow:hidden;display:block;width:100%;border:none;text-align:left;background:var(--pink);border-radius:var(--r-card);padding:22px 22px 24px;min-height:136px}
+.today-card:active{opacity:0.9}
+.today-title{font-size:1.75rem;font-weight:700;line-height:1.2;position:relative}
+.today-sub{font-size:0.8125rem;margin-top:6px;position:relative;max-width:70%}
+.today-card .deco{position:absolute;border-radius:50%;background:var(--white)}
+.today-card .deco.d1{width:46px;height:46px;top:-12px;right:44px}
+.today-card .deco.d2{width:22px;height:22px;top:22px;right:20px}
+.today-card .deco.d3{width:12px;height:12px;top:48px;right:52px}
+.today-go{position:absolute;right:16px;bottom:16px;width:48px;height:48px;border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center}
 
-.section-label{padding:0 24px 8px;font-size:12px;color:var(--text-mid);font-weight:500}
+.week-card{display:block;width:100%;border:none;text-align:left}
+.week-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.week-streak{text-align:right;flex-shrink:0}
+.week-streak b{font-size:1.125rem;font-weight:700}
+.week-today{font-size:0.75rem;color:var(--text-sub);margin-top:2px}
+.week-dots{display:flex;justify-content:space-between;gap:4px;margin-top:14px}
+.wd{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.wd i{display:block;width:30px;height:30px;border-radius:50%;border:2px dashed var(--green)}
+.wd.done i{background:var(--green);border-style:solid}
+.wd.today i{border:3px solid var(--green)}
+.wd span{font-size:0.6875rem;color:var(--text-sub)}
+/* 今日が目標に届くと丸は他のやった日と同じになるので、曜日の文字で今日を示す */
+.wd.today span{font-weight:700;color:var(--text)}
 
-.subject-list{padding:0 16px 12px;display:flex;flex-direction:column;gap:10px}
-.subject-btn{border:none;border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:transform 0.12s,opacity 0.12s;width:100%;text-align:left;font-family:var(--font-main)}
-.subject-btn:active{transform:scale(0.97);opacity:0.85}
-.subject-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.subject-info{flex:1}
-.subject-name{font-size:1rem;font-weight:700;color:var(--text-dark)}
-.subject-count{font-size:0.75rem;color:var(--text-mid);margin-top:1px}
-.subject-rate{font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;margin-left:auto}
+.subj-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.subj-tile{min-width:0;border:none;background:var(--green-l);border-radius:var(--r-tile);padding:16px;text-align:left;display:flex;flex-direction:column;gap:10px}
+.subj-tile:active{opacity:0.85}
+.subj-head{display:flex;align-items:center;gap:10px;min-width:0}
+.subj-ini{width:44px;height:44px;border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.125rem}
+.subj-name{font-size:1rem;font-weight:700}
+.mini-dots{display:flex;gap:3px}
+.mini-dots i{display:block;flex:1;max-width:10px;aspect-ratio:1;border-radius:50%;background:var(--white)}
+.mini-dots i.on{background:var(--green-d)}
+.subj-pct{font-size:0.75rem;color:var(--text-sub)}
 
-.subject-btn.kokugo{background:var(--kokugo-card)}
-.subject-btn.kokugo .subject-icon{background:#F0EEE8}
-.subject-btn.kokugo .subject-rate{color:var(--kokugo-accent)}
-.subject-btn.gijutsu{background:var(--gijutsu-card)}
-.subject-btn.gijutsu .subject-icon{background:#C0E8E4}
-.subject-btn.gijutsu .subject-rate{color:var(--gijutsu-accent)}
-.subject-btn.rika{background:var(--rika-card)}
-.subject-btn.rika .subject-icon{background:#C4E8B4}
-.subject-btn.rika .subject-rate{color:var(--rika-accent)}
-.subject-btn.sugaku{background:var(--sugaku-card)}
-.subject-btn.sugaku .subject-icon{background:#B8D8EE}
-.subject-btn.sugaku .subject-rate{color:var(--sugaku-accent)}
-.subject-btn.chiri{background:var(--chiri-card)}
-.subject-btn.chiri .subject-icon{background:#F5C060}
-.subject-btn.chiri .subject-rate{color:var(--chiri-accent)}
-.subject-btn.rekishi{background:var(--rekishi-card)}
-.subject-btn.rekishi .subject-icon{background:#EDB79C}
-.subject-btn.rekishi .subject-rate{color:var(--rekishi-accent)}
+/* ===== 教科ページ ===== */
+.units{padding:8px 6px}
+.unit-row{display:flex;align-items:center;gap:2px;min-height:60px;padding:4px 0}
+.unit-row.is-excluded{opacity:0.45}
+.unit-row.is-empty{opacity:0.5}
+.sel-btn,.moon-btn{width:44px;height:44px;border:none;background:none;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text)}
+.sel-btn i{width:26px;height:26px;border-radius:50%;border:2px solid var(--green);display:flex;align-items:center;justify-content:center}
+.sel-btn i .ic{width:16px;height:16px;stroke-width:3;visibility:hidden}
+.sel-btn.on i{background:var(--green)}
+.sel-btn.on i .ic{visibility:visible}
+.sel-btn.blank{visibility:hidden}
+.moon-btn.on .ic{fill:currentColor}
+.unit-info{flex:1;min-width:0;border:none;background:none;text-align:left;padding:8px 4px;min-height:44px}
+.unit-name{font-size:0.9375rem;font-weight:500;line-height:1.45;word-break:break-word}
+.unit-row.is-recommend .unit-name{font-weight:700}
+.unit-meta{font-size:0.75rem;color:var(--text-sub);margin-top:3px;display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.due-tag{display:none;background:var(--green);color:var(--text);font-size:0.6875rem;font-weight:700;border-radius:999px;padding:1px 9px;line-height:1.6}
+.unit-row.is-recommend .due-tag{display:inline-block}
 
-.home-footer{padding:16px 20px 32px;display:flex;gap:10px}
-.footer-btn{flex:1;background:rgba(255,255,255,0.6);border:none;border-radius:14px;padding:12px 8px;font-family:var(--font-main);font-size:13px;font-weight:500;color:var(--text-dark);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:opacity 0.12s}
-.footer-btn:active{opacity:0.7}
-.footer-btn span{font-size:20px}
+.bottom-row{flex:0 0 auto;display:flex;gap:10px;padding:10px 16px 6px}
+.bottom-row .clear-btn{flex:1}
+.bottom-row .start-btn{flex:2}
 
-/* ===== SUBJECT SCREEN ===== */
-/* スクロールするのは .subj-middle だけ。画面全体は動かさない
-   （#subject-screen 側の overflow は上の #subject-screen{overflow:hidden} が持つ） */
-.back-btn{position:absolute;top:48px;left:20px;background:rgba(255,255,255,0.5);border:none;border-radius:12px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;color:var(--text-dark)}
-/* 教科名は細いバーにも出るので、畳まれる見出し側は控えめにする */
-.subject-screen-icon{font-size:40px;margin-bottom:6px}
-.subject-screen-name{font-size:22px;font-weight:700;color:var(--text-dark)}
-
-.unit-list{padding:0 16px 16px;display:flex;flex-direction:column;gap:8px}
-.unit-row{display:flex;align-items:stretch;gap:8px}
-.unit-row .unit-btn{flex:1}
-.unit-exclude{flex-shrink:0;width:48px;border:none;border-radius:16px;background:rgba(255,255,255,0.6);font-size:1.1rem;cursor:pointer;font-family:var(--font-main);transition:background 0.15s}
-.unit-exclude.is-excluded{background:#FFD9D9;color:#C04040;font-weight:700}
-.unit-btn{background:rgba(255,255,255,0.6);border:none;border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;font-family:var(--font-main);text-align:left;width:100%;transition:transform 0.12s}
-.unit-btn:active{transform:scale(0.97)}
-/* 単元名は1行目の幅を丸ごと使う。状態は2行目に問題数と並べる */
-.unit-info{flex:1;min-width:0}
-.unit-name{font-size:0.9375rem;font-weight:600;color:var(--text-dark)}
-.unit-meta{font-size:12px;color:var(--text-mid);margin-top:2px}
-/* 復習どきの単元は押してほしいので、2行目の文字に埋めない。
-   色だけに頼らないよう、左の帯（形）と単元名の太さ（文字）を併せて変える */
-.unit-btn.is-recommend{box-shadow:inset 4px 0 0 #C04040}
-.unit-btn.is-recommend .unit-name{font-weight:800}
-.unit-btn.is-recommend .unit-meta{color:#C04040;font-weight:700}
-.unit-flag{flex-shrink:0;font-size:1rem;line-height:1}
-
-
-
-
-/* 下部の固定バーは「クリア」と「はじめる」の2つ。幅は 1:2 で、はじめるを主役にする */
-.start-row{display:flex;gap:10px;margin:0 16px 10px}
-.start-btn{flex:2;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:0.85rem 1rem;font-family:var(--font-main);font-size:1.0625rem;font-weight:700;cursor:pointer;transition:opacity 0.12s;letter-spacing:0.3px}
-.clear-btn{flex:1;background:rgba(255,255,255,0.7);color:var(--text-dark);border:none;border-radius:18px;padding:0.85rem 0.5rem;font-family:var(--font-main);font-size:0.9375rem;font-weight:700;cursor:pointer;transition:opacity 0.12s}
-.start-btn:active,.clear-btn:active{opacity:0.8}
-/* 選ばれていないときは押せないことを見た目でも示す（背景・文字とも薄いグレー） */
-.start-btn:disabled,.clear-btn:disabled{background:#E2E2E2;color:#9A9A9A;cursor:default}
-.start-btn:disabled:active,.clear-btn:disabled:active{opacity:1}
-
-/* ===== QUIZ SCREEN ===== */
-#quiz{position:relative}
-.quiz-bg{position:absolute;inset:0;z-index:0;transition:background 0.3s}
-.quiz-content{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
-
-.quiz-top{padding:52px 20px 12px;display:flex;align-items:center;gap:12px}
-.quiz-back{background:rgba(255,255,255,0.4);border:none;border-radius:12px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:var(--text-dark);flex-shrink:0}
-.quiz-progress-wrap{flex:1}
-.quiz-progress-text{font-size:12px;color:var(--text-mid);margin-bottom:4px;display:flex;justify-content:space-between}
-.quiz-progress-bar{height:6px;background:rgba(255,255,255,0.4);border-radius:3px;overflow:hidden}
-.quiz-progress-fill{height:100%;background:var(--text-dark);border-radius:3px;transition:width 0.3s ease}
-
-.quiz-unit-tag{margin:0 20px 8px;background:rgba(255,255,255,0.4);border-radius:10px;padding:4px 12px;font-size:11px;color:var(--text-mid);display:inline-block;align-self:flex-start}
-
-.card-area{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;min-height:auto}
-.question-card{background:rgba(255,255,255,0.85);border-radius:24px;padding:28px 24px;width:100%;text-align:center;backdrop-filter:blur(4px)}
-.question-label{font-size:11px;color:var(--text-soft);margin-bottom:12px;letter-spacing:0.5px}
-.question-text{font-size:calc(22px * var(--font-scale));font-weight:700;color:var(--text-dark);line-height:1.5;word-break:break-all}
-.question-hint{font-size:13px;color:var(--text-mid);margin-top:8px}
-
-.choices{padding:16px 16px 24px;display:flex;flex-direction:column;gap:10px}
-.choice-btn{background:rgba(255,255,255,0.75);border:2px solid transparent;border-radius:18px;padding:16px 20px;font-family:var(--font-main);font-size:calc(16px * var(--font-scale));font-weight:500;color:var(--text-dark);cursor:pointer;text-align:left;transition:transform 0.1s,background 0.15s,border-color 0.15s;line-height:1.4;word-break:break-all}
-.choice-btn:active:not(.disabled){transform:scale(0.97)}
-.choice-btn.correct{background:#D4F5DE;border-color:var(--correct);color:#1A5A30}
-.choice-btn.wrong{background:#FFE0E0;border-color:var(--wrong);color:#7A1A1A}
-.choice-btn.show-correct{background:#D4F5DE;border-color:var(--correct);color:#1A5A30}
+/* ===== 出題 ===== */
+.quiz-top{flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:10px 16px}
+.qprog{flex:1;min-width:0}
+.qcount{font-size:0.9375rem;font-weight:600}
+.qdots{display:flex;gap:4px;margin-top:6px}
+.qdots i{display:block;flex:1;max-width:12px;aspect-ratio:1;border-radius:50%;background:var(--white)}
+.qdots i.done{background:var(--pink-d)}
+.qdots i.now{background:var(--pink)}
+.qunit{font-size:0.75rem;color:var(--text-sub);margin:2px 6px 10px;line-height:1.5}
+.qcard{background:var(--white);border-radius:var(--r-card);padding:24px 22px}
+.q-label{font-size:0.6875rem;font-weight:600;letter-spacing:0.14em;color:var(--text-sub);margin-bottom:10px}
+.question-text{font-size:1.3125rem;font-weight:700;line-height:1.55;word-break:break-word}
+.choices{display:flex;flex-direction:column;gap:10px;margin:14px 0}
+.choice-btn{width:100%;border:none;background:var(--white);border-radius:var(--r-tile);min-height:56px;padding:14px 18px;text-align:left;font-size:1rem;font-weight:500;line-height:1.45;display:flex;align-items:center;gap:10px;word-break:break-word}
+.choice-btn:active:not(.disabled){opacity:0.8}
+.choice-text{flex:1;min-width:0}
+.choice-mark{display:none;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;flex-shrink:0;white-space:nowrap}
+.choice-btn.correct,.choice-btn.show-correct{background:var(--green-l)}
+.choice-btn.wrong{background:var(--peach)}
+.choice-btn.correct .choice-mark,.choice-btn.show-correct .choice-mark,.choice-btn.wrong .choice-mark{display:flex}
 .choice-btn.disabled{cursor:default}
-
-.next-btn{margin:0 16px 8px;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:18px;font-family:var(--font-main);font-size:16px;font-weight:700;cursor:pointer;transition:opacity 0.12s;display:none}
-.next-btn.visible{display:block}
-.next-btn:active{opacity:0.8}
-.explanation-box{margin:0 16px 40px;background:rgba(255,255,255,0.75);border-radius:16px;padding:14px 18px;display:none;font-size:calc(13px * var(--font-scale));color:var(--text-mid);line-height:1.6}
+.explanation-box{display:none;background:var(--white);border-radius:var(--r-card);padding:16px 20px;font-size:0.875rem;line-height:1.7;margin-bottom:12px}
 .explanation-box.visible{display:block}
-.explanation-label{font-size:11px;font-weight:700;color:var(--wrong);margin-bottom:4px}
+.explanation-label{font-size:0.75rem;font-weight:700;color:var(--text-sub);margin-bottom:4px}
+.next-btn{display:none}
+.next-btn.visible{display:flex}
 
-/* ===== RESULT SCREEN ===== */
-#result{overflow-y:auto}
-.result-content{padding:52px 24px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;min-height:100%}
-.result-emoji{font-size:64px;margin-bottom:12px;animation:bounceIn 0.5s ease}
-@keyframes bounceIn{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
-.result-title{font-size:1.625rem;font-weight:700;color:var(--text-dark);margin-bottom:4px}
-.result-score{font-family:'Nunito',sans-serif;font-size:52px;font-weight:800;color:var(--text-dark);line-height:1}
-.result-score-label{font-size:14px;color:var(--text-mid);margin-bottom:24px}
-
-.result-stats{display:flex;gap:12px;width:100%;margin-bottom:24px}
-.result-stat{flex:1;background:rgba(255,255,255,0.6);border-radius:16px;padding:14px 10px}
-.result-stat-num{font-family:'Nunito',sans-serif;font-size:24px;font-weight:800;color:var(--text-dark)}
-.result-stat-label{font-size:11px;color:var(--text-mid);margin-top:2px}
-
-
+/* ===== 結果 ===== */
+.result-content{display:flex;flex-direction:column;align-items:center;text-align:center;padding:32px 4px 12px}
+.result-mark svg{width:96px;height:56px}
+@keyframes popIn{0%{transform:scale(0.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.result-mark{animation:popIn 0.4s ease}
+@media (prefers-reduced-motion: reduce){ .result-mark{animation:none} }
+.result-title{font-size:1.25rem;font-weight:700;margin-top:14px;line-height:1.5}
+.result-score{font-size:3.5rem;font-weight:700;line-height:1.1;margin-top:8px}
+.result-score-label{font-size:0.875rem;color:var(--text-sub);margin-bottom:20px}
+.result-stats{display:flex;gap:12px;width:100%;margin-bottom:20px}
+.result-stat{flex:1;background:var(--white);border-radius:var(--r-tile);padding:14px 10px}
+.result-stat-num{font-size:1.5rem;font-weight:700}
+.result-stat-label{font-size:0.75rem;color:var(--text-sub);margin-top:2px}
 .result-btns{display:flex;flex-direction:column;gap:10px;width:100%}
-.result-btn-primary{background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:18px;font-family:var(--font-main);font-size:16px;font-weight:700;cursor:pointer}
-.result-btn-secondary{background:rgba(255,255,255,0.6);border:none;border-radius:18px;padding:16px;font-family:var(--font-main);font-size:15px;font-weight:600;color:var(--text-dark);cursor:pointer}
 
-/* ===== DATA SCREEN ===== */
-#data-screen{overflow-y:auto;background:var(--lemon-yellow)}
-.data-header{padding:48px 24px 16px;display:flex;align-items:center;gap:12px}
-.data-title{font-size:20px;font-weight:700;color:var(--text-dark)}
-.data-area{padding:0 16px 32px;display:flex;flex-direction:column;gap:12px}
-.data-card{background:rgba(255,255,255,0.65);border-radius:18px;padding:18px}
-.data-card-title{font-size:13px;font-weight:600;color:var(--text-mid);margin-bottom:10px}
-.data-btn{width:100%;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:14px;padding:14px;font-family:var(--font-main);font-size:15px;font-weight:700;cursor:pointer;margin-top:8px}
-.data-export-text{font-size:12px;color:var(--text-mid);word-break:break-all;background:rgba(255,255,255,0.5);border-radius:10px;padding:10px;max-height:120px;overflow-y:auto;line-height:1.6}
-.copy-btn{width:100%;background:rgba(255,255,255,0.7);border:none;border-radius:12px;padding:12px;font-family:var(--font-main);font-size:14px;font-weight:600;color:var(--text-dark);cursor:pointer;margin-top:8px}
+/* ===== 記録・データ ===== */
+.stat-pair{display:flex;gap:12px;margin-bottom:12px}
+.stat-pair .card{flex:1;text-align:center;padding:14px 10px}
+.stat-num{font-size:1.5rem;font-weight:700}
+.week-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.week-nav .round-btn{background:var(--green-l)}
+.week-chart{display:flex;align-items:flex-end;justify-content:space-between;gap:6px;height:140px;padding:0 2px}
+.wc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.wc-bar-wrap{width:100%;flex:1;display:flex;align-items:flex-end}
+.wc-bar{width:100%;background:var(--green-l);border-radius:10px;min-height:4px;transition:height .4s ease}
+.wc-bar.reached{background:var(--green)}
+.wc-bar.today{outline:2px solid var(--green);outline-offset:1px}
+.wc-bar-val{font-size:0.6875rem;font-weight:600;color:var(--text-sub)}
+.wc-label{font-size:0.6875rem;color:var(--text-sub)}
+.data-export-text{font-size:0.75rem;color:var(--text-sub);word-break:break-all;background:var(--dot-base);border-radius:16px;padding:12px;max-height:140px;overflow-y:auto;line-height:1.6;margin-top:12px}
+.data-export-text.is-open{user-select:all;-webkit-user-select:all}
 
-/* ===== FEEDBACK FLASH ===== */
-.feedback-flash{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity 0.15s}
-.feedback-flash.show{opacity:1}
-.feedback-flash.correct-flash{background:rgba(76,175,106,0.15)}
-.feedback-flash.wrong-flash{background:rgba(232,92,92,0.1)}
-.feedback-text{font-size:48px;font-weight:800;font-family:'Nunito',sans-serif}
+/* ===== 設定シート ===== */
+.sheet-scrim{display:none;position:fixed;inset:0;background:var(--scrim);z-index:50}
+.sheet{display:none;position:fixed;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;background:var(--white);border-radius:var(--r-card) var(--r-card) 0 0;padding:20px 16px 28px;z-index:60;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sheet.open,.sheet-scrim.open{display:block}
+.sheet-title{font-size:1rem;font-weight:700;text-align:center;margin-bottom:14px}
+.menu-row{width:100%;display:flex;align-items:center;gap:12px;background:var(--dot-base);border:none;border-radius:20px;min-height:52px;padding:0 16px;font-size:0.9375rem;font-weight:500;text-align:left;margin-bottom:8px}
+.menu-row span{flex:1}
+.opt-label{font-size:0.75rem;color:var(--text-sub);margin:18px 4px 8px}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;min-height:44px;border:none;border-radius:999px;background:var(--dot-base);font-size:0.8125rem;padding:0 6px;line-height:1.3}
+.seg button.is-on{background:var(--pink);font-weight:700}
+.danger{background:var(--peach);border-radius:20px;margin-top:22px;overflow:hidden}
+.danger-toggle{width:100%;min-height:52px;border:none;background:none;display:flex;align-items:center;gap:10px;padding:0 16px;font-size:0.875rem;font-weight:700;text-align:left}
+.danger-toggle span{flex:1}
+.danger-body{display:none;padding:0 16px 16px}
+.danger-text{font-size:0.8125rem;line-height:1.6;margin-bottom:10px}
+.danger-row{display:flex;gap:8px}
+.danger-row .btn{min-height:44px;font-size:0.8125rem}
+.reset-input{width:100%;min-height:48px;padding:0 16px;margin-bottom:8px;border:none;border-radius:999px;background:var(--white);font-size:0.9375rem}
+.reset-done{display:none;margin-top:10px;font-size:0.8125rem;font-weight:700;align-items:center;justify-content:center;gap:6px}
+.sheet-close{margin-top:18px}
 </style>
 </head>
 <body>
-<div id="app">
-<div class="stripe-bar stripe-top"></div>
-<div class="stripe-bar stripe-bottom"></div>
+<!-- 線のアイコン（ストロークは文字色を使う） -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 13.5A8 8 0 1 1 10.5 4a6.2 6.2 0 0 0 9.5 9.5z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></symbol>
+  <symbol id="i-open" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></symbol>
+  <symbol id="i-type" viewBox="0 0 24 24"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-retry" viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <!-- ロゴ：3つのドットが重なる（ピンク・白・緑）。白を一番手前に描いて、背景のピンクにまぎれないようにする。塗りは変数から取る -->
+  <symbol id="logo-dots" viewBox="0 0 42 24"><circle cx="10" cy="12" r="9.5" style="fill:var(--pink-d)"/><circle cx="32" cy="12" r="9.5" style="fill:var(--green)"/><circle cx="21" cy="12" r="10" style="fill:var(--white)"/></symbol>
+</svg>
 
-<!-- 共通フッター（全ページ下部に表示） -->
-<div id="app-footer">
+<div id="app">
+
+<!-- 共通フッター（ホーム以外で画面の下に固定。ホームではスクロールの末尾に複製する） -->
+<div id="app-footer" class="foot">
   <span class="footer-updated">Updated Aug 06, 2026 06:00</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
 <!-- HOME -->
 <div id="home" class="screen active">
-  <div class="home-top">
-    <div class="home-bar">
-      <div class="home-bar-title">remon</div>
-      <div class="home-bar-actions">
-        <button class="icon-btn" onclick="openGuide()" title="使い方ガイド" aria-label="使い方ガイド">📖</button>
-        <button class="icon-btn" onclick="showSettingsMenu()" title="設定" aria-label="設定">⚙️</button>
-      </div>
-    </div>
-
-    <div class="home-header">
-      <div class="home-title">remon</div>
-      <div class="home-subtitle">今日もちょっとだけやってみよう</div>
-    </div>
+  <div class="bar">
+    <div class="logo"><svg aria-hidden="true"><use href="#logo-dots"/></svg><span>remon</span></div>
+    <button class="round-btn" onclick="showSettingsMenu()" title="設定" aria-label="設定"><svg class="ic"><use href="#i-gear"/></svg></button>
   </div>
 
-  <div class="home-middle">
-    <button class="daily-mix-btn" onclick="startDailyMix()">
-      <div class="daily-mix-text">
-        <div class="daily-mix-title">今日の20</div>
-        <div class="daily-mix-sub">全教科からピックアップ</div>
-      </div>
-      <div class="daily-mix-arrow">▶</div>
+  <div class="scroll">
+    <div class="label">TODAY</div>
+    <button class="today-card" onclick="startDailyMix()">
+      <span class="deco d1"></span><span class="deco d2"></span><span class="deco d3"></span>
+      <div class="today-title">今日の20</div>
+      <div class="today-sub">全教科から、復習どきと未学習の問題を20問</div>
+      <span class="today-go" aria-hidden="true"><svg class="ic"><use href="#i-arrow"/></svg></span>
     </button>
 
-    <div class="week-card" onclick="openStats()">
-      <div class="week-card-head">
-        <div class="week-card-title">📊 今週のがんばり</div>
-        <span id="week-total">今週 0問</span>
-        <span id="today-goal-display">目標 —</span>
-        <div class="week-card-link">記録を見る ▶</div>
+    <div class="label">THIS WEEK</div>
+    <button class="card week-card" onclick="openStats()">
+      <div class="week-head">
+        <div class="card-title">今週のがんばり</div>
+        <div class="week-streak">
+          <div>連続 <b id="week-streak">0</b> 日</div>
+          <div class="week-today" id="today-goal-display">今日 0/20問</div>
+        </div>
       </div>
-      <div class="week-chart" id="week-chart"></div>
-    </div>
+      <div class="week-dots" id="week-chart"></div>
+    </button>
 
-    <div class="section-label">教科を選ぶ</div>
+    <div class="label">SUBJECTS</div>
+    <div class="subj-grid" id="subject-list"></div>
 
-    <div class="subject-list" id="subject-list">
-    <button class="subject-btn kokugo" onclick="openSubject('kokugo')">
-      <div class="subject-icon">📖</div>
-      <div class="subject-info">
-        <div class="subject-name">国語</div>
-        <div class="subject-count" id="count-kokugo">問題なし</div>
-      </div>
-      <div class="subject-rate" id="rate-kokugo">—</div>
-    </button>
-    <button class="subject-btn sugaku" onclick="openSubject('sugaku')">
-      <div class="subject-icon">📐</div>
-      <div class="subject-info">
-        <div class="subject-name">数学</div>
-        <div class="subject-count" id="count-sugaku">問題なし</div>
-      </div>
-      <div class="subject-rate" id="rate-sugaku">—</div>
-    </button>
-    <button class="subject-btn rika" onclick="openSubject('rika')">
-      <div class="subject-icon">🔬</div>
-      <div class="subject-info">
-        <div class="subject-name">理科</div>
-        <div class="subject-count" id="count-rika">問題なし</div>
-      </div>
-      <div class="subject-rate" id="rate-rika">—</div>
-    </button>
-    <button class="subject-btn chiri" onclick="openSubject('chiri')">
-      <div class="subject-icon">🌏</div>
-      <div class="subject-info">
-        <div class="subject-name">地理</div>
-        <div class="subject-count" id="count-chiri">問題なし</div>
-      </div>
-      <div class="subject-rate" id="rate-chiri">—</div>
-    </button>
-    <button class="subject-btn rekishi" onclick="openSubject('rekishi')">
-      <div class="subject-icon">📜</div>
-      <div class="subject-info">
-        <div class="subject-name">歴史</div>
-        <div class="subject-count" id="count-rekishi">問題なし</div>
-      </div>
-      <div class="subject-rate" id="rate-rekishi">—</div>
-    </button>
-    <button class="subject-btn gijutsu" onclick="openSubject('eigo')">
-      <div class="subject-icon">🔤</div>
-      <div class="subject-info">
-        <div class="subject-name">英語</div>
-        <div class="subject-count" id="count-eigo">問題なし</div>
-      </div>
-      <div class="subject-rate" id="rate-eigo">—</div>
-    </button>
-  </div>
-
-  <div class="home-footer">
-    <button class="footer-btn" onclick="showExport()">
-      <span>💾</span>データ保存
-    </button>
-    <button class="footer-btn" onclick="openRestore()">
-      <span>📂</span>データ読み込み
-    </button>
-    <input type="file" id="restore-file" accept="application/json,.json" style="display:none" onchange="restoreDataFile(this)">
-    <button class="footer-btn" onclick="showFontMenu()">
-      <span>🔤</span>文字サイズ
-    </button>
-    <button class="footer-btn" onclick="showSettingsMenu()">
-      <span>⚙️</span>設定
-    </button>
-  </div>
-
-  <!-- 更新日時は #app-footer が唯一の情報源。起動時にここへ中身を複製する -->
-  <div class="home-scroll-footer" id="home-scroll-footer"></div>
-  </div>
-  <div id="font-menu" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-radius:20px 20px 0 0;padding:20px 16px 40px;z-index:999;box-shadow:0 -4px 20px rgba(0,0,0,0.15)">
-    <div style="font-size:13px;color:var(--text-mid);margin-bottom:12px;text-align:center">文字サイズ</div>
-    <div style="display:flex;gap:10px">
-      <button class="font-size-btn" id="fs-small" onclick="setFontSize('small')" style="flex:1;padding:14px;border:2px solid transparent;border-radius:14px;background:#F5F0D0;font-family:var(--font-main);font-size:14px;cursor:pointer">小</button>
-      <button class="font-size-btn" id="fs-medium" onclick="setFontSize('medium')" style="flex:1;padding:14px;border:2px solid transparent;border-radius:14px;background:#F5F0D0;font-family:var(--font-main);font-size:17px;cursor:pointer">中</button>
-      <button class="font-size-btn" id="fs-large" onclick="setFontSize('large')" style="flex:1;padding:14px;border:2px solid transparent;border-radius:14px;background:#F5F0D0;font-family:var(--font-main);font-size:20px;cursor:pointer">大</button>
-    </div>
-    <button onclick="document.getElementById('font-menu').style.display='none'" style="width:100%;margin-top:12px;padding:14px;border:none;border-radius:14px;background:#EEE;font-family:var(--font-main);font-size:15px;cursor:pointer">とじる</button>
+    <!-- 更新日時は #app-footer が唯一の情報源。起動時にここへ中身を複製する -->
+    <div class="foot home-scroll-footer" id="home-scroll-footer"></div>
   </div>
 </div>
 
-  <!-- 危険な操作を開くと縦に伸びるので、画面からはみ出す分はシートの中でスクロールさせる -->
-  <div id="settings-menu" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-radius:20px 20px 0 0;padding:20px 16px 40px;z-index:999;box-shadow:0 -4px 20px rgba(0,0,0,0.15);max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch">
-    <div style="font-size:1rem;color:var(--text-mid);margin-bottom:16px;text-align:center">設定</div>
-    <div style="font-size:0.75rem;color:var(--text-mid);margin-bottom:8px">📅 一日の目標正解数</div>
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button id="goal-10" onclick="setDailyGoal(10)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">10問</button>
-      <button id="goal-20" onclick="setDailyGoal(20)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">20問</button>
-      <button id="goal-30" onclick="setDailyGoal(30)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">30問</button>
-      <button id="goal-50" onclick="setDailyGoal(50)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">50問</button>
-    </div>
-    <div style="font-size:0.75rem;color:var(--text-mid);margin-bottom:8px">🃏 一回の出題数</div>
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button id="session-5" onclick="setSessionSize(5)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">5問</button>
-      <button id="session-10" onclick="setSessionSize(10)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">10問</button>
-      <button id="session-20" onclick="setSessionSize(20)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">20問</button>
-      <button id="session-all" onclick="setSessionSize(0)" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">全問</button>
-    </div>
-    <div style="font-size:0.75rem;color:var(--text-mid);margin-bottom:8px">💡 解説を出すタイミング</div>
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button id="explain-wrong" onclick="setExplainMode('wrong')" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">まちがえた時だけ</button>
-      <button id="explain-always" onclick="setExplainMode('always')" style="flex:1;padding:12px 6px;border:2px solid transparent;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">いつも出す</button>
-    </div>
-    <!-- 危険な操作。既定は閉じていて、開かないとリセットのボタンは見えない -->
-    <div style="border:1px solid #F0D4D4;border-radius:14px;margin-bottom:16px;overflow:hidden">
-      <button id="danger-toggle" onclick="toggleDangerZone()" style="width:100%;padding:12px 14px;border:none;background:#FFF4F4;font-family:var(--font-main);font-size:0.8125rem;font-weight:700;color:#7A1A1A;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px">
-        <span>⚠️ 危険な操作</span><span id="danger-arrow">▼</span>
-      </button>
-      <div id="danger-body" style="display:none;padding:14px;background:#FFF9F9">
-        <!-- 1段目：警告とバックアップの案内 -->
-        <div id="reset-step1">
-          <div style="font-size:0.8125rem;color:#7A1A1A;line-height:1.6;margin-bottom:10px">学習の記録がすべて消えます。元に戻せません。</div>
-          <button onclick="saveDataFile()" style="width:100%;padding:12px;margin-bottom:8px;border:none;border-radius:12px;background:#F5F0D0;font-family:var(--font-main);font-size:0.8125rem;font-weight:700;color:var(--text-dark);cursor:pointer">先にバックアップを取る 💾</button>
-          <div style="display:flex;gap:8px">
-            <button onclick="resetGoStep2()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#C04040;color:white;font-family:var(--font-main);font-size:0.8125rem;font-weight:700;cursor:pointer">リセットへ進む</button>
-            <button onclick="closeDangerZone()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#EEE;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">やめる</button>
-          </div>
-        </div>
-        <!-- 2段目：合いことばを打たないと押せない -->
-        <div id="reset-confirm" style="display:none">
-          <div style="font-size:0.8125rem;color:#7A1A1A;line-height:1.6;margin-bottom:10px">本当に消す場合は、下の欄に リセット と入力してください。</div>
-          <input id="reset-typed" type="text" autocomplete="off" oninput="resetTypeCheck()" placeholder="リセット" style="width:100%;padding:12px;margin-bottom:8px;border:2px solid #E8C0C0;border-radius:12px;background:white;font-family:var(--font-main);font-size:0.9375rem;color:var(--text-dark)">
-          <div style="display:flex;gap:8px">
-            <button id="reset-do" disabled onclick="runReset()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#C04040;color:white;font-family:var(--font-main);font-size:0.8125rem;font-weight:700;cursor:default;opacity:0.4">リセットする</button>
-            <button onclick="closeDangerZone()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#EEE;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">やめる</button>
-          </div>
-        </div>
-        <div id="reset-done" style="display:none;margin-top:10px;text-align:center;font-size:0.8125rem;color:#3A7A28">✅ リセットしました</div>
-      </div>
-    </div>
+<!-- 設定シート。危険な操作を開くと縦に伸びるので、はみ出す分はシートの中でスクロールさせる -->
+<div class="sheet-scrim" id="settings-scrim" onclick="closeSettingsMenu()"></div>
+<div class="sheet" id="settings-menu" role="dialog" aria-label="設定">
+  <div class="sheet-title">設定</div>
+  <button class="menu-row" onclick="closeSettingsMenu();openGuide()"><svg class="ic"><use href="#i-book"/></svg><span>使い方ガイド</span><svg class="ic ic-s"><use href="#i-next"/></svg></button>
+  <button class="menu-row" onclick="closeSettingsMenu();showExport()"><svg class="ic"><use href="#i-save"/></svg><span>データ保存</span><svg class="ic ic-s"><use href="#i-next"/></svg></button>
+  <button class="menu-row" onclick="openRestore()"><svg class="ic"><use href="#i-open"/></svg><span>データ読み込み</span><svg class="ic ic-s"><use href="#i-next"/></svg></button>
+  <input type="file" id="restore-file" accept="application/json,.json" style="display:none" onchange="restoreDataFile(this)">
 
-    <button onclick="closeSettingsMenu()" style="width:100%;padding:14px;border:none;border-radius:14px;background:#EEE;font-family:var(--font-main);font-size:0.9375rem;cursor:pointer">とじる</button>
+  <div class="opt-label">文字サイズ</div>
+  <div class="seg">
+    <button id="fs-small" onclick="setFontSize('small')">小</button>
+    <button id="fs-medium" onclick="setFontSize('medium')">中</button>
+    <button id="fs-large" onclick="setFontSize('large')">大</button>
   </div>
+  <div class="opt-label">1日の目標正解数</div>
+  <div class="seg">
+    <button id="goal-10" onclick="setDailyGoal(10)">10問</button>
+    <button id="goal-20" onclick="setDailyGoal(20)">20問</button>
+    <button id="goal-30" onclick="setDailyGoal(30)">30問</button>
+    <button id="goal-50" onclick="setDailyGoal(50)">50問</button>
+  </div>
+  <div class="opt-label">1回の出題数</div>
+  <div class="seg">
+    <button id="session-5" onclick="setSessionSize(5)">5問</button>
+    <button id="session-10" onclick="setSessionSize(10)">10問</button>
+    <button id="session-20" onclick="setSessionSize(20)">20問</button>
+    <button id="session-all" onclick="setSessionSize(0)">全問</button>
+  </div>
+  <div class="opt-label">解説を出すタイミング</div>
+  <div class="seg">
+    <button id="explain-wrong" onclick="setExplainMode('wrong')">まちがえた時だけ</button>
+    <button id="explain-always" onclick="setExplainMode('always')">いつも出す</button>
+  </div>
+
+  <!-- 危険な操作。既定は閉じていて、開かないとリセットのボタンは見えない -->
+  <div class="danger">
+    <button class="danger-toggle" id="danger-toggle" onclick="toggleDangerZone()">
+      <svg class="ic"><use href="#i-alert"/></svg><span>危険な操作</span><svg class="ic ic-s" id="danger-arrow"><use href="#i-down"/></svg>
+    </button>
+    <div class="danger-body" id="danger-body">
+      <!-- 1段目：警告とバックアップの案内 -->
+      <div id="reset-step1">
+        <div class="danger-text">学習の記録がすべて消えます。元に戻せません。</div>
+        <button class="btn btn-white" onclick="saveDataFile()" style="margin-bottom:8px;min-height:44px;font-size:0.8125rem"><svg class="ic ic-s"><use href="#i-save"/></svg>先にバックアップを取る</button>
+        <div class="danger-row">
+          <button class="btn btn-white" onclick="resetGoStep2()">リセットへ進む</button>
+          <button class="btn btn-white" onclick="closeDangerZone()">やめる</button>
+        </div>
+      </div>
+      <!-- 2段目：合いことばを打たないと押せない -->
+      <div id="reset-confirm" style="display:none">
+        <div class="danger-text">本当に消す場合は、下の欄に リセット と入力してください。</div>
+        <input id="reset-typed" class="reset-input" type="text" autocomplete="off" oninput="resetTypeCheck()" placeholder="リセット">
+        <div class="danger-row">
+          <button class="btn btn-white" id="reset-do" disabled onclick="runReset()">リセットする</button>
+          <button class="btn btn-white" onclick="closeDangerZone()">やめる</button>
+        </div>
+      </div>
+      <div class="reset-done" id="reset-done"><svg class="ic ic-s"><use href="#i-check"/></svg>リセットしました</div>
+    </div>
+  </div>
+
+  <button class="btn btn-base sheet-close" onclick="closeSettingsMenu()">とじる</button>
+</div>
 
 <!-- SUBJECT SCREEN -->
 <div id="subject-screen" class="screen">
-  <div class="subj-top">
-    <div class="subj-bar">
-      <button class="icon-btn" onclick="navBack()" title="戻る" aria-label="戻る">←</button>
-      <div class="subj-bar-title" id="ss-bar-name">国語</div>
-    </div>
-
-    <div class="subject-header">
-      <div class="subject-screen-icon" id="ss-icon">📖</div>
-      <div class="subject-screen-name" id="ss-name">国語</div>
-    </div>
+  <div class="bar">
+    <button class="round-btn" onclick="navBack()" title="戻る" aria-label="戻る"><svg class="ic"><use href="#i-back"/></svg></button>
+    <div class="bar-title" id="ss-bar-name">国語</div>
   </div>
 
-  <div class="subj-middle">
-  <div class="unit-list" id="unit-list"></div>
+  <div class="scroll subj-middle">
+    <div class="label">UNITS</div>
+    <div class="card units" id="unit-list"></div>
   </div>
 
-  <div class="subj-bottom">
-  <div class="start-row">
-    <button class="clear-btn" id="clear-btn" onclick="clearSelection()">クリア</button>
-    <button class="start-btn" id="start-btn" onclick="startQuiz()">はじめる</button>
-  </div>
+  <div class="bottom-row">
+    <button class="btn btn-white clear-btn" id="clear-btn" onclick="clearSelection()">クリア</button>
+    <button class="btn btn-pink start-btn" id="start-btn" onclick="startQuiz()">はじめる</button>
   </div>
 </div>
 
 <!-- QUIZ SCREEN -->
 <div id="quiz" class="screen">
-  <div class="quiz-bg" id="quiz-bg"></div>
-  <div class="quiz-content">
-    <div class="quiz-top">
-      <button class="quiz-back" onclick="navBack()">←</button>
-      <div class="quiz-progress-wrap">
-        <div class="quiz-progress-text">
-          <span id="q-current">1</span>/<span id="q-total">10</span>
-          <span id="q-correct-count">✓ 0</span>
-        </div>
-        <div class="quiz-progress-bar">
-          <div class="quiz-progress-fill" id="q-progress-fill" style="width:0%"></div>
-        </div>
-      </div>
-    </div>
-    <div class="quiz-unit-tag" id="q-unit-tag">単元名</div>
-    <div class="card-area">
-      <div class="question-card">
-        <div class="question-label" id="q-direction-label">用語</div>
-        <div class="question-text" id="q-text">問題文がここに入ります</div>
-        <div class="question-hint" id="q-hint"></div>
-      </div>
-    </div>
-    <div class="choices" id="choices"></div>
-    <button class="next-btn" id="next-btn" onclick="nextQuestion()">つぎへ →</button>
-    <div class="explanation-box" id="explanation-box">
-      <div class="explanation-label">📝 解説</div>
-      <div id="explanation-text"></div>
+  <div class="quiz-top">
+    <button class="round-btn" onclick="navBack()" title="戻る" aria-label="戻る"><svg class="ic"><use href="#i-back"/></svg></button>
+    <div class="qprog">
+      <div class="qcount"><span id="q-current">1</span> / <span id="q-total">10</span></div>
+      <div class="qdots" id="q-dots"></div>
     </div>
   </div>
-  <div class="feedback-flash" id="feedback-flash">
-    <div class="feedback-text" id="feedback-text"></div>
+  <div class="scroll">
+    <div class="qunit" id="q-unit-tag">単元名</div>
+    <div class="qcard">
+      <div class="q-label">QUESTION</div>
+      <div class="question-text" id="q-text">問題文がここに入ります</div>
+    </div>
+    <div class="choices" id="choices"></div>
+    <div class="explanation-box" id="explanation-box">
+      <div class="explanation-label">解説</div>
+      <div id="explanation-text"></div>
+    </div>
+    <button class="btn btn-pink next-btn" id="next-btn" onclick="nextQuestion()">つぎへ<svg class="ic"><use href="#i-arrow"/></svg></button>
   </div>
 </div>
 
 <!-- RESULT SCREEN -->
 <div id="result" class="screen">
-  <div class="result-content">
-    <div class="result-emoji" id="result-emoji">✨</div>
-    <div class="result-title" id="result-title">よくできました！</div>
-    <div class="result-score" id="result-score">0</div>
-    <div class="result-score-label">正解</div>
-    <div class="result-stats">
-      <div class="result-stat">
-        <div class="result-stat-num" id="res-total">0</div>
-        <div class="result-stat-label">問中</div>
+  <div class="scroll">
+    <div class="result-content">
+      <div class="result-mark"><svg aria-hidden="true"><use href="#logo-dots"/></svg></div>
+      <div class="result-title" id="result-title">よくできました！</div>
+      <div class="result-score" id="result-score">0</div>
+      <div class="result-score-label">問 正解</div>
+      <div class="result-stats">
+        <div class="result-stat">
+          <div class="result-stat-num" id="res-total">0</div>
+          <div class="result-stat-label">問中</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-num" id="res-rate">0%</div>
+          <div class="result-stat-label">正答率</div>
+        </div>
       </div>
-      <div class="result-stat">
-        <div class="result-stat-num" id="res-rate">0%</div>
-        <div class="result-stat-label">正答率</div>
+      <div class="result-btns">
+        <button class="btn btn-peach" id="review-wrong-btn" style="display:none" onclick="startReviewWrong()"><svg class="ic"><use href="#i-x"/></svg>まちがえた問題を復習</button>
+        <button class="btn btn-pink" onclick="goHome()"><svg class="ic"><use href="#i-home"/></svg>ホームへ</button>
+        <button class="btn btn-white" onclick="restartSame()"><svg class="ic"><use href="#i-retry"/></svg>もう一度</button>
       </div>
-    </div>
-    <div class="result-btns">
-      <button class="result-btn-secondary" id="review-wrong-btn" style="display:none;background:#FFE0E0;color:#C04040" onclick="startReviewWrong()">✕ まちがえた問題を復習</button>
-      <button class="result-btn-primary" onclick="goHome()">ホームへ</button>
-      <button class="result-btn-secondary" onclick="restartSame()">もう一度</button>
     </div>
   </div>
 </div>
 
 <!-- DATA SCREEN -->
-<div id="data-screen" class="screen" style="background:var(--lemon-yellow)">
-  <div class="data-header">
-    <button class="back-btn" style="position:static" onclick="goHomeNav()">←</button>
-    <div class="data-title">データ</div>
+<div id="data-screen" class="screen">
+  <div class="bar">
+    <button class="round-btn" onclick="goHomeNav()" title="戻る" aria-label="戻る"><svg class="ic"><use href="#i-back"/></svg></button>
+    <div class="bar-title">データ</div>
   </div>
-  <div class="data-area">
-    <div class="data-card">
-      <div class="data-card-title">💾 データをファイルに保存</div>
-      <div style="font-size:12px;color:var(--text-mid);margin-bottom:8px;line-height:1.6">いまの学習の記録をファイルにのこせます。ホームの「📂 データ読み込み」で、このファイルからもとにもどせます。</div>
-      <button class="data-btn" onclick="saveDataFile()">ファイルに保存する 💾</button>
-      <div class="data-export-text" id="export-preview" style="margin-top:12px">（ボタンを押すとデータが表示されます）</div>
-      <div id="copy-instruction" style="display:none;font-size:12px;color:#5A7A4A;margin-top:6px;padding:6px 10px;background:#E8F8E8;border-radius:8px">上のテキストを長押しして「すべて選択」→「コピー」してください</div>
-      <button class="copy-btn" onclick="copyExport()">データを表示してコピー 📋</button>
+  <div class="scroll">
+    <div class="label">BACKUP</div>
+    <div class="card">
+      <div class="card-title">データをファイルに保存</div>
+      <div class="sub" style="margin:6px 0 14px">いまの学習の記録をファイルにのこせます。設定の「データ読み込み」で、このファイルからもとにもどせます。</div>
+      <button class="btn btn-pink" onclick="saveDataFile()"><svg class="ic"><use href="#i-save"/></svg>ファイルに保存する</button>
+      <div class="data-export-text" id="export-preview">（ボタンを押すとデータが表示されます）</div>
+      <div class="sub" id="copy-instruction" style="display:none;margin-top:8px">上のテキストを長押しして「すべて選択」→「コピー」してください</div>
+      <button class="btn btn-base" style="margin-top:10px" onclick="copyExport()"><svg class="ic"><use href="#i-copy"/></svg>データを表示してコピー</button>
     </div>
   </div>
 </div>
 
 <!-- STATS SCREEN -->
-<div id="stats-screen" class="screen" style="background:var(--lemon-yellow);overflow-y:auto">
-  <div class="data-header">
-    <button class="back-btn" style="position:static" onclick="goHomeNav()">←</button>
-    <div class="data-title">📊 学習の記録</div>
+<div id="stats-screen" class="screen">
+  <div class="bar">
+    <button class="round-btn" onclick="goHomeNav()" title="戻る" aria-label="戻る"><svg class="ic"><use href="#i-back"/></svg></button>
+    <div class="bar-title">学習の記録</div>
   </div>
-  <div style="padding:0 16px 40px">
-    <div style="display:flex;gap:10px;margin-bottom:16px">
-      <div style="flex:1;background:rgba(255,255,255,0.7);border-radius:14px;padding:12px;text-align:center">
-        <div style="font-size:1.5rem;font-weight:800;color:var(--text-dark)" id="stats-total">0</div>
-        <div style="font-size:0.7rem;color:var(--text-mid)">累計正解</div>
-      </div>
-      <div style="flex:1;background:rgba(255,255,255,0.7);border-radius:14px;padding:12px;text-align:center">
-        <div style="font-size:1.5rem;font-weight:800;color:var(--text-dark)" id="stats-days">0</div>
-        <div style="font-size:0.7rem;color:var(--text-mid)">学習した日数</div>
-      </div>
+  <div class="scroll">
+    <div class="label">RECORD</div>
+    <div class="stat-pair">
+      <div class="card"><div class="stat-num" id="stats-total">0</div><div class="sub">累計正解</div></div>
+      <div class="card"><div class="stat-num" id="stats-days">0</div><div class="sub">学習した日数</div></div>
     </div>
-    <div style="background:rgba(255,255,255,0.7);border-radius:16px;padding:16px;margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <button onclick="shiftWeek(-1)" style="background:#F5F0D0;border:none;border-radius:10px;width:36px;height:36px;font-size:18px;cursor:pointer;font-family:var(--font-main)">◀</button>
-        <div style="font-size:0.85rem;font-weight:700;color:var(--text-dark)" id="stats-week-label">今週</div>
-        <button onclick="shiftWeek(1)" id="stats-next-btn" style="background:#F5F0D0;border:none;border-radius:10px;width:36px;height:36px;font-size:18px;cursor:pointer;font-family:var(--font-main)">▶</button>
+    <div class="card">
+      <div class="week-nav">
+        <button class="round-btn" onclick="shiftWeek(-1)" aria-label="前の週"><svg class="ic"><use href="#i-back"/></svg></button>
+        <div class="card-title" id="stats-week-label">今週</div>
+        <button class="round-btn" onclick="shiftWeek(1)" id="stats-next-btn" aria-label="次の週"><svg class="ic"><use href="#i-next"/></svg></button>
       </div>
-      <div class="week-chart" id="stats-week-chart" style="height:140px"></div>
-      <div style="text-align:center;margin-top:10px;font-size:0.78rem;color:var(--text-mid);font-weight:600" id="stats-week-total">この週 0問</div>
+      <div class="week-chart" id="stats-week-chart"></div>
+      <div class="sub" style="text-align:center;margin-top:10px;font-weight:600" id="stats-week-total">この週 0問</div>
     </div>
-    <div style="font-size:0.75rem;color:var(--text-mid);text-align:center;line-height:1.6">毎日少しずつ続けるのが、いちばんの近道だよ</div>
+    <div class="sub" style="text-align:center;margin-top:16px">毎日少しずつ続けるのが、いちばんの近道だよ</div>
   </div>
 </div>
 
 <!-- GUIDE SCREEN -->
-<div id="guide-screen" class="screen" style="background:var(--lemon-yellow);overflow-y:auto">
-  <div class="data-header">
-    <button class="back-btn" style="position:static" onclick="goHomeNav()">←</button>
-    <div class="data-title">📖 remonの使い方</div>
+<!-- 文章はコミット5で書き直す。ここでは器と色だけを新しい形に合わせている -->
+<div id="guide-screen" class="screen">
+  <div class="bar">
+    <button class="round-btn" onclick="goHomeNav()" title="戻る" aria-label="戻る"><svg class="ic"><use href="#i-back"/></svg></button>
+    <div class="bar-title">remonの使い方</div>
   </div>
-  <div style="padding:0 18px 48px;color:var(--text-dark);line-height:1.8">
-    <div style="background:rgba(255,255,255,0.75);border-radius:18px;padding:18px;margin-bottom:14px;text-align:center">
+  <div class="scroll" style="line-height:1.8">
+    <div style="background:var(--white);border-radius:18px;padding:18px;margin-bottom:14px;text-align:center">
       <div style="font-size:2.2rem">🍋</div>
       <div style="font-size:1.1rem;font-weight:800;margin-top:4px">remon って？</div>
-      <div style="font-size:0.85rem;color:var(--text-mid);margin-top:8px">教科書に合わせた4択クイズで、楽しく暗記できるアプリ。<br>まちがえた問題は忘れたころにまた出てくるから、くり返すうちに自然と身につくよ。</div>
+      <div style="font-size:0.85rem;color:var(--text-sub);margin-top:8px">教科書に合わせた4択クイズで、楽しく暗記できるアプリ。<br>まちがえた問題は忘れたころにまた出てくるから、くり返すうちに自然と身につくよ。</div>
     </div>
 
-    <div style="background:#FFF8D6;border:2px dashed var(--lemon-dark);border-radius:16px;padding:16px;margin-bottom:16px">
+    <div style="background:var(--white);border:2px dashed var(--pink);border-radius:16px;padding:16px;margin-bottom:16px">
       <div style="font-size:0.95rem;font-weight:800;margin-bottom:6px">💡 名前のひみつ</div>
       <div style="font-size:0.85rem">「remon」は…<br><b>re</b>＝くり返し（repeat）<br><b>mon</b>＝問題の「問（もん）」<br>を合わせた名前なんだ。<br>くり返し問題をといて覚えよう、という意味だよ。<br><br>でも、本当のレモンの英語のつづりは <b>Lemon</b>！<br>テストで書くときは気をつけてね🍋</div>
     </div>
 
     <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🎯 基本の使い方</div>
-    <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
+    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
       <b>① 教科をえらぶ</b><br>ホームで教科をタップ。単元ごとに練習できるよ。
     </div>
-    <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
+    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
       <b>② 今日の 20 remon</b><br>ホーム一番上のボタンを押すと、全教科からまだ覚えていない問題を中心に20問出題。まよったらこれ！
     </div>
-    <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
+    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
       <b>③ 4つの中からえらぶ</b><br>正解するとレモンがたまって🍋、まちがえると解説が出るよ。
     </div>
 
     <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🏷️ 単元の2行目の見かた</div>
-    <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
+    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
       単元名の下に「問題数・今の状態」が出るよ。<br><br>
       <b>7問・未学習</b>　まだといていない問題があるよ<br><br>
       <b>7問・学習済み</b>　一度は全部といたよ。いまは落ち着いている状態<br><br>
@@ -663,27 +531,27 @@ html{font-size:calc(16px * var(--font-scale))}
     </div>
 
     <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🎚️ 単元のオン・オフ</div>
-    <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
+    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
       各単元の左にある🍋ボタンで、「今日の 20 remon」や「今日の remon」に入れる・入れないを切りかえられるよ。🍋ボタンは、教科ページで<b>「単元を選ぶ」</b>に切りかえると出てくるよ。タップすると✕に変わって、その単元はおやすみ（対象外）になる。もう一度タップすると🍋にもどるよ。苦手な単元だけにしぼって練習したいときに便利。<br><br>下の<b>「クリア」</b>をおすと、選んだものをまとめて消せるよ。
     </div>
 
     <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🔁 かしこく覚えるしくみ</div>
-    <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
+    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
       remon は「間隔をあけてくり返す」と覚えやすい、という勉強のコツを使っているよ。<br><br>正解した問題は、次は少し先にもう一度出てくる。まちがえた問題は、近いうちにまた出てくる。<br><br>このくり返しで、忘れたころにちょうど復習できて、しっかり身につくんだ。
     </div>
 
     <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">📈 記録とグラフ</div>
-    <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
+    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
       ホームの「今週のがんばり」グラフで、毎日の正解数が見られるよ。タップすると記録画面がひらいて、過去の週もさかのぼれるよ。たまったレモン🍋も結果画面で確認できるよ。
     </div>
 
     <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">⚙️ 便利な設定</div>
-    <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
+    <div style="background:var(--white);border-radius:14px;padding:14px;margin-bottom:10px;font-size:0.85rem">
       ・<b>文字サイズ</b>：小・中・大から選べる<br>・<b>解説の出し方</b>：いつも出す／まちがえた時だけ<br>・<b>今日の目標</b>：1日の目標問題数を設定<br>・<b>一回の出題数</b>：1回に出す問題数（5問・10問・20問・全問）
     </div>
 
     <div style="font-size:0.95rem;font-weight:800;margin:18px 0 8px">🌱 つづけるコツ・かしこい使い方</div>
-    <div style="background:rgba(255,255,255,0.7);border-radius:14px;padding:14px;font-size:0.85rem">
+    <div style="background:var(--white);border-radius:14px;padding:14px;font-size:0.85rem">
       ・一度に全部やろうとしなくて大丈夫。<b>毎日少しずつ</b>が、いちばん身につくよ。<br>
       ・まよったら<b>「今日の 20 remon」</b>。今やるとよい問題をえらんで出してくれる。<br>
       ・<b>🔔がついた単元</b>から手をつけると、効率よく復習できるよ。<br>
@@ -792,14 +660,16 @@ var quizCorrect=0, quizSessionCorrect=0, lastSessionSubject=null;
 var sessionWrong=[];
 var isDailyMix=false;
 
+// 教科ごとの色分けはしない。ホームのタイルに出す頭文字だけを持つ
 var SUBJECTS={
-  kokugo:{name:'国語',icon:'📖',bg:'var(--kokugo-bg)'},
-  sugaku:{name:'数学',icon:'📐',bg:'var(--sugaku-bg)'},
-  rika:{name:'理科',icon:'🔬',bg:'var(--rika-bg)'},
-  chiri:{name:'地理',icon:'🌏',bg:'var(--chiri-bg)'},
-  rekishi:{name:'歴史',icon:'📜',bg:'var(--rekishi-bg)'},
-  eigo:{name:'英語',icon:'🔤',bg:'var(--gijutsu-bg)'}
+  kokugo:{name:'国語',ini:'国'},
+  sugaku:{name:'数学',ini:'数'},
+  rika:{name:'理科',ini:'理'},
+  chiri:{name:'地理',ini:'地'},
+  rekishi:{name:'歴史',ini:'歴'},
+  eigo:{name:'英語',ini:'英'}
 };
+var WEEK_LABELS=['月','火','水','木','金','土','日'];
 
 // ── Helpers ───────────────────────────────────────────────
 function dateKey(d){
@@ -828,7 +698,7 @@ function renderWeekChart(container,offset,showZero){
   if(!container) return;
   var dr=state.dailyRecords||{};
   var days=weekDates(offset);
-  var labels=['月','火','水','木','金','土','日'];
+  var labels=WEEK_LABELS;
   var today=todayStr();
   var max=1;
   days.forEach(function(k){ if((dr[k]||0)>max) max=dr[k]; });
@@ -877,7 +747,7 @@ function renderStats(){
     label=ds[0].slice(5).replace('-','/')+' 〜 '+ds[6].slice(5).replace('-','/');
   }
   document.getElementById('stats-week-label').textContent=label;
-  document.getElementById('stats-next-btn').style.opacity=(statsWeekOffset===0?'0.3':'1');
+  document.getElementById('stats-next-btn').disabled=(statsWeekOffset===0);
 }
 
 function shuffle(arr){
@@ -898,23 +768,53 @@ function refreshHome(){
   var today=todayStr();
   if(state.todayDate!==today){ state.todayCorrect=0; state.todayDate=today; saveState(); }
   if(!state.dailyRecords) state.dailyRecords={};
-  renderWeekChart(document.getElementById('week-chart'),0,false);
-  var wkTotal=weekTotal(0);
-  document.getElementById('week-total').textContent='今週 '+wkTotal+'問';
+  renderWeekDots(document.getElementById('week-chart'));
+  document.getElementById('week-streak').textContent=shownStreak();
   var goal=state.dailyGoal||20;
-  var pct=Math.min(Math.round(state.todayCorrect/goal*100),100);
-  document.getElementById('today-goal-display').textContent='目標'+goal+'問 ('+pct+'%)';
-  Object.keys(SUBJECTS).forEach(function(sk){
-    var qs=state.questions[sk]||[];
-    var ce=document.getElementById('count-'+sk);
-    var re=document.getElementById('rate-'+sk);
-    if(!ce||!re) return;
-    if(!qs.length){ ce.textContent='問題なし'; re.textContent='—'; return; }
-    var h=state.history[sk]||{}, correct=0, attempted=0, learned=0;
-    qs.forEach(function(_,i){ var r=h[i]; if(r&&r.attempts>0){ attempted++; learned++; if(r.correct>0)correct++; } });
-    ce.textContent='学習 '+learned+'/'+qs.length+'問';
-    re.textContent=attempted?Math.round(correct/attempted*100)+'%':'—';
+  document.getElementById('today-goal-display').textContent='今日 '+(state.todayCorrect||0)+'/'+goal+'問';
+  renderSubjectTiles();
+}
+
+// 今週のがんばり。やった日の基準は以前の棒グラフと同じ「その日の正解数が1日の目標以上」。
+// やった日は緑の丸、今日は緑の輪（やったら丸）、やっていない日は点線の輪
+function renderWeekDots(container){
+  if(!container) return;
+  var dr=state.dailyRecords||{}, days=weekDates(0), today=todayStr(), goal=state.dailyGoal||20, html='';
+  days.forEach(function(k,i){
+    var v=dr[k]||0, cls='wd';
+    if(v>=goal) cls+=' done';
+    if(k===today) cls+=' today';
+    html+='<div class="'+cls+'" aria-label="'+WEEK_LABELS[i]+' '+v+'問"><i></i><span>'+WEEK_LABELS[i]+'</span></div>';
   });
+  container.innerHTML=html;
+}
+
+// 連続日数は出題を終えたときにしか更新されないので、
+// 最後に学習した日が昨日より前なら、途切れているものとして 0 を出す（保存値は変えない）
+function shownStreak(){
+  if(!state.lastDate) return 0;
+  var diff=Math.round((new Date(todayStr())-new Date(state.lastDate))/86400000);
+  return diff<=1 ? (state.streak||0) : 0;
+}
+
+// 教科のタイル。10個のドットと % は「一度でも解いた問題」の割合
+function renderSubjectTiles(){
+  var el=document.getElementById('subject-list');
+  if(!el) return;
+  var html='';
+  Object.keys(SUBJECTS).forEach(function(sk){
+    var qs=state.questions[sk]||[], h=state.history[sk]||{}, learned=0;
+    qs.forEach(function(_,i){ var r=h[i]; if(r&&r.attempts>0) learned++; });
+    var pct=qs.length?Math.floor(learned*100/qs.length):0;
+    var on=qs.length?Math.floor(learned*10/qs.length):0, dots='';
+    for(var i=0;i<10;i++) dots+='<i'+(i<on?' class="on"':'')+'></i>';
+    html+='<button class="subj-tile" onclick="openSubject(\''+sk+'\')">'
+      +'<span class="subj-head"><span class="subj-ini">'+SUBJECTS[sk].ini+'</span>'
+      +'<span class="subj-name">'+SUBJECTS[sk].name+'</span></span>'
+      +'<span class="mini-dots" aria-hidden="true">'+dots+'</span>'
+      +'<span class="subj-pct">'+(qs.length?'学習済み '+pct+'%':'問題なし')+'</span></button>';
+  });
+  el.innerHTML=html;
 }
 
 // ── Screen ────────────────────────────────────────────────
@@ -927,30 +827,6 @@ function showScreen(id){
   if(id==='home') refreshHome();
   if(id==='data-screen') updateExportPreview();
 }
-
-// ── 見出しの畳み込み（ホーム・教科ページ共通）──────────────
-// 画面ごとに別の仕組みを作らず、この1つを使い回す。
-// 付ける／外す閾値をずらして、境目でのちらつきを防ぐ。
-function bindCollapsingHeader(screenId, scrollSelector){
-  var scr=document.getElementById(screenId);
-  var mid=scr&&scr.querySelector(scrollSelector);
-  if(!scr||!mid) return;
-  mid.addEventListener('scroll', function(){
-    var t=mid.scrollTop;
-    if(t>24) scr.classList.add('collapsed');
-    else if(t<8) scr.classList.remove('collapsed');
-  }, {passive:true});
-}
-// 見出しを開いた状態に戻す（画面に入り直したとき用）
-function resetCollapsingHeader(screenId, scrollSelector){
-  var scr=document.getElementById(screenId);
-  var mid=scr&&scr.querySelector(scrollSelector);
-  if(!scr) return;
-  scr.classList.remove('collapsed');
-  if(mid) mid.scrollTop=0;
-}
-bindCollapsingHeader('home','.home-middle');
-bindCollapsingHeader('subject-screen','.subj-middle');
 
 // 更新日時はフッターを増やさず、#app-footer の中身をスクロール末尾に複製する。
 (function(){
@@ -1017,14 +893,12 @@ window.addEventListener('load', function(){
 function renderSubject(sk, sel){
   currentSubject=sk;
   selectedUnits=sel?sel.slice():[];
-  document.getElementById('ss-icon').textContent=SUBJECTS[sk].icon;
-  document.getElementById('ss-name').textContent=SUBJECTS[sk].name;
   document.getElementById('ss-bar-name').textContent=SUBJECTS[sk].name;
-  document.getElementById('subject-screen').style.background=SUBJECTS[sk].bg;
   renderUnitList();
-  // 入り直したときは見出しを開いた状態から始める
-  resetCollapsingHeader('subject-screen','.subj-middle');
   showScreen('subject-screen');
+  // 入り直したときは一覧の先頭から見せる
+  var mid=document.querySelector('#subject-screen .subj-middle');
+  if(mid) mid.scrollTop=0;
 }
 function openSubject(sk){
   renderSubject(sk);
@@ -1061,18 +935,19 @@ function getFrameworkUnits(sk){
   return order;
 }
 
-// 単元行の状態表示。右はしのバッジはやめ、2行目に「7問・未学習」の形で出す。
-// 「復習どき（旧おすすめ）」だけは2行目の文字にせず、左の帯・単元名の太さ・右の🔔で示す。
+// 単元行の状態表示。2行目に「7問・未学習」の形で出す。
+// 「復習どき」だけは文字に埋めず、緑の小さなラベルと単元名の太字で示す。
 // 押してほしい単元が一覧の中で埋もれないようにするため。
-function applyUnitState(btn,count,unlearned,reviewDue,excluded){
+function applyUnitState(row,count,unlearned,reviewDue,excluded){
   var recommend=!excluded&&reviewDue>0;
-  // 「学習済み」は“一度は全部といた”の意味。復習どき（🔔）と重なっても矛盾しない言い方にしている
+  // 「学習済み」は“一度は全部といた”の意味。復習どきと重なっても矛盾しない言い方にしている
   var label=excluded?'おやすみ中':(unlearned>0?'未学習':'学習済み');
-  var meta=btn.querySelector('.unit-meta');
+  var meta=row.querySelector('.meta-text');
   if(meta) meta.textContent=count+'問・'+label;
-  btn.classList.toggle('is-recommend',recommend);
-  var flag=btn.querySelector('.unit-flag');
-  if(flag) flag.style.display=recommend?'':'none';
+  row.classList.toggle('is-recommend',recommend);
+  row.classList.toggle('is-excluded',excluded);
+  var moon=row.querySelector('.moon-btn');
+  if(moon){ moon.classList.toggle('on',excluded); moon.setAttribute('aria-pressed',excluded?'true':'false'); }
 }
 
 function renderUnitList(){
@@ -1085,55 +960,44 @@ function renderUnitList(){
 
   order.forEach(function(unit){
     var ids=unitMap[unit]||[], h=state.history[sk]||{}, today=todayStr();
-    var hasQ=ids.length>0;
-    var unlearned=ids.filter(function(id){ return !h[id]; }).length;
-    var reviewDue=ids.filter(function(id){ var r=h[id]; return r&&r.nextDate<=today; }).length;
-    var due=unlearned+reviewDue;
     var row=document.createElement('div');
     row.className='unit-row';
-    if(!hasQ){
-      // 空枠：準備中表示（選択・除外ボタンなし）
-      var ph=document.createElement('div');
-      ph.className='unit-btn';
-      ph.style.opacity='0.5';
-      ph.style.cursor='default';
-      ph.innerHTML='<div class="unit-info"><div class="unit-name">'+unit+'</div><div class="unit-meta">準備中</div></div>';
-      row.appendChild(ph);
+    if(!ids.length){
+      // 空枠：準備中表示（選ぶ・おやすみのボタンなし）。左は単元名の位置をそろえる空き
+      row.classList.add('is-empty');
+      row.innerHTML='<span class="sel-btn blank"></span><div class="unit-info"><span class="unit-name"></span><span class="unit-meta">準備中</span></div>';
+      row.querySelector('.unit-name').textContent=unit;
       el.appendChild(row);
       return;
     }
-    var excluded=isUnitExcluded(sk,unit);
-    var btn=document.createElement('button');
-    btn.className='unit-btn'; btn.dataset.unit=unit;
-    btn.style.opacity=(selectedUnits.indexOf(unit)>=0)?'1':'0.4';
-    btn.innerHTML='<div class="unit-info"><div class="unit-name">'+unit+'</div><div class="unit-meta"></div></div>'
-      +'<span class="unit-flag" aria-hidden="true">🔔</span>';
-    applyUnitState(btn,ids.length,unlearned,reviewDue,excluded);
-    btn.onclick=function(){ toggleUnit(unit,btn); };
-    var exBtn=document.createElement('button');
-    exBtn.className='unit-exclude'+(excluded?' is-excluded':'');
-    exBtn.title='今日の20の対象/おやすみ';
-    exBtn.textContent=excluded?'✕':'○';
-    exBtn.onclick=function(){
+    var unlearned=ids.filter(function(id){ return !h[id]; }).length;
+    var reviewDue=ids.filter(function(id){ var r=h[id]; return r&&r.nextDate<=today; }).length;
+    var on=selectedUnits.indexOf(unit)>=0;
+    row.dataset.unit=unit;
+    row.innerHTML='<button class="sel-btn'+(on?' on':'')+'" aria-pressed="'+on+'" aria-label="この単元を選ぶ"><i><svg class="ic"><use href="#i-check"/></svg></i></button>'
+      +'<button class="unit-info"><span class="unit-name"></span>'
+      +'<span class="unit-meta"><span class="due-tag">復習どき</span><span class="meta-text"></span></span></button>'
+      +'<button class="moon-btn" aria-label="おやすみ（今日の20に出さない）"><svg class="ic"><use href="#i-moon"/></svg></button>';
+    row.querySelector('.unit-name').textContent=unit;
+    applyUnitState(row,ids.length,unlearned,reviewDue,isUnitExcluded(sk,unit));
+    row.querySelector('.sel-btn').onclick=function(){ toggleUnit(unit,row); };
+    row.querySelector('.unit-info').onclick=function(){ toggleUnit(unit,row); };
+    row.querySelector('.moon-btn').onclick=function(){
       toggleExcludeUnit(sk,unit);
-      var nowEx=isUnitExcluded(sk,unit);
-      exBtn.textContent=nowEx?'✕':'○';
-      exBtn.className='unit-exclude'+(nowEx?' is-excluded':'');
-      // 2行目の状態表示も更新する
-      applyUnitState(btn,ids.length,unlearned,reviewDue,nowEx);
+      applyUnitState(row,ids.length,unlearned,reviewDue,isUnitExcluded(sk,unit));
     };
-    row.appendChild(exBtn);
-    row.appendChild(btn);
     el.appendChild(row);
   });
   // 選択の有無を下のボタンに反映する
   updateStartBtn();
 }
 
-function toggleUnit(unit,btn){
+function toggleUnit(unit,row){
   var i=selectedUnits.indexOf(unit);
-  if(i>=0){ selectedUnits.splice(i,1); btn.style.opacity='0.4'; }
-  else{ selectedUnits.push(unit); btn.style.opacity='1'; }
+  if(i>=0) selectedUnits.splice(i,1); else selectedUnits.push(unit);
+  var on=(i<0), b=row.querySelector('.sel-btn');
+  b.classList.toggle('on',on);
+  b.setAttribute('aria-pressed',on?'true':'false');
   updateStartBtn();
 }
 
@@ -1155,7 +1019,6 @@ function startQuiz(){
   var savedSk=sk, savedSel=selectedUnits.slice();
   navStack=[ function(){ showScreen('home'); } ];
   navStack.push(function(){ renderSubject(savedSk, savedSel); });
-  document.getElementById('quiz-bg').style.background=SUBJECTS[sk].bg;
   showScreen('quiz');
   renderQuestion();
   navGo(restoreQuiz);
@@ -1165,12 +1028,9 @@ function renderQuestion(){
   var total=quizQueue.length, item=quizQueue[quizIndex], q=item.q;
   document.getElementById('q-current').textContent=quizIndex+1;
   document.getElementById('q-total').textContent=total;
-  document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
-  document.getElementById('q-progress-fill').style.width=(quizIndex/total*100)+'%';
+  renderQuizDots(quizIndex,total);
   document.getElementById('q-unit-tag').textContent=(item.mixSubject?(SUBJECTS[item.mixSubject].name+'・'):'')+(q.unit||'');
-  document.getElementById('q-direction-label').textContent='問題';
   document.getElementById('q-text').textContent=q.question;
-  document.getElementById('q-hint').textContent='';
   document.getElementById('explanation-box').classList.remove('visible');
   document.getElementById('explanation-text').textContent='';
   document.getElementById('next-btn').classList.remove('visible');
@@ -1181,10 +1041,30 @@ function renderQuestion(){
   var choices=shuffle((q.choices||[correct]).slice());
   choices.forEach(function(c){
     var btn=document.createElement('button');
-    btn.className='choice-btn'; btn.textContent=c;
+    btn.className='choice-btn';
+    btn.innerHTML='<span class="choice-text"></span><span class="choice-mark"></span>';
+    btn.querySelector('.choice-text').textContent=c;
+    btn.dataset.choice=c;
     btn.onclick=function(){ selectChoice(btn,c,correct,item); };
     choicesEl.appendChild(btn);
   });
+  var sc=document.querySelector('#quiz .scroll');
+  if(sc) sc.scrollTop=0;
+}
+
+// 出題の進み具合を20個までのドットで出す（済み＝濃いピンク、今の問題＝ピンク、残り＝白）。
+// 20問を超えるときは、20個のドットを進んだ割合で埋める
+function renderQuizDots(idx,total){
+  var el=document.getElementById('q-dots');
+  if(!el) return;
+  var n=Math.min(total,20), cur=(total<=20)?idx:Math.floor(idx*20/total), html='';
+  for(var i=0;i<n;i++) html+='<i'+(i<cur?' class="done"':(i===cur?' class="now"':''))+'></i>';
+  el.innerHTML=html;
+}
+
+// 選択肢に ✓正解／✕まちがい の印を付ける。色だけに頼らず記号と文言を添える
+function markChoice(btn,ok){
+  btn.querySelector('.choice-mark').innerHTML='<svg class="ic ic-s"><use href="#i-'+(ok?'check':'x')+'"/></svg>'+(ok?'正解':'まちがい');
 }
 
 function selectChoice(btn,chosen,correct,item){
@@ -1192,11 +1072,9 @@ function selectChoice(btn,chosen,correct,item){
   var ok=chosen===correct;
   var subj=item.mixSubject||lastSessionSubject;
   if(ok){
-    btn.classList.add('correct');
+    btn.classList.add('correct'); markChoice(btn,true);
     quizCorrect++; quizSessionCorrect++;
-    showFeedback(true);
     updateSR(item.id,true,subj); saveState();
-    document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
     if((state.explainMode||'wrong')==='always'){
       var expc=item.q.explanation||('正解は「'+correct+'」です。');
       document.getElementById('explanation-text').textContent=expc;
@@ -1206,13 +1084,11 @@ function selectChoice(btn,chosen,correct,item){
       setTimeout(function(){ nextQuestion(); },600);
     }
   } else {
-    btn.classList.add('wrong');
-    document.querySelectorAll('.choice-btn').forEach(function(b){ if(b.textContent===correct)b.classList.add('show-correct'); });
-    showFeedback(false);
+    btn.classList.add('wrong'); markChoice(btn,false);
+    document.querySelectorAll('.choice-btn').forEach(function(b){ if(b.dataset.choice===correct){ b.classList.add('show-correct'); markChoice(b,true); } });
     updateSR(item.id,false,subj); saveState();
     // 間違えた問題を記録（復習用）
     sessionWrong.push({subject:subj, id:item.id});
-    document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
     var exp=item.q.explanation||('正解は「'+correct+'」です。');
     document.getElementById('explanation-text').textContent=exp;
     document.getElementById('explanation-box').classList.add('visible');
@@ -1246,14 +1122,6 @@ function nextQuestion(){
   else renderQuestion();
 }
 
-function showFeedback(ok){
-  var el=document.getElementById('feedback-flash');
-  el.className='feedback-flash '+(ok?'correct-flash':'wrong-flash');
-  document.getElementById('feedback-text').textContent=ok?'✓':'✕';
-  el.classList.add('show');
-  setTimeout(function(){ el.classList.remove('show'); },400);
-}
-
 // ── Result ────────────────────────────────────────────────
 function updateStreak(){
   var today=todayStr();
@@ -1269,13 +1137,12 @@ function updateStreak(){
 function showResult(){
   updateStreak();
   var total=quizQueue.length, rate=Math.round(quizCorrect/total*100);
-  var emoji,title;
-  if(rate>=100){emoji='🌟';title='パーフェクト！全問正解！';}
-  else if(rate>=90){emoji='✨';title='すごい！パーフェクトまであと少し！';}
-  else if(rate>=70){emoji='👍';title='よくできました！';}
-  else if(rate>=50){emoji='💪';title='もう少し！次はもっといける！';}
-  else{emoji='🌱';title='これが最初の一歩だよ';}
-  document.getElementById('result-emoji').textContent=emoji;
+  var title;
+  if(rate>=100) title='パーフェクト！全問正解！';
+  else if(rate>=90) title='すごい！パーフェクトまであと少し！';
+  else if(rate>=70) title='よくできました！';
+  else if(rate>=50) title='もう少し！次はもっといける！';
+  else title='これが最初の一歩だよ';
   document.getElementById('result-title').textContent=title;
   document.getElementById('result-score').textContent=quizCorrect;
   document.getElementById('res-total').textContent=total;
@@ -1304,7 +1171,6 @@ function startReviewWrong(){
   if(!q.length){ alert('復習する問題がありません'); return; }
   quizQueue=q; quizIndex=0; quizCorrect=0; quizSessionCorrect=0;
   lastSessionSubject=null; sessionWrong=[]; isDailyMix=true;
-  document.getElementById('quiz-bg').style.background='var(--lemon-yellow)';
   // 結果画面から始めるので、下はホーム1段に戻してからクイズの段を積む
   navStack=[ function(){ showScreen('home'); } ];
   showScreen('quiz'); renderQuestion();
@@ -1316,8 +1182,6 @@ function goHome(){ goHomeNav(); }
 function restartSame(){
   quizIndex=0; quizCorrect=0; quizSessionCorrect=0;
   quizQueue=shuffle(quizQueue);
-  var bg = (isDailyMix||!lastSessionSubject) ? 'var(--lemon-yellow)' : SUBJECTS[lastSessionSubject].bg;
-  document.getElementById('quiz-bg').style.background=bg;
   // 結果画面から始めるので、下はホーム1段に戻してからクイズの段を積む
   navStack=[ function(){ showScreen('home'); } ];
   showScreen('quiz'); renderQuestion();
@@ -1449,10 +1313,7 @@ function copyExport(){
   var txt=JSON.stringify(backupData());
   var el=document.getElementById('export-preview');
   el.textContent=txt;
-  el.style.userSelect='all';
-  el.style.webkitUserSelect='all';
-  el.style.background='#FFFDE0';
-  el.style.border='2px solid #D4C200';
+  el.classList.add('is-open');
   document.getElementById('copy-instruction').style.display='block';
   try{
     var range=document.createRange();
@@ -1463,12 +1324,12 @@ function copyExport(){
   }catch(e){}
   try{
     navigator.clipboard.writeText(txt).then(function(){
-      document.getElementById('copy-instruction').textContent='✅ コピーできました！';
+      document.getElementById('copy-instruction').textContent='コピーできました';
     }).catch(function(){});
   }catch(e){}
 }
 
-// ── リセット（設定シートの「⚠️ 危険な操作」の中）──────────────
+// ── リセット（設定シートの「危険な操作」の中）──────────────
 // 誤爆しにくいよう3重にしてある：枠を開く → 警告 → 合いことばの入力。
 // 確認はすべてこのブロックで行い、confirm() は使わない。
 var RESET_WORD='リセット';
@@ -1478,13 +1339,13 @@ function toggleDangerZone(){
   var open=body.style.display!=='block';
   if(open){ body.style.display='block'; }
   else { closeDangerZone(); return; }
-  document.getElementById('danger-arrow').textContent='▲';
+  document.getElementById('danger-arrow').style.transform='rotate(180deg)';
 }
 
 // 枠を畳んで、確認の段階と入力欄を初期状態に戻す
 function closeDangerZone(){
   document.getElementById('danger-body').style.display='none';
-  document.getElementById('danger-arrow').textContent='▼';
+  document.getElementById('danger-arrow').style.transform='';
   document.getElementById('reset-step1').style.display='block';
   document.getElementById('reset-confirm').style.display='none';
   document.getElementById('reset-done').style.display='none';
@@ -1508,8 +1369,6 @@ function resetTypeCheck(){
   if(!t||!b) return;
   var ok=(t.value===RESET_WORD);
   b.disabled=!ok;
-  b.style.opacity=ok?'1':'0.4';
-  b.style.cursor=ok?'pointer':'default';
 }
 
 function runReset(){
@@ -1524,7 +1383,7 @@ function resetAllConfirm(){
   state=defaultState();
   saveState();
   document.getElementById('reset-confirm').style.display='none';
-  document.getElementById('reset-done').style.display='block';
+  document.getElementById('reset-done').style.display='flex';
   setTimeout(function(){ showScreen('home'); },1200);
 }
 
@@ -1570,7 +1429,6 @@ function startDailyMix(){
   lastSessionSubject = null;
   sessionWrong = [];
   isDailyMix = true;
-  document.getElementById('quiz-bg').style.background = 'var(--lemon-yellow)';
   // ホームから始めるので、下はホーム1段にしてからクイズの段を積む
   navStack=[ function(){ showScreen('home'); } ];
   showScreen('quiz');
@@ -1580,70 +1438,48 @@ function startDailyMix(){
 
 // 閉じるときは危険な操作の枠も畳み、確認の段階と入力欄を初期状態に戻す
 function closeSettingsMenu(){
-  document.getElementById('settings-menu').style.display='none';
+  document.getElementById('settings-menu').classList.remove('open');
+  document.getElementById('settings-scrim').classList.remove('open');
   closeDangerZone();
 }
 
 function showSettingsMenu(){
-  document.getElementById('settings-menu').style.display='block';
+  document.getElementById('settings-menu').classList.add('open');
+  document.getElementById('settings-scrim').classList.add('open');
   closeDangerZone();
-  var goal=state.dailyGoal||20, sz=state.sessionSize||10;
-  [10,20,30,50].forEach(function(g){
-    var b=document.getElementById('goal-'+g);
-    if(b){ b.style.borderColor=g===goal?'var(--text-dark)':'transparent'; b.style.background=g===goal?'rgba(255,255,255,0.95)':'#F5F0D0'; }
-  });
-  var szk=sz===0?'all':sz;
-  [5,10,20,'all'].forEach(function(s){
-    var b=document.getElementById('session-'+s);
-    if(b){ b.style.borderColor=s===szk?'var(--text-dark)':'transparent'; b.style.background=s===szk?'rgba(255,255,255,0.95)':'#F5F0D0'; }
-  });
-  var em=state.explainMode||'wrong';
-  ['wrong','always'].forEach(function(m){
-    var b=document.getElementById('explain-'+m);
-    if(b){ b.style.borderColor=m===em?'var(--text-dark)':'transparent'; b.style.background=m===em?'rgba(255,255,255,0.95)':'#F5F0D0'; }
+  var sz=state.sessionSize||10;
+  markSeg('fs-',['small','medium','large'],state.fontSize||'small');
+  markSeg('goal-',[10,20,30,50],state.dailyGoal||20);
+  markSeg('session-',[5,10,20,'all'],sz===0?'all':sz);
+  markSeg('explain-',['wrong','always'],state.explainMode||'wrong');
+}
+
+// 設定シートの選択肢のうち、いま選ばれているものに印を付ける
+function markSeg(prefix,values,current){
+  values.forEach(function(v){
+    var b=document.getElementById(prefix+v);
+    if(b){ b.classList.toggle('is-on',v===current); b.setAttribute('aria-pressed',v===current?'true':'false'); }
   });
 }
 
 function setExplainMode(m){
   state.explainMode=m; saveState();
-  ['wrong','always'].forEach(function(v){
-    var b=document.getElementById('explain-'+v);
-    if(b){ b.style.borderColor=v===m?'var(--text-dark)':'transparent'; b.style.background=v===m?'rgba(255,255,255,0.95)':'#F5F0D0'; }
-  });
+  markSeg('explain-',['wrong','always'],m);
 }
 
 function setDailyGoal(g){
   state.dailyGoal=g; saveState(); refreshHome();
-  [10,20,30,50].forEach(function(v){
-    var b=document.getElementById('goal-'+v);
-    if(b){ b.style.borderColor=v===g?'var(--text-dark)':'transparent'; b.style.background=v===g?'rgba(255,255,255,0.95)':'#F5F0D0'; }
-  });
+  markSeg('goal-',[10,20,30,50],g);
 }
 
 function setSessionSize(s){
   state.sessionSize=s; saveState();
-  var szk=s===0?'all':s;
-  [5,10,20,'all'].forEach(function(v){
-    var b=document.getElementById('session-'+v);
-    if(b){ b.style.borderColor=v===szk?'var(--text-dark)':'transparent'; b.style.background=v===szk?'rgba(255,255,255,0.95)':'#F5F0D0'; }
-  });
-}
-
-function showFontMenu(){
-  document.getElementById('font-menu').style.display='block';
-  var sz=state.fontSize||'small';
-  ['small','medium','large'].forEach(function(s){
-    var b=document.getElementById('fs-'+s);
-    if(b){ b.style.borderColor=s===sz?'var(--text-dark)':'transparent'; b.style.background=s===sz?'rgba(255,255,255,0.95)':'#F5F0D0'; }
-  });
+  markSeg('session-',[5,10,20,'all'],s===0?'all':s);
 }
 
 function setFontSize(sz){
   state.fontSize=sz; saveState(); applyFontSize();
-  ['small','medium','large'].forEach(function(s){
-    var b=document.getElementById('fs-'+s);
-    if(b){ b.style.borderColor=s===sz?'var(--text-dark)':'transparent'; b.style.background=s===sz?'rgba(255,255,255,0.95)':'#F5F0D0'; }
-  });
+  markSeg('fs-',['small','medium','large'],sz);
 }
 
 // ── Init ──────────────────────────────────────────────────
