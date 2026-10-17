@@ -120,7 +120,6 @@ html{font-size:calc(16px * var(--font-scale))}
 .home-scroll-footer .footer-made{display:block;font-weight:700}
 .home-title{font-family:'Nunito',sans-serif;font-size:2.625rem;font-weight:800;color:var(--text-dark);letter-spacing:-1px;line-height:1}
 .home-subtitle{font-size:13px;color:var(--text-mid);margin-top:4px}
-.lemon-deco{font-size:28px;margin-bottom:4px}
 
 .daily-mix-btn{margin:0 16px 14px;background:var(--text-dark);border:none;border-radius:22px;padding:20px 22px;display:flex;align-items:center;gap:16px;cursor:pointer;width:calc(100% - 32px);transition:transform 0.12s,opacity 0.12s;box-shadow:0 4px 16px rgba(0,0,0,0.15)}
 .daily-mix-btn:active{transform:scale(0.97);opacity:0.9}
@@ -221,19 +220,10 @@ html{font-size:calc(16px * var(--font-scale))}
 .unit-btn.is-recommend .unit-meta{color:#C04040;font-weight:700}
 .unit-flag{flex-shrink:0;font-size:1rem;line-height:1}
 
-/* 学習モードは横並びのセグメント1本。高さは書かず、中身に応じて伸ばす。
-   セグメント自体が見出しの役目をするので「学習モード」のラベルは置かない */
-.mode-section{padding:8px 16px 12px}
-.mode-seg{display:flex;gap:4px;background:rgba(255,255,255,0.45);border-radius:14px;padding:4px}
-.mode-seg-btn{flex:1;background:transparent;border:none;border-radius:11px;padding:0.5rem 0.4rem;font-family:var(--font-main);font-size:0.8125rem;font-weight:600;line-height:1.2;color:var(--text-mid);cursor:pointer;transition:background 0.15s,color 0.15s}
-.mode-seg-btn.selected{background:rgba(255,255,255,0.95);color:var(--text-dark)}
-/* 説明は選んでいるモードの分だけ1行出す */
-.mode-desc{margin-top:6px;padding:0 4px;font-size:0.72rem;color:var(--text-mid)}
 
 
 
-/* 下部の固定バーは「クリア」と「はじめる」の2つ。幅は 1:2 で、はじめるを主役にする。
-   両モードで同じ構成にして、モードを切り替えても位置と大きさが動かないようにする */
+/* 下部の固定バーは「クリア」と「はじめる」の2つ。幅は 1:2 で、はじめるを主役にする */
 .start-row{display:flex;gap:10px;margin:0 16px 10px}
 .start-btn{flex:2;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:0.85rem 1rem;font-family:var(--font-main);font-size:1.0625rem;font-weight:700;cursor:pointer;transition:opacity 0.12s;letter-spacing:0.3px}
 .clear-btn{flex:1;background:rgba(255,255,255,0.7);color:var(--text-dark);border:none;border-radius:18px;padding:0.85rem 0.5rem;font-family:var(--font-main);font-size:0.9375rem;font-weight:700;cursor:pointer;transition:opacity 0.12s}
@@ -291,9 +281,6 @@ html{font-size:calc(16px * var(--font-scale))}
 .result-stat-num{font-family:'Nunito',sans-serif;font-size:24px;font-weight:800;color:var(--text-dark)}
 .result-stat-label{font-size:11px;color:var(--text-mid);margin-top:2px}
 
-.lemons-section{width:100%;background:rgba(255,255,255,0.5);border-radius:18px;padding:16px;margin-bottom:20px}
-.lemons-title{font-size:12px;color:var(--text-mid);margin-bottom:10px}
-.lemons-display{font-size:28px;letter-spacing:2px;min-height:36px}
 
 .result-btns{display:flex;flex-direction:column;gap:10px;width:100%}
 .result-btn-primary{background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:18px;padding:18px;font-family:var(--font-main);font-size:16px;font-weight:700;cursor:pointer}
@@ -309,10 +296,6 @@ html{font-size:calc(16px * var(--font-scale))}
 .data-btn{width:100%;background:var(--text-dark);color:var(--lemon-yellow);border:none;border-radius:14px;padding:14px;font-family:var(--font-main);font-size:15px;font-weight:700;cursor:pointer;margin-top:8px}
 .data-export-text{font-size:12px;color:var(--text-mid);word-break:break-all;background:rgba(255,255,255,0.5);border-radius:10px;padding:10px;max-height:120px;overflow-y:auto;line-height:1.6}
 .copy-btn{width:100%;background:rgba(255,255,255,0.7);border:none;border-radius:12px;padding:12px;font-family:var(--font-main);font-size:14px;font-weight:600;color:var(--text-dark);cursor:pointer;margin-top:8px}
-
-/* ===== LEMON DECORATIONS ===== */
-.lemon-float{position:fixed;pointer-events:none;font-size:20px;animation:floatUp 1.2s ease forwards;z-index:999}
-@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-80px) scale(1.3)}}
 
 /* ===== FEEDBACK FLASH ===== */
 .feedback-flash{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity 0.15s}
@@ -345,7 +328,6 @@ html{font-size:calc(16px * var(--font-scale))}
     </div>
 
     <div class="home-header">
-      <div class="lemon-deco">🍋</div>
       <div class="home-title">remon</div>
       <div class="home-subtitle">今日もちょっとだけやってみよう</div>
     </div>
@@ -353,9 +335,8 @@ html{font-size:calc(16px * var(--font-scale))}
 
   <div class="home-middle">
     <button class="daily-mix-btn" onclick="startDailyMix()">
-      <div class="daily-mix-icon">🍋</div>
       <div class="daily-mix-text">
-        <div class="daily-mix-title">今日の 20 remon</div>
+        <div class="daily-mix-title">今日の20</div>
         <div class="daily-mix-sub">全教科からピックアップ</div>
       </div>
       <div class="daily-mix-arrow">▶</div>
@@ -522,34 +503,13 @@ html{font-size:calc(16px * var(--font-scale))}
   </div>
 
   <div class="subj-middle">
-  <div class="mode-section">
-    <div class="mode-seg">
-      <button class="mode-seg-btn selected" id="mode-today" onclick="selectMode('today')">📅 今日の remon</button>
-      <button class="mode-seg-btn" id="mode-unit" onclick="selectMode('unit')">📚 単元を選ぶ</button>
-    </div>
-    <div class="mode-desc" id="mode-desc">忘却曲線で出題</div>
-  </div>
-
-  <!-- 見出しの「単元」はセグメントの選択と重なるので置かない -->
-  <div id="unit-section" style="display:none">
-    <div class="unit-list" id="unit-list"></div>
-  </div>
+  <div class="unit-list" id="unit-list"></div>
   </div>
 
   <div class="subj-bottom">
   <div class="start-row">
     <button class="clear-btn" id="clear-btn" onclick="clearSelection()">クリア</button>
-    <button class="start-btn" id="start-btn" onclick="startQuiz()">はじめる 🍋</button>
-  </div>
-  <!-- 今日の remon のクリアだけ、実行前に案内を出す（🍋はこの画面から戻せないため）。
-       確認は設定シートのリセットと同じく自前のブロックで作る -->
-  <!-- z-index は #app-footer(9001) より上。教科ページでは更新日時が固定表示されていて、下に敷くと文字が重なる -->
-  <div id="clear-confirm" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-radius:20px 20px 0 0;padding:20px 16px 40px;z-index:9002;box-shadow:0 -4px 20px rgba(0,0,0,0.15)">
-    <div style="font-size:0.8125rem;color:#7A1A1A;line-height:1.6;margin-bottom:12px">これは「今日のremon」の🍋のクリアです。復活させるときは「単元を選ぶ」のモードから選び直してください</div>
-    <div style="display:flex;gap:8px">
-      <button onclick="clearTodayConfirmed()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#C04040;color:white;font-family:var(--font-main);font-size:0.8125rem;font-weight:700;cursor:pointer">クリアする</button>
-      <button onclick="closeClearConfirm()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#EEE;font-family:var(--font-main);font-size:0.8125rem;cursor:pointer">やめる</button>
-    </div>
+    <button class="start-btn" id="start-btn" onclick="startQuiz()">はじめる</button>
   </div>
   </div>
 </div>
@@ -593,7 +553,7 @@ html{font-size:calc(16px * var(--font-scale))}
 <!-- RESULT SCREEN -->
 <div id="result" class="screen">
   <div class="result-content">
-    <div class="result-emoji" id="result-emoji">🍋</div>
+    <div class="result-emoji" id="result-emoji">✨</div>
     <div class="result-title" id="result-title">よくできました！</div>
     <div class="result-score" id="result-score">0</div>
     <div class="result-score-label">正解</div>
@@ -606,14 +566,6 @@ html{font-size:calc(16px * var(--font-scale))}
         <div class="result-stat-num" id="res-rate">0%</div>
         <div class="result-stat-label">正答率</div>
       </div>
-      <div class="result-stat">
-        <div class="result-stat-num" id="res-lemons">🍋×0</div>
-        <div class="result-stat-label">今回のレモン</div>
-      </div>
-    </div>
-    <div class="lemons-section">
-      <div class="lemons-title">🍋 あなたのレモン</div>
-      <div class="lemons-display" id="lemons-display"></div>
     </div>
     <div class="result-btns">
       <button class="result-btn-secondary" id="review-wrong-btn" style="display:none;background:#FFE0E0;color:#C04040" onclick="startReviewWrong()">✕ まちがえた問題を復習</button>
@@ -657,10 +609,6 @@ html{font-size:calc(16px * var(--font-scale))}
         <div style="font-size:1.5rem;font-weight:800;color:var(--text-dark)" id="stats-days">0</div>
         <div style="font-size:0.7rem;color:var(--text-mid)">学習した日数</div>
       </div>
-      <div style="flex:1;background:rgba(255,255,255,0.7);border-radius:14px;padding:12px;text-align:center">
-        <div style="font-size:1.5rem;font-weight:800;color:var(--text-dark)" id="stats-lemons">0</div>
-        <div style="font-size:0.7rem;color:var(--text-mid)">🍋レモン</div>
-      </div>
     </div>
     <div style="background:rgba(255,255,255,0.7);border-radius:16px;padding:16px;margin-bottom:14px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -671,7 +619,7 @@ html{font-size:calc(16px * var(--font-scale))}
       <div class="week-chart" id="stats-week-chart" style="height:140px"></div>
       <div style="text-align:center;margin-top:10px;font-size:0.78rem;color:var(--text-mid);font-weight:600" id="stats-week-total">この週 0問</div>
     </div>
-    <div style="font-size:0.75rem;color:var(--text-mid);text-align:center;line-height:1.6">毎日少しずつ続けるのが、いちばんの近道だよ🍋</div>
+    <div style="font-size:0.75rem;color:var(--text-mid);text-align:center;line-height:1.6">毎日少しずつ続けるのが、いちばんの近道だよ</div>
   </div>
 </div>
 
@@ -815,53 +763,6 @@ function syncPreload(){
 }
 
 
-// ── 旧「社会(shakai)」を地理(chiri)・歴史(rekishi)に分ける移行 ────────
-// 単元名の接頭辞「地理：」「歴史：」で振り分け、接頭辞は落とす。
-//   ・問題と学習履歴 … 履歴は questions の並び順の位置で持っているので、問題と一緒に振り分ける。
-//     ここで直しておかないと、syncPreload() が「教科キー＋問題文」で履歴を引き継ぐときに
-//     旧キー(shakai)の履歴が新しい教科キーと結びつかず、社会183問の記録が消える
-//   ・おやすみ中の単元 … "shakai||地理：〇〇" を "chiri||〇〇" に直す
-//   ・単元の選択状態 … 一時的なものなので移行しない。PRELOADにない教科キーは捨てる
-// どちらにも振り分けられないものは捨てる。バックアップの読み込みでも同じ関数を通す。
-var SHAKAI_SPLIT={'地理：':'chiri','歴史：':'rekishi'};
-function splitShakai(st){
-  if(!st||typeof st!=='object') return;
-  var qs=st.questions&&st.questions.shakai;
-  if(Array.isArray(qs)){
-    if(!st.history||typeof st.history!=='object') st.history={};
-    var oldHist=st.history.shakai||{};
-    qs.forEach(function(q,i){
-      var u=String((q&&q.unit)||''), sk=SHAKAI_SPLIT[u.slice(0,3)];
-      if(!sk) return;
-      if(!st.questions[sk]) st.questions[sk]=[];
-      if(!st.history[sk]) st.history[sk]={};
-      var nq={};
-      Object.keys(q).forEach(function(k){ nq[k]=q[k]; });
-      nq.unit=u.slice(3);
-      var idx=st.questions[sk].push(nq)-1;
-      if(oldHist[i]) st.history[sk][idx]=oldHist[i];
-    });
-    delete st.questions.shakai;
-    delete st.history.shakai;
-  }
-  var ex=st.excludedUnits;
-  if(ex&&typeof ex==='object'&&!Array.isArray(ex)){
-    var moved={};
-    Object.keys(ex).forEach(function(k){
-      if(k.indexOf('shakai||')!==0){ moved[k]=ex[k]; return; }
-      var u=k.slice(8), sk=SHAKAI_SPLIT[u.slice(0,3)];
-      if(sk) moved[sk+'||'+u.slice(3)]=ex[k];
-    });
-    st.excludedUnits=moved;
-  }
-  var sel=st.selectedUnits;
-  if(sel&&typeof sel==='object'&&!Array.isArray(sel)){
-    var known={};
-    PRELOAD.forEach(function(s){ known[s.subject]=1; });
-    Object.keys(sel).forEach(function(sk){ if(!known[sk]) delete sel[sk]; });
-  }
-}
-
 // おやすみ（excludedUnits）のうち、PRELOAD にもう無いものを捨てる。
 //   ・教科ごと無くなったもの（例：旧 sonota）
 //   ・教科は残っているが単元枠が無くなったもの（例：旧 巻末文法1、季節のしおり 春）
@@ -877,12 +778,15 @@ function pruneExcludedUnits(){
   if(removed) saveState();
 }
 
-splitShakai(state);
+// 単元の選択は保存しない（教科ページを開いている間だけ持つ）。
+// 以前の版が保存していた selectedUnits は起動時に捨てる。
+if(state.selectedUnits!==undefined){ delete state.selectedUnits; }
 syncPreload();
 pruneExcludedUnits();
 
 // ── Quiz vars ─────────────────────────────────────────────
-var currentSubject=null, currentMode='today';
+var currentSubject=null;
+// 選んでいる単元。保存せず、教科ページを開いている間だけ持つ
 var selectedUnits=[], quizQueue=[], quizIndex=0;
 var quizCorrect=0, quizSessionCorrect=0, lastSessionSubject=null;
 var sessionWrong=[];
@@ -963,7 +867,6 @@ function renderStats(){
   var days=0;
   Object.keys(state.dailyRecords).forEach(function(k){ if(state.dailyRecords[k]>0) days++; });
   document.getElementById('stats-days').textContent=days;
-  document.getElementById('stats-lemons').textContent=state.lemons||0;
   renderWeekChart(document.getElementById('stats-week-chart'),statsWeekOffset,true);
   document.getElementById('stats-week-total').textContent='この週 '+weekTotal(statsWeekOffset)+'問';
   var label;
@@ -1018,8 +921,6 @@ function refreshHome(){
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
-  // 画面を移るときは、開いたままの案内を閉じる
-  closeClearConfirm();
   // ホームはスクロールの末尾にフッターを置くので、固定フッターは出さない
   var af=document.getElementById('app-footer');
   if(af) af.style.display = (id==='home') ? 'none' : '';
@@ -1111,14 +1012,16 @@ window.addEventListener('load', function(){
 });
 
 // ── Subject screen ────────────────────────────────────────
-function renderSubject(sk){
+// sel を渡したときだけ、その選択を復元する（出題から戻ったとき）。
+// それ以外は選択を空にして開く。選択は保存しない。
+function renderSubject(sk, sel){
   currentSubject=sk;
+  selectedUnits=sel?sel.slice():[];
   document.getElementById('ss-icon').textContent=SUBJECTS[sk].icon;
   document.getElementById('ss-name').textContent=SUBJECTS[sk].name;
   document.getElementById('ss-bar-name').textContent=SUBJECTS[sk].name;
   document.getElementById('subject-screen').style.background=SUBJECTS[sk].bg;
-  currentMode='today';
-  applyMode('today');
+  renderUnitList();
   // 入り直したときは見出しを開いた状態から始める
   resetCollapsingHeader('subject-screen','.subj-middle');
   showScreen('subject-screen');
@@ -1130,93 +1033,21 @@ function openSubject(sk){
   history.pushState({d:2,buf:0}, '');
 }
 
-var MODE_DESC={today:'忘却曲線で出題', unit:'まとめて練習'};
-
-function applyMode(m){
-  currentMode=m;
-  closeClearConfirm();
-  document.getElementById('mode-today').classList.toggle('selected',m==='today');
-  document.getElementById('mode-unit').classList.toggle('selected',m==='unit');
-  document.getElementById('mode-desc').textContent=MODE_DESC[m]||'';
-  if(m==='unit'){ document.getElementById('unit-section').style.display='block'; renderUnitList(); }
-  else{ document.getElementById('unit-section').style.display='none'; }
-  updateStartBtn();
-}
-
-// いま表示しているモードで「選ばれている」単元の数。
-//   単元を選ぶ … selectedUnits（教科ごとに保存している選択）
-//   今日の remon … 🍋がついている（＝おやすみにしていない）単元
-// モードごとに状態の持ち方が違うので、数え方もここで分ける。
-function selectedUnitCount(){
-  if(currentMode==='unit') return selectedUnits.length;
-  var map=getUnits(currentSubject), n=0;
-  Object.keys(map).forEach(function(u){ if(!isUnitExcluded(currentSubject,u)) n++; });
-  return n;
-}
-
-// 表示中のモードの選択だけを空にする。もう一方のモードや他教科には触れない。
-// 学習記録は変わらないので、単元を選ぶ側は確認なしで消す。
-// 今日の remon 側は、この画面から🍋を戻せないので実行前に案内をはさむ。
+// 選択だけを空にする。学習記録もおやすみも変わらないので確認なしで消す
 function clearSelection(){
-  if(selectedUnitCount()===0) return;
-  if(currentMode==='unit'){
-    selectedUnits=[];
-    if(!state.selectedUnits) state.selectedUnits={};
-    state.selectedUnits[currentSubject]=[];
-    saveState();
-    renderUnitList();
-    return;
-  }
-  document.getElementById('clear-confirm').style.display='block';
-}
-
-function closeClearConfirm(){
-  var el=document.getElementById('clear-confirm');
-  if(el) el.style.display='none';
-}
-
-// 案内で「クリアする」を押したときだけ実行する。
-// 今日の remon は「🍋を全部はずす」＝この教科の単元をすべて✕にする
-function clearTodayConfirmed(){
-  closeClearConfirm();
-  if(currentMode!=='today') return;
-  if(!state.excludedUnits) state.excludedUnits={};
-  var map=getUnits(currentSubject);
-  Object.keys(map).forEach(function(u){ state.excludedUnits[unitKey(currentSubject,u)]=true; });
-  saveState();
-  updateStartBtn();
+  if(selectedUnits.length===0) return;
+  selectedUnits=[];
+  renderUnitList();
 }
 
 // 下部の2ボタンの有効・無効。選択が0件ならどちらも押せない
 function updateStartBtn(){
   var start=document.getElementById('start-btn'), clear=document.getElementById('clear-btn');
   if(!start||!clear) return;
-  var none=(selectedUnitCount()===0);
+  var none=(selectedUnits.length===0);
   start.disabled=none;
   clear.disabled=none;
 }
-// selectMode が積んだ「単元展開」の段。自分で積んだ段だけを戻すために覚えておく
-var unitModeLevel=null;
-function selectMode(m){
-  var prev=currentMode;
-  // 「単元を選ぶ」を開く操作は1ステップ積む（戻るで展開を閉じる）。
-  // 積むのは進んだ先＝単元一覧を開いた状態の復元関数
-  if(m==='unit' && prev!=='unit'){
-    applyMode(m);
-    unitModeLevel=function(){ applyMode('unit'); };
-    navGo(unitModeLevel);
-    return;
-  }
-  // 「今日の remon」に戻す操作は、自分で積んだ段を1つ戻す。
-  // 戻さないと段が積み残り、あとで戻るを押したとき単元一覧が開き直してしまう
-  if(m==='today' && prev==='unit' && unitModeLevel && navStack[navStack.length-1]===unitModeLevel){
-    unitModeLevel=null;
-    navBack();
-    return;
-  }
-  applyMode(m);
-}
-
 function getUnits(sk){
   var qs=state.questions[sk]||[], map={};
   qs.forEach(function(q,i){ var u=q.unit||'その他'; if(!map[u])map[u]=[]; map[u].push(i); });
@@ -1247,9 +1078,6 @@ function applyUnitState(btn,count,unlearned,reviewDue,excluded){
 function renderUnitList(){
   var sk=currentSubject, unitMap=getUnits(sk), el=document.getElementById('unit-list');
   el.innerHTML='';
-  // 教科ごとの選択を復元（解除するまで保持）
-  if(!state.selectedUnits) state.selectedUnits={};
-  selectedUnits=(state.selectedUnits[sk]||[]).slice();
   // 教科書準拠の枠の順番で全単元を表示（問題が無い枠は「準備中」）
   var order=getFrameworkUnits(sk);
   // state側に枠以外の単元があれば後ろに足す（インポート分など）
@@ -1284,23 +1112,21 @@ function renderUnitList(){
     btn.onclick=function(){ toggleUnit(unit,btn); };
     var exBtn=document.createElement('button');
     exBtn.className='unit-exclude'+(excluded?' is-excluded':'');
-    exBtn.title='今日の20問の対象/除外';
-    exBtn.textContent=excluded?'✕':'🍋';
+    exBtn.title='今日の20の対象/おやすみ';
+    exBtn.textContent=excluded?'✕':'○';
     exBtn.onclick=function(){
       toggleExcludeUnit(sk,unit);
       var nowEx=isUnitExcluded(sk,unit);
-      exBtn.textContent=nowEx?'✕':'🍋';
+      exBtn.textContent=nowEx?'✕':'○';
       exBtn.className='unit-exclude'+(nowEx?' is-excluded':'');
       // 2行目の状態表示も更新する
       applyUnitState(btn,ids.length,unlearned,reviewDue,nowEx);
-      // 🍋の付け外しは「今日の remon」の選択そのものなので、下のボタンも即座に反映する
-      updateStartBtn();
     };
     row.appendChild(exBtn);
     row.appendChild(btn);
     el.appendChild(row);
   });
-  // 復元した選択を「はじめる」の表記に反映する
+  // 選択の有無を下のボタンに反映する
   updateStartBtn();
 }
 
@@ -1308,49 +1134,27 @@ function toggleUnit(unit,btn){
   var i=selectedUnits.indexOf(unit);
   if(i>=0){ selectedUnits.splice(i,1); btn.style.opacity='0.4'; }
   else{ selectedUnits.push(unit); btn.style.opacity='1'; }
-  // 教科ごとに選択を保存（解除するまで保持）
-  if(!state.selectedUnits) state.selectedUnits={};
-  state.selectedUnits[currentSubject]=selectedUnits.slice();
-  saveState();
   updateStartBtn();
 }
 
 // ── Quiz ──────────────────────────────────────────────────
-function getDueQuestions(sk){
-  var qs=state.questions[sk]||[], h=state.history[sk]||{}, today=todayStr();
-  return qs.map(function(_,i){ return i; }).filter(function(id){
-    // ✕で除外した単元（レモンがついていない単元）は対象外
-    var unit=(qs[id]&&qs[id].unit)||'その他';
-    if(isUnitExcluded(sk,unit)) return false;
-    var r=h[id]; return !r||r.nextDate<=today;
-  });
-}
-
 function startQuiz(){
   var sk=currentSubject, qs=state.questions[sk]||[];
   if(!qs.length){ alert('この教科の問題がまだありません。'); return; }
-  var ids=[];
-  if(currentMode==='today'){
-    ids=getDueQuestions(sk);
-    if(!ids.length){ alert('今日の remon は終わっています！また来てね 🍋'); return; }
-  } else {
-    var unitMap=getUnits(sk);
-    selectedUnits.forEach(function(u){ if(unitMap[u]) ids=ids.concat(unitMap[u]); });
-  }
-  if(currentMode==='unit'&&selectedUnits.length===0){ alert('単元を選んでください'); return; }
+  if(selectedUnits.length===0){ alert('単元を選んでください'); return; }
+  // おやすみは今日の20だけに効く。選んで出題するときは、おやすみ中の単元も出す
+  var ids=[], unitMap=getUnits(sk);
+  selectedUnits.forEach(function(u){ if(unitMap[u]) ids=ids.concat(unitMap[u]); });
   ids=shuffle(ids);
   var sz=state.sessionSize||10;
   if(sz>0) ids=ids.slice(0,sz);
   quizQueue=ids.map(function(id){ return {id:id,q:qs[id]}; });
   quizIndex=0; quizCorrect=0; quizSessionCorrect=0; lastSessionSubject=sk; isDailyMix=false;
   sessionWrong=[];
-  // 進む前に下の段を組み立てる。モードを行き来しても段が積み残らないよう作り直す。
-  // 単元モードなら戻り先は「単元一覧を開いた教科ページ」（選択は state から復元される）
-  var savedSk=sk, unitMode=(currentMode==='unit');
+  // 進む前に下の段を組み立てる。戻り先は、出題前の選択を復元した教科ページ
+  var savedSk=sk, savedSel=selectedUnits.slice();
   navStack=[ function(){ showScreen('home'); } ];
-  navStack.push(unitMode
-    ? function(){ renderSubject(savedSk); applyMode('unit'); }
-    : function(){ renderSubject(savedSk); });
+  navStack.push(function(){ renderSubject(savedSk, savedSel); });
   document.getElementById('quiz-bg').style.background=SUBJECTS[sk].bg;
   showScreen('quiz');
   renderQuestion();
@@ -1372,7 +1176,7 @@ function renderQuestion(){
   document.getElementById('next-btn').classList.remove('visible');
   var choicesEl=document.getElementById('choices');
   choicesEl.innerHTML='';
-  var correct=q.meaning||(q.choices&&q.choices[0])||'';
+  var correct=(q.choices&&q.choices[0])||'';
   item.correctAnswer=correct;
   var choices=shuffle((q.choices||[correct]).slice());
   choices.forEach(function(c){
@@ -1390,7 +1194,7 @@ function selectChoice(btn,chosen,correct,item){
   if(ok){
     btn.classList.add('correct');
     quizCorrect++; quizSessionCorrect++;
-    showFeedback(true); spawnLemons();
+    showFeedback(true);
     updateSR(item.id,true,subj); saveState();
     document.getElementById('q-correct-count').textContent='✓ '+quizCorrect;
     if((state.explainMode||'wrong')==='always'){
@@ -1417,7 +1221,7 @@ function selectChoice(btn,chosen,correct,item){
 }
 
 function updateSR(id,correct,subject){
-  // 今日の20 remon・まちがえた問題の復習では lastSessionSubject が null なので、
+  // 今日の20・まちがえた問題の復習では lastSessionSubject が null なので、
   // 呼び出し側が渡す教科（item.mixSubject）を優先する。
   var sk=subject||lastSessionSubject;
   if(!state.history[sk]) state.history[sk]={};
@@ -1425,8 +1229,8 @@ function updateSR(id,correct,subject){
   if(!h[id]) h[id]={attempts:0,correct:0,interval:1,nextDate:todayStr()};
   var rec=h[id]; rec.attempts++;
   if(correct){
+    // lemons は読み書きの互換のためにだけ残している。もう数えない
     rec.correct++; state.totalCorrect++; state.todayCorrect++;
-    state.lemons=(state.lemons||0)+1;
     if(!state.dailyRecords) state.dailyRecords={};
     var dk=todayStr();
     state.dailyRecords[dk]=(state.dailyRecords[dk]||0)+1;
@@ -1450,20 +1254,6 @@ function showFeedback(ok){
   setTimeout(function(){ el.classList.remove('show'); },400);
 }
 
-function spawnLemons(){
-  for(var i=0;i<2;i++){
-    (function(delay){
-      setTimeout(function(){
-        var el=document.createElement('div');
-        el.className='lemon-float'; el.textContent='🍋';
-        el.style.left=(20+Math.random()*60)+'%'; el.style.bottom='80px';
-        document.body.appendChild(el);
-        setTimeout(function(){ el.remove(); },1200);
-      },delay);
-    })(i*150);
-  }
-}
-
 // ── Result ────────────────────────────────────────────────
 function updateStreak(){
   var today=todayStr();
@@ -1482,7 +1272,7 @@ function showResult(){
   var emoji,title;
   if(rate>=100){emoji='🌟';title='パーフェクト！全問正解！';}
   else if(rate>=90){emoji='✨';title='すごい！パーフェクトまであと少し！';}
-  else if(rate>=70){emoji='🍋';title='よくできました！';}
+  else if(rate>=70){emoji='👍';title='よくできました！';}
   else if(rate>=50){emoji='💪';title='もう少し！次はもっといける！';}
   else{emoji='🌱';title='これが最初の一歩だよ';}
   document.getElementById('result-emoji').textContent=emoji;
@@ -1490,11 +1280,6 @@ function showResult(){
   document.getElementById('result-score').textContent=quizCorrect;
   document.getElementById('res-total').textContent=total;
   document.getElementById('res-rate').textContent=rate+'%';
-  document.getElementById('res-lemons').textContent='🍋×'+quizSessionCorrect;
-  var tl=state.lemons||0, ls='';
-  for(var i=0;i<Math.min(tl,30);i++) ls+='🍋';
-  if(tl>30) ls+=' +'+(tl-30);
-  document.getElementById('lemons-display').textContent=ls||'まだないよ';
   // 間違えた問題を保存（復習用）
   state.lastWrong = sessionWrong.slice();
   // 復習ボタンの表示
@@ -1541,7 +1326,7 @@ function restartSame(){
 
 // ── Data ──────────────────────────────────────────────────
 // 保存・読み込みで受け渡しする中身。ここを変えたら checkBackup() の検査も合わせる。
-// 単元の選択状態（selectedUnits）は作業中の一時的なものなので入れない。
+// lemons はもう数えていないが、古い版との読み書きの互換のために入れておく。
 // PRELOAD_STRUCT_VERSION は復元先の問題データ側の値なので入れない。
 function backupData(){
   return {backupVersion:2,
@@ -1632,8 +1417,6 @@ function restoreDataFile(input){
       alert('このファイルは remon のデータではないみたい。\nremon で保存したファイルをえらんでね。\n（'+ng+'）');
       return;
     }
-    // 旧「社会」で保存されたファイルは、ここで地理・歴史に振り分けてから取りこむ
-    splitShakai(data);
     // バックアップの questions はそのまま採用しない。いったん受けてから
     // syncPreload() で PRELOAD の内容に合わせ直す（古い問題や消した問題を持ちこませない）。
     // 履歴は問題文で張り直されるので、PRELOAD に今もある問題の記録は残る。
@@ -1643,6 +1426,7 @@ function restoreDataFile(input){
     state.streak=data.streak||0;
     state.lastDate=data.lastDate||null;
     state.totalCorrect=data.totalCorrect||0;
+    // lemons は画面では使わないが、書き出したときに元の値が残るよう受けておく
     state.lemons=data.lemons||0;
     // 記録と設定は、バックアップに入っていたときだけ入れかえる。
     // 入っていなければ今の値をそのまま残す（|| で既定値に書きもどさない）。
@@ -1779,7 +1563,7 @@ function startDailyMix(){
     });
   });
   var picked = shuffle(pool0).concat(shuffle(pool1)).concat(shuffle(pool2));
-  if(picked.length === 0){ alert('出題できる問題がありません。単元の🍋をオンにしてみてください。'); return; }
+  if(picked.length === 0){ alert('出題できる問題がありません。おやすみ中の単元をもどしてみてください。'); return; }
   picked = picked.slice(0, 20);
   quizQueue = picked.map(function(it){ return {id:it.id, q:it.q, mixSubject:it.subject}; });
   quizIndex = 0; quizCorrect = 0; quizSessionCorrect = 0;
