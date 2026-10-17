@@ -1135,7 +1135,7 @@ function startQuiz(){
   var ids=[], unitMap=getUnits(sk);
   selectedUnits.forEach(function(u){ if(unitMap[u]) ids=ids.concat(unitMap[u]); });
   ids=shuffle(ids);
-  var sz=state.sessionSize||10;
+  var sz=sessionSizeSetting();
   if(sz>0) ids=ids.slice(0,sz);
   quizQueue=ids.map(function(id){ return {id:id,q:qs[id]}; });
   quizIndex=0; quizCorrect=0; quizSessionCorrect=0; lastSessionSubject=sk; isDailyMix=false;
@@ -1585,7 +1585,7 @@ function showSettingsMenu(){
   document.getElementById('settings-menu').classList.add('open');
   document.getElementById('settings-scrim').classList.add('open');
   closeDangerZone();
-  var sz=state.sessionSize||10;
+  var sz=sessionSizeSetting();
   markSeg('fs-',['small','medium','large'],state.fontSize||'small');
   markSeg('goal-',[10,20,30,50],state.dailyGoal||20);
   markSeg('session-',[5,10,20,'all'],sz===0?'all':sz);
@@ -1608,6 +1608,12 @@ function setExplainMode(m){
 function setDailyGoal(g){
   state.dailyGoal=g; saveState(); refreshHome();
   markSeg('goal-',[10,20,30,50],g);
+}
+
+// 1回の出題数。0 は「全問」なので、|| で既定の10に戻さない
+function sessionSizeSetting(){
+  var s=state.sessionSize;
+  return (typeof s==='number' && isFinite(s) && s>=0) ? s : 10;
 }
 
 function setSessionSize(s){
