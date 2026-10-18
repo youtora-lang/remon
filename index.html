@@ -131,8 +131,6 @@ button{cursor:pointer}
 .subj-head{display:flex;align-items:center;gap:8px;min-width:0}
 .subj-play{margin-left:auto;width:28px;height:28px;border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .subj-play .ic{width:14px;height:14px;fill:currentColor;stroke:none;margin-left:2px}
-.subj-review{font-size:0.8125rem;font-weight:700}
-.subj-review.none{font-weight:400;color:var(--text-sub)}
 .subj-units{border:none;background:var(--white);border-radius:999px;min-height:44px;padding:0 12px;font-size:0.8125rem;font-weight:500;display:flex;align-items:center;justify-content:center;gap:4px}
 .subj-units:active{opacity:0.8}
 .subj-ini{width:40px;height:40px;flex-shrink:0;border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.125rem}
@@ -154,10 +152,7 @@ button{cursor:pointer}
 .sel-btn.blank{visibility:hidden}
 .unit-info{flex:1;min-width:0;border:none;background:none;text-align:left;padding:8px 4px;min-height:44px}
 .unit-name{font-size:0.9375rem;font-weight:500;line-height:1.45;word-break:break-word}
-.unit-row.is-recommend .unit-name{font-weight:700}
 .unit-meta{font-size:0.75rem;color:var(--text-sub);margin-top:3px;display:flex;align-items:center;flex-wrap:wrap;gap:6px}
-.due-tag{display:none;background:var(--green);color:var(--text);font-size:0.6875rem;font-weight:700;border-radius:999px;padding:1px 9px;line-height:1.6}
-.unit-row.is-recommend .due-tag{display:inline-block}
 
 .bottom-row{flex:0 0 auto;display:flex;gap:10px;padding:10px 16px 6px}
 .bottom-row .clear-btn{flex:1}
@@ -312,7 +307,7 @@ button{cursor:pointer}
 
 <!-- 共通フッター（ホーム以外で画面の下に固定。ホームではスクロールの末尾に複製する） -->
 <div id="app-footer" class="foot">
-  <span class="footer-updated">Updated Oct 18, 2026 09:47</span>
+  <span class="footer-updated">Updated Oct 18, 2026 10:13</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -342,7 +337,7 @@ button{cursor:pointer}
     <div class="label">SUBJECTS</div>
     <div class="subj-intro">
       <div class="card-title">どの教科にする？</div>
-      <div class="sub">押すとすぐ始まります。復習と、次の問題から出ます</div>
+      <div class="sub">押すとすぐ始まります。まちがえた問題と、次の問題から出ます</div>
     </div>
     <div class="subj-grid" id="subject-list"></div>
 
@@ -555,12 +550,11 @@ button{cursor:pointer}
     <div class="label">HOW TO</div>
     <div class="card guide-card">
       <h3>① 教科を押して始める</h3>
-      <p>ホームの教科のタイルの上の部分（再生の印があるところ）を押すと、その教科の問題がすぐ始まるよ。</p>
-      <p>出るのは、<b>復習どきの問題</b>（半分まで）と、<b>まだといていない問題</b>（教科書の順に、続きから）。問題の数は設定の「1回の出題数」で決まるよ。タイルの「復習 ○問」は、いま復習どきの問題の数だよ。</p>
+      <p>ホームの教科のタイルの上の部分（再生の印があるところ）を押すと、すぐ始まるよ。<b>まちがえた問題</b>と、<b>教科書の順に次の問題</b>が出るよ。問題の数は設定の「1回の出題数」で決まるよ。</p>
     </div>
     <div class="card guide-card">
       <h3>② 単元を選んで出題</h3>
-      <p>教科のタイルの下の「単元を選ぶ」を押すと、単元の一覧がひらくよ。やりたい単元の左の丸をタップ（緑のチェックがつくよ）。ひらいたときは、問題がある単元がぜんぶ選ばれているよ。やらない単元の丸をタップして外してね。下の「はじめる」で出題、「クリア」で選んだものをまとめて消せるよ。</p>
+      <p>テスト前などは、タイルの下の「単元を選ぶ」から、<b>やりたい単元だけで出題</b>もできるよ。ひらいたときは全部の単元が選ばれているので、やらない単元の丸をタップして外してね。下の「はじめる」で出題、「クリア」で選んだものをまとめて消せるよ。</p>
     </div>
     <div class="card guide-card">
       <h3>③ 4つの中からえらぶ</h3>
@@ -574,7 +568,6 @@ button{cursor:pointer}
       <p><b>7問・未学習</b>　まだといていない問題があるよ<br>
       <b>7問・学習済み</b>　一度は全部といたよ<br>
       <b>準備中</b>　まだ問題が入っていない単元</p>
-      <p>今が復習どきの単元は、緑の「復習どき」のラベルがついて、単元名が太字になるよ。そこから始めるのがおすすめ！</p>
     </div>
 
     <div class="label">COLLECTION</div>
@@ -610,8 +603,7 @@ button{cursor:pointer}
     <div class="card guide-card">
       <h3>つづけるコツ</h3>
       <p>・一度に全部やろうとしなくて大丈夫。<b>毎日少しずつ</b>が、いちばん身につくよ。<br>
-      ・まよったら<b>教科を押すだけ</b>。復習どきの問題と、続きの問題をえらんで出してくれる。<br>
-      ・タイルの<b>「復習 ○問」</b>が多い教科から手をつけると、効率よく復習できるよ。<br>
+      ・まよったら<b>教科を押すだけ</b>。まちがえた問題と、続きの問題をえらんで出してくれる。<br>
       ・まちがえても大丈夫。それが覚えるチャンス。解説を読んでから次に進もう。</p>
     </div>
   </div>
@@ -925,13 +917,11 @@ function renderSubjectTiles(){
     var pct=qs.length?Math.floor(learned*100/qs.length):0;
     var on=qs.length?Math.floor(learned*10/qs.length):0, dots='';
     for(var i=0;i<10;i++) dots+='<i'+(i<on?' class="on"':'')+'></i>';
-    var due=subjectPools(sk).review.length;
     html+='<div class="subj-tile">'
       +'<button class="subj-main" onclick="startSubjectQuiz(\''+sk+'\')" aria-label="'+SUBJECTS[sk].name+'をはじめる">'
       +'<span class="subj-head"><span class="subj-ini">'+SUBJECTS[sk].ini+'</span>'
       +'<span class="subj-name">'+SUBJECTS[sk].name+'</span>'
       +'<span class="subj-play" aria-hidden="true"><svg class="ic"><use href="#i-play"/></svg></span></span>'
-      +'<span class="subj-review'+(due?'':' none')+'">'+(due?'復習 '+due+'問':'復習はなし')+'</span>'
       +'<span class="mini-dots" aria-hidden="true">'+dots+'</span>'
       +'<span class="subj-pct">'+(qs.length?'学習済み '+pct+'%':'問題なし')+'</span></button>'
       +'<button class="subj-units" onclick="openSubject(\''+sk+'\')">単元を選ぶ<svg class="ic ic-s"><use href="#i-next"/></svg></button>'
@@ -945,7 +935,7 @@ function renderSubjectTiles(){
 //   review … 復習どき：次に出す日が今日以前のもの、または一度も正解していないもの（次に出す日の近い順）
 //   fresh  … 未学習：教科書の順（PRELOAD の単元の並び、単元内の問題の順）
 //   later  … 次に出す日がまだ来ていないもの（日付の近い順）
-// 復習どきかどうか。教科のタイルの「復習 ○問」・出題の選び方・単元の「復習どき」のラベルで同じ判定を使う。
+// 復習どきかどうか（教科のタイルから始める出題の選び方で使う。画面には出さない）。
 // 一度は解いた問題のうち、次に出す日が今日以前のもの、または一度も正解していないもの
 function isReviewDue(r,today){
   return !!(r&&r.attempts&&(r.nextDate<=today||r.correct===0));
@@ -1124,16 +1114,12 @@ function getFrameworkUnits(sk){
   return order;
 }
 
-// 単元行の状態表示。2行目に「7問・未学習」の形で出す。
-// 「復習どき」だけは文字に埋めず、緑の小さなラベルと単元名の太字で示す。
-// 押してほしい単元が一覧の中で埋もれないようにするため。
-function applyUnitState(row,count,unlearned,reviewDue){
-  var recommend=reviewDue>0;
-  // 「学習済み」は“一度は全部といた”の意味。復習どきと重なっても矛盾しない言い方にしている
+// 単元行の状態表示。2行目は「7問・未学習」「7問・学習済み」（問題のない枠は「準備中」）の3種類
+function applyUnitState(row,count,unlearned){
+  // 「学習済み」は“一度は全部といた”の意味
   var label=unlearned>0?'未学習':'学習済み';
   var meta=row.querySelector('.meta-text');
   if(meta) meta.textContent=count+'問・'+label;
-  row.classList.toggle('is-recommend',recommend);
 }
 
 function renderUnitList(){
@@ -1157,14 +1143,13 @@ function renderUnitList(){
       return;
     }
     var unlearned=ids.filter(function(id){ return !h[id]; }).length;
-    var reviewDue=ids.filter(function(id){ return isReviewDue(h[id],today); }).length;
     var on=selectedUnits.indexOf(unit)>=0;
     row.dataset.unit=unit;
     row.innerHTML='<button class="sel-btn'+(on?' on':'')+'" aria-pressed="'+on+'" aria-label="この単元を選ぶ"><i><svg class="ic"><use href="#i-check"/></svg></i></button>'
       +'<button class="unit-info"><span class="unit-name"></span>'
-      +'<span class="unit-meta"><span class="due-tag">復習どき</span><span class="meta-text"></span></span></button>';
+      +'<span class="unit-meta"><span class="meta-text"></span></span></button>';
     row.querySelector('.unit-name').textContent=unit;
-    applyUnitState(row,ids.length,unlearned,reviewDue);
+    applyUnitState(row,ids.length,unlearned);
     row.querySelector('.sel-btn').onclick=function(){ toggleUnit(unit,row); };
     row.querySelector('.unit-info').onclick=function(){ toggleUnit(unit,row); };
     el.appendChild(row);

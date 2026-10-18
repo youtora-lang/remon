@@ -1,4 +1,4 @@
-const CACHE_NAME = 'remon-v110';
+const CACHE_NAME = 'remon-v111';
 const ASSETS = [
   './index.html',
   './questions.js',
