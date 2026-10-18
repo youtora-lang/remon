@@ -201,7 +201,7 @@ button{cursor:pointer}
 
 /* ===== ドットコレクション =====
    累計正解（totalCorrect）から計算するだけで、保存データは増やさない。
-   正解10問で1ドット、30ドット（10個×3行）で1枚のボード */
+   正解10問で1ドット、30ドット（10個×3行）で1枚のシート */
 .coll-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px}
 .coll-board-no{font-size:0.8125rem;color:var(--text-sub);font-weight:600;flex-shrink:0}
 .board{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;background:var(--dot-base);border-radius:20px;padding:12px}
@@ -216,7 +216,7 @@ button{cursor:pointer}
 @media (prefers-reduced-motion: reduce){ .board i.pop{animation:none} }
 .coll-info{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px;margin-top:12px;font-size:0.8125rem;color:var(--text-sub)}
 .coll-info b{color:var(--text);font-size:1rem}
-/* 完成したボード。枚数分の小さな四角を並べる（0枚のときは出さない） */
+/* 完成したシート。枚数分の小さな四角を並べる（0枚のときは出さない） */
 .coll-done{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:12px;font-size:0.8125rem;color:var(--text-sub)}
 .coll-done i{display:block;width:12px;height:12px;border-radius:3px;background:var(--pink-d)}
 .coll-done span{margin-left:4px}
@@ -315,7 +315,7 @@ button{cursor:pointer}
 
 <!-- 共通フッター（ホーム以外で画面の下に固定。ホームではスクロールの末尾に複製する） -->
 <div id="app-footer" class="foot">
-  <span class="footer-updated">Updated Oct 18, 2026 09:37</span>
+  <span class="footer-updated">Updated Oct 18, 2026 09:47</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -589,8 +589,8 @@ button{cursor:pointer}
     <div class="label">COLLECTION</div>
     <div class="card guide-card">
       <h3>ドットコレクション</h3>
-      <p>正解を10問重ねるごとに、ドットが1つ増えるよ。ドットが30個そろうと、ボードが1枚完成！ ドットは少しずつ濃いピンクになっていくよ。</p>
-      <p>次のドットの輪は、正解するたびに少しずつ埋まっていくよ。完成したボードの枚数も、ボードの下に出るよ。</p>
+      <p>正解を10問重ねるごとに、ドットが1つ増えるよ。ドットが30個そろうと、シートが1枚完成！ ドットは少しずつ濃いピンクになっていくよ。</p>
+      <p>次のドットの輪は、正解するたびに少しずつ埋まっていくよ。完成したシートの枚数も、シートの下に出るよ。</p>
     </div>
 
     <div class="label">REVIEW</div>
@@ -870,13 +870,13 @@ function dotStats(total){
   var dots=Math.floor(total/DOT_PER);
   return {
     dots:dots,                                 // これまでに集めたドット
-    board:Math.floor(dots/BOARD_DOTS)+1,       // いま埋めているボードの番号（1から）
-    inBoard:dots%BOARD_DOTS,                   // そのボードで埋まっているドット
+    board:Math.floor(dots/BOARD_DOTS)+1,       // いま埋めているシートの番号（1から）
+    inBoard:dots%BOARD_DOTS,                   // そのシートで埋まっているドット
     progress:total%DOT_PER,                    // 次のドットまでに解いた問題（0〜9）
     toNext:DOT_PER-total%DOT_PER               // 次のドットまであと何問
   };
 }
-// ボードの i 番目（0〜29）の色。淡いピンクから濃いピンクへ順に濃くする
+// シートの i 番目（0〜29）の色。淡いピンクから濃いピンクへ順に濃くする
 function dotColor(i){
   var t=Math.round(i/(BOARD_DOTS-1)*100);
   return 'color-mix(in srgb, var(--pink-d) '+t+'%, var(--pink))';
@@ -899,17 +899,17 @@ function renderCollection(el){
   }
   el.innerHTML='<div class="coll-head"><div class="card-title">ドットコレクション</div>'
     +'<div class="coll-board-no">'+d.board+'枚目</div></div>'
-    +'<div class="board" role="img" aria-label="'+d.board+'枚目のボード、'+d.inBoard+'個のドット">'+html+'</div>'
+    +'<div class="board" role="img" aria-label="'+d.board+'枚目のシート、'+d.inBoard+'個のドット">'+html+'</div>'
     +'<div class="coll-info"><span>あと <b>'+d.toNext+'</b> 問で次のドット</span>'
-    +'<span>'+d.board+'枚目まで あと <b>'+(BOARD_DOTS-d.inBoard)+'</b> ドット</span></div>'
+    +'<span>次のシートまで あと <b>'+(BOARD_DOTS-d.inBoard)+'</b> ドット</span></div>'
     +doneBoardsHtml(d.board-1);
 }
-// 完成したボードの印と「完成 ○枚」。これも累計正解から計算するだけ
+// 完成したシートの印と「完成 ○枚」。これも累計正解から計算するだけ
 function doneBoardsHtml(n){
   if(n<=0) return '';
   var marks='';
   for(var i=0;i<n;i++) marks+='<i></i>';
-  return '<div class="coll-done" aria-label="完成したボード '+n+'枚">'+marks+'<span>完成 <b>'+n+'</b>枚</span></div>';
+  return '<div class="coll-done" aria-label="完成したシート '+n+'枚">'+marks+'<span>完成 <b>'+n+'</b>枚</span></div>';
 }
 function updateCollections(){
   renderCollection(document.getElementById('home-collection'));
