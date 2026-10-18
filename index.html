@@ -315,7 +315,7 @@ button{cursor:pointer}
 
 <!-- 共通フッター（ホーム以外で画面の下に固定。ホームではスクロールの末尾に複製する） -->
 <div id="app-footer" class="foot">
-  <span class="footer-updated">Updated Oct 18, 2026 08:58</span>
+  <span class="footer-updated">Updated Oct 18, 2026 09:32</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -563,7 +563,7 @@ button{cursor:pointer}
     </div>
     <div class="card guide-card">
       <h3>② 単元を選んで出題</h3>
-      <p>教科のタイルの下の「単元を選ぶ」を押すと、単元の一覧がひらくよ。やりたい単元の左の丸をタップ（緑のチェックがつくよ）。いくつでも選べるよ。下の「はじめる」で出題、「クリア」で選んだものをまとめて消せるよ。</p>
+      <p>教科のタイルの下の「単元を選ぶ」を押すと、単元の一覧がひらくよ。やりたい単元の左の丸をタップ（緑のチェックがつくよ）。ひらいたときは、おやすみ中と準備中をのぞく単元がぜんぶ選ばれているよ。やらない単元の丸をタップして外してね。下の「はじめる」で出題、「クリア」で選んだものをまとめて消せるよ。</p>
     </div>
     <div class="card guide-card">
       <h3>③ 4つの中からえらぶ</h3>
@@ -1077,16 +1077,20 @@ window.addEventListener('load', function(){
 
 // ── Subject screen ────────────────────────────────────────
 // sel を渡したときだけ、その選択を復元する（出題から戻ったとき）。
-// それ以外は選択を空にして開く。選択は保存しない。
+// それ以外は、おやすみ中と準備中を除くすべての単元を選んだ状態で開く。選択は保存しない。
 function renderSubject(sk, sel){
   currentSubject=sk;
-  selectedUnits=sel?sel.slice():[];
-  document.getElementById('ss-bar-name').textContent=SUBJECTS[sk].name;
+  selectedUnits=sel?sel.slice():defaultUnitSelection(sk);
+  document.getElementById('ss-bar-name').textContent=SUBJECTS[sk].name+'の単元を選ぶ';
   renderUnitList();
   showScreen('subject-screen');
   // 入り直したときは一覧の先頭から見せる
   var mid=document.querySelector('#subject-screen .subj-middle');
   if(mid) mid.scrollTop=0;
+}
+function defaultUnitSelection(sk){
+  var map=getUnits(sk);
+  return getFrameworkUnits(sk).filter(function(u){ return (map[u]||[]).length>0 && !isUnitExcluded(sk,u); });
 }
 function openSubject(sk){
   renderSubject(sk);
@@ -1165,7 +1169,7 @@ function renderUnitList(){
     row.innerHTML='<button class="sel-btn'+(on?' on':'')+'" aria-pressed="'+on+'" aria-label="この単元を選ぶ"><i><svg class="ic"><use href="#i-check"/></svg></i></button>'
       +'<button class="unit-info"><span class="unit-name"></span>'
       +'<span class="unit-meta"><span class="due-tag">復習どき</span><span class="meta-text"></span></span></button>'
-      +'<button class="moon-btn" aria-label="おやすみ（教科のタイルから始めるときに飛ばす）"><svg class="ic"><use href="#i-moon"/></svg></button>';
+      +'<button class="moon-btn" title="おやすみにした単元は、教科を押して始めるときに飛ばされます" aria-label="おやすみ。おやすみにした単元は、教科を押して始めるときに飛ばされます"><svg class="ic"><use href="#i-moon"/></svg></button>';
     row.querySelector('.unit-name').textContent=unit;
     applyUnitState(row,ids.length,unlearned,reviewDue,isUnitExcluded(sk,unit));
     row.querySelector('.sel-btn').onclick=function(){ toggleUnit(unit,row); };
