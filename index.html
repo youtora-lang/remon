@@ -134,7 +134,9 @@ button{cursor:pointer}
 .subj-units{border:none;background:var(--white);border-radius:999px;min-height:44px;padding:0 12px;font-size:0.8125rem;font-weight:500;display:flex;align-items:center;justify-content:center;gap:4px}
 .subj-units:active{opacity:0.8}
 .subj-ini{width:40px;height:40px;flex-shrink:0;border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.125rem}
+.subj-name-wrap{display:flex;flex-direction:column;min-width:0}
 .subj-name{font-size:1rem;font-weight:700;white-space:nowrap}
+.subj-count{font-size:0.6875rem;color:var(--text-sub);white-space:nowrap}
 .mini-dots{display:flex;gap:3px}
 .mini-dots i{display:block;flex:1;max-width:10px;aspect-ratio:1;border-radius:50%;background:var(--white)}
 .mini-dots i.on{background:var(--green-d)}
@@ -155,7 +157,8 @@ button{cursor:pointer}
 .unit-meta{font-size:0.75rem;color:var(--text-sub);margin-top:3px;display:flex;align-items:center;flex-wrap:wrap;gap:6px}
 
 .bottom-row{flex:0 0 auto;display:flex;gap:10px;padding:10px 16px 6px}
-.bottom-row .clear-btn{flex:1}
+.bottom-row .btn{padding:0 6px}
+.bottom-row .all-btn,.bottom-row .clear-btn{flex:1;font-size:0.9375rem}
 .bottom-row .start-btn{flex:2}
 
 /* ===== 出題 ===== */
@@ -307,7 +310,7 @@ button{cursor:pointer}
 
 <!-- 共通フッター（ホーム以外で画面の下に固定。ホームではスクロールの末尾に複製する） -->
 <div id="app-footer" class="foot">
-  <span class="footer-updated">Updated Oct 18, 2026 10:13</span>
+  <span class="footer-updated">Updated Oct 18, 2026 10:18</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -425,6 +428,7 @@ button{cursor:pointer}
   </div>
 
   <div class="bottom-row">
+    <button class="btn btn-white all-btn" id="all-btn" onclick="selectAllUnits()">全選択</button>
     <button class="btn btn-white clear-btn" id="clear-btn" onclick="clearSelection()">クリア</button>
     <button class="btn btn-pink start-btn" id="start-btn" onclick="startQuiz()">はじめる</button>
   </div>
@@ -554,7 +558,7 @@ button{cursor:pointer}
     </div>
     <div class="card guide-card">
       <h3>② 単元を選んで出題</h3>
-      <p>テスト前などは、タイルの下の「単元を選ぶ」から、<b>やりたい単元だけで出題</b>もできるよ。ひらいたときは全部の単元が選ばれているので、やらない単元の丸をタップして外してね。下の「はじめる」で出題、「クリア」で選んだものをまとめて消せるよ。</p>
+      <p>テスト前などは、タイルの下の「単元を選ぶ」から、<b>やりたい単元だけで出題</b>もできるよ。やらない単元の丸をタップして外してね。チェックはそのまま保存されて、<b>教科を押して始めるときも、チェックした単元からだけ</b>出るよ。下の「全選択」で全部にチェック、「クリア」で全部外す、「はじめる」で出題だよ。</p>
     </div>
     <div class="card guide-card">
       <h3>③ 4つの中からえらぶ</h3>
@@ -679,8 +683,7 @@ function syncPreload(){
 }
 
 
-// excludedUnits（以前の「おやすみ」の設定）のうち、PRELOAD にもう無いものを捨てる。
-// おやすみはやめたので画面でも出題でも使っていないが、バックアップの互換のためにキーは残している。
+// excludedUnits（チェックを外した単元）のうち、PRELOAD にもう無いものを捨てる。
 //   ・教科ごと無くなったもの（例：旧 sonota）
 //   ・教科は残っているが単元枠が無くなったもの（例：旧 巻末文法1、季節のしおり 春）
 // キーは "教科キー||単元名" なので、PRELOAD の枠から作った同じ形の一覧と突き合わせれば
@@ -698,6 +701,15 @@ function pruneExcludedUnits(){
 // 単元の選択は保存しない（教科ページを開いている間だけ持つ）。
 // 以前の版が保存していた selectedUnits は起動時に捨てる。
 if(state.selectedUnits!==undefined){ delete state.selectedUnits; }
+// excludedUnits は「チェックを外した単元」の記録（以前は「おやすみ」に使っていた）。
+// チェックの保存を始めたこの版に切り替わったときに一度だけ空にして、全部チェック済みから始める。
+// 一度済ませた印は localStorage の別キーに持つ（バックアップには入れない）
+var UNIT_CHECK_RESET_KEY='remon_unitcheck_reset_v1';
+if(sGet(UNIT_CHECK_RESET_KEY)!=='1'){
+  state.excludedUnits={};
+  saveState();
+  sSet(UNIT_CHECK_RESET_KEY,'1');
+}
 syncPreload();
 pruneExcludedUnits();
 
@@ -917,10 +929,13 @@ function renderSubjectTiles(){
     var pct=qs.length?Math.floor(learned*100/qs.length):0;
     var on=qs.length?Math.floor(learned*10/qs.length):0, dots='';
     for(var i=0;i<10;i++) dots+='<i'+(i<on?' class="on"':'')+'></i>';
+    // チェックが全部付いていないときだけ「○/○単元」を出す（準備中の単元は数えない）
+    var total=unitsWithQuestions(sk).length, checked=checkedUnits(sk).length;
     html+='<div class="subj-tile">'
       +'<button class="subj-main" onclick="startSubjectQuiz(\''+sk+'\')" aria-label="'+SUBJECTS[sk].name+'をはじめる">'
       +'<span class="subj-head"><span class="subj-ini">'+SUBJECTS[sk].ini+'</span>'
-      +'<span class="subj-name">'+SUBJECTS[sk].name+'</span>'
+      +'<span class="subj-name-wrap"><span class="subj-name">'+SUBJECTS[sk].name+'</span>'
+      +(total&&checked<total?'<span class="subj-count">'+checked+'/'+total+'単元</span>':'')+'</span>'
       +'<span class="subj-play" aria-hidden="true"><svg class="ic"><use href="#i-play"/></svg></span></span>'
       +'<span class="mini-dots" aria-hidden="true">'+dots+'</span>'
       +'<span class="subj-pct">'+(qs.length?'学習済み '+pct+'%':'問題なし')+'</span></button>'
@@ -931,7 +946,7 @@ function renderSubjectTiles(){
 }
 
 // ── 教科のタイルから始める出題 ───────────────────────────
-// その教科の問題を3つに分ける（どれも state.questions の位置）。
+// チェックの付いた単元の問題を3つに分ける（どれも state.questions の位置）。
 //   review … 復習どき：次に出す日が今日以前のもの、または一度も正解していないもの（次に出す日の近い順）
 //   fresh  … 未学習：教科書の順（PRELOAD の単元の並び、単元内の問題の順）
 //   later  … 次に出す日がまだ来ていないもの（日付の近い順）
@@ -945,6 +960,7 @@ function subjectPools(sk){
   var qs=state.questions[sk]||[], h=state.history[sk]||{}, today=todayStr();
   var review=[], fresh=[], later=[];
   qs.forEach(function(q,i){
+    if(!isUnitChecked(sk,q.unit||'その他')) return;
     var r=h[i];
     if(!r||!r.attempts) fresh.push(i);
     else if(isReviewDue(r,today)) review.push(i);
@@ -979,8 +995,10 @@ function pickSubjectQuestions(sk){
 var lastStart=null;
 
 function startSubjectQuiz(sk){
-  var qs=state.questions[sk]||[], pick=pickSubjectQuestions(sk);
-  if(!pick.ids.length){ alert('この教科の問題がまだありません。'); return; }
+  var qs=state.questions[sk]||[];
+  if(!qs.length){ alert('この教科の問題がまだありません。'); return; }
+  if(!checkedUnits(sk).length){ alert('単元が選ばれていません。単元を選ぶから選んでください'); return; }
+  var pick=pickSubjectQuestions(sk);
   quizQueue=pick.ids.map(function(id){ return {id:id,q:qs[id]}; });
   quizIndex=0; quizCorrect=0; quizSessionCorrect=0; lastSessionSubject=sk;
   sessionWrong=[];
@@ -1063,11 +1081,10 @@ window.addEventListener('load', function(){
 });
 
 // ── Subject screen ────────────────────────────────────────
-// sel を渡したときだけ、その選択を復元する（出題から戻ったとき）。
-// それ以外は、準備中を除くすべての単元を選んだ状態で開く。選択は保存しない。
-function renderSubject(sk, sel){
+// 保存されたチェックの状態で開く。チェックは excludedUnits に保存してあり、タイルからの出題にも使う
+function renderSubject(sk){
   currentSubject=sk;
-  selectedUnits=sel?sel.slice():defaultUnitSelection(sk);
+  selectedUnits=checkedUnits(sk);
   document.getElementById('ss-bar-name').textContent=SUBJECTS[sk].name+'の単元を選ぶ';
   renderUnitList();
   showScreen('subject-screen');
@@ -1075,9 +1092,26 @@ function renderSubject(sk, sel){
   var mid=document.querySelector('#subject-screen .subj-middle');
   if(mid) mid.scrollTop=0;
 }
-function defaultUnitSelection(sk){
-  var map=getUnits(sk);
-  return getFrameworkUnits(sk).filter(function(u){ return (map[u]||[]).length>0; });
+// ── 単元のチェック ──────────────────────────────────────
+// excludedUnits に「チェックを外した単元」を "教科キー||単元名": true で持つ。
+// 記録にない単元はチェック済み（新しく増えた単元は最初からチェックが付く）
+function isUnitChecked(sk,unit){
+  var ex=state.excludedUnits;
+  return !(ex&&ex[unitKey(sk,unit)]===true);
+}
+function setUnitChecked(sk,unit,on){
+  if(!state.excludedUnits||typeof state.excludedUnits!=='object'||Array.isArray(state.excludedUnits)) state.excludedUnits={};
+  var k=unitKey(sk,unit);
+  if(on) delete state.excludedUnits[k]; else state.excludedUnits[k]=true;
+}
+// 問題がある単元（準備中を除く）を教科書の順に
+function unitsWithQuestions(sk){
+  var map=getUnits(sk), order=getFrameworkUnits(sk);
+  Object.keys(map).forEach(function(u){ if(order.indexOf(u)<0) order.push(u); });
+  return order.filter(function(u){ return (map[u]||[]).length>0; });
+}
+function checkedUnits(sk){
+  return unitsWithQuestions(sk).filter(function(u){ return isUnitChecked(sk,u); });
 }
 function openSubject(sk){
   renderSubject(sk);
@@ -1086,20 +1120,29 @@ function openSubject(sk){
   history.pushState({d:2,buf:0}, '');
 }
 
-// 選択だけを空にする。学習記録は変わらないので確認なしで消す
+// チェックをすべて外す／すべて付ける。学習記録は変わらないので確認なしで行い、すぐ保存する
 function clearSelection(){
   if(selectedUnits.length===0) return;
+  unitsWithQuestions(currentSubject).forEach(function(u){ setUnitChecked(currentSubject,u,false); });
+  saveState();
   selectedUnits=[];
   renderUnitList();
 }
+function selectAllUnits(){
+  unitsWithQuestions(currentSubject).forEach(function(u){ setUnitChecked(currentSubject,u,true); });
+  saveState();
+  selectedUnits=checkedUnits(currentSubject);
+  renderUnitList();
+}
 
-// 下部の2ボタンの有効・無効。選択が0件ならどちらも押せない
+// 下部の3ボタンの有効・無効。0件なら「クリア」「はじめる」、全部なら「全選択」を押せなくする
 function updateStartBtn(){
-  var start=document.getElementById('start-btn'), clear=document.getElementById('clear-btn');
-  if(!start||!clear) return;
+  var start=document.getElementById('start-btn'), clear=document.getElementById('clear-btn'), all=document.getElementById('all-btn');
+  if(!start||!clear||!all) return;
   var none=(selectedUnits.length===0);
   start.disabled=none;
   clear.disabled=none;
+  all.disabled=(selectedUnits.length>=unitsWithQuestions(currentSubject).length);
 }
 function getUnits(sk){
   var qs=state.questions[sk]||[], map={};
@@ -1162,6 +1205,8 @@ function toggleUnit(unit,row){
   var i=selectedUnits.indexOf(unit);
   if(i>=0) selectedUnits.splice(i,1); else selectedUnits.push(unit);
   var on=(i<0), b=row.querySelector('.sel-btn');
+  setUnitChecked(currentSubject,unit,on);
+  saveState();
   b.classList.toggle('on',on);
   b.setAttribute('aria-pressed',on?'true':'false');
   updateStartBtn();
@@ -1181,10 +1226,10 @@ function startQuiz(){
   quizIndex=0; quizCorrect=0; quizSessionCorrect=0; lastSessionSubject=sk;
   sessionWrong=[];
   lastStart={type:'units'};
-  // 進む前に下の段を組み立てる。戻り先は、出題前の選択を復元した教科ページ
-  var savedSk=sk, savedSel=selectedUnits.slice();
+  // 進む前に下の段を組み立てる。戻り先は教科ページ（チェックは保存してあるので、そのまま戻る）
+  var savedSk=sk;
   navStack=[ function(){ showScreen('home'); } ];
-  navStack.push(function(){ renderSubject(savedSk, savedSel); });
+  navStack.push(function(){ renderSubject(savedSk); });
   showScreen('quiz');
   renderQuestion();
   navGo(restoreQuiz);
