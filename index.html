@@ -145,15 +145,13 @@ button{cursor:pointer}
 /* ===== 教科ページ ===== */
 .units{padding:8px 6px}
 .unit-row{display:flex;align-items:center;gap:2px;min-height:60px;padding:4px 0}
-.unit-row.is-excluded{opacity:0.45}
 .unit-row.is-empty{opacity:0.5}
-.sel-btn,.moon-btn{width:44px;height:44px;border:none;background:none;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text)}
+.sel-btn{width:44px;height:44px;border:none;background:none;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text)}
 .sel-btn i{width:26px;height:26px;border-radius:50%;border:2px solid var(--green);display:flex;align-items:center;justify-content:center}
 .sel-btn i .ic{width:16px;height:16px;stroke-width:3;visibility:hidden}
 .sel-btn.on i{background:var(--green)}
 .sel-btn.on i .ic{visibility:visible}
 .sel-btn.blank{visibility:hidden}
-.moon-btn.on .ic{fill:currentColor}
 .unit-info{flex:1;min-width:0;border:none;background:none;text-align:left;padding:8px 4px;min-height:44px}
 .unit-name{font-size:0.9375rem;font-weight:500;line-height:1.45;word-break:break-word}
 .unit-row.is-recommend .unit-name{font-weight:700}
@@ -296,7 +294,6 @@ button{cursor:pointer}
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
-  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 13.5A8 8 0 1 1 10.5 4a6.2 6.2 0 0 0 9.5 9.5z"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
   <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
@@ -563,7 +560,7 @@ button{cursor:pointer}
     </div>
     <div class="card guide-card">
       <h3>② 単元を選んで出題</h3>
-      <p>教科のタイルの下の「単元を選ぶ」を押すと、単元の一覧がひらくよ。やりたい単元の左の丸をタップ（緑のチェックがつくよ）。ひらいたときは、おやすみ中と準備中をのぞく単元がぜんぶ選ばれているよ。やらない単元の丸をタップして外してね。下の「はじめる」で出題、「クリア」で選んだものをまとめて消せるよ。</p>
+      <p>教科のタイルの下の「単元を選ぶ」を押すと、単元の一覧がひらくよ。やりたい単元の左の丸をタップ（緑のチェックがつくよ）。ひらいたときは、問題がある単元がぜんぶ選ばれているよ。やらない単元の丸をタップして外してね。下の「はじめる」で出題、「クリア」で選んだものをまとめて消せるよ。</p>
     </div>
     <div class="card guide-card">
       <h3>③ 4つの中からえらぶ</h3>
@@ -576,14 +573,8 @@ button{cursor:pointer}
       <p>単元名の下に「問題数・今の状態」が出るよ。</p>
       <p><b>7問・未学習</b>　まだといていない問題があるよ<br>
       <b>7問・学習済み</b>　一度は全部といたよ<br>
-      <b>7問・おやすみ中</b>　月のボタンでおやすみにした単元<br>
       <b>準備中</b>　まだ問題が入っていない単元</p>
       <p>今が復習どきの単元は、緑の「復習どき」のラベルがついて、単元名が太字になるよ。そこから始めるのがおすすめ！</p>
-    </div>
-    <div class="card guide-card">
-      <h3>おやすみ（月のボタン）</h3>
-      <p>単元の右にある月のボタンをタップすると、その単元はおやすみになって、教科を押して始めるときに出なくなるよ。月がぬりつぶされて、行がうすくなるよ。もう一度タップするともとにもどるよ。</p>
-      <p>テスト前に、範囲に入らない単元をおやすみにしておくと便利。おやすみ中の単元も、自分で選べば練習できるよ。</p>
     </div>
 
     <div class="label">COLLECTION</div>
@@ -696,7 +687,8 @@ function syncPreload(){
 }
 
 
-// おやすみ（excludedUnits）のうち、PRELOAD にもう無いものを捨てる。
+// excludedUnits（以前の「おやすみ」の設定）のうち、PRELOAD にもう無いものを捨てる。
+// おやすみはやめたので画面でも出題でも使っていないが、バックアップの互換のためにキーは残している。
 //   ・教科ごと無くなったもの（例：旧 sonota）
 //   ・教科は残っているが単元枠が無くなったもの（例：旧 巻末文法1、季節のしおり 春）
 // キーは "教科キー||単元名" なので、PRELOAD の枠から作った同じ形の一覧と突き合わせれば
@@ -949,7 +941,7 @@ function renderSubjectTiles(){
 }
 
 // ── 教科のタイルから始める出題 ───────────────────────────
-// おやすみ中の単元を除いた、その教科の問題を3つに分ける（どれも state.questions の位置）。
+// その教科の問題を3つに分ける（どれも state.questions の位置）。
 //   review … 復習どき：次に出す日が今日以前のもの、または一度も正解していないもの（次に出す日の近い順）
 //   fresh  … 未学習：教科書の順（PRELOAD の単元の並び、単元内の問題の順）
 //   later  … 次に出す日がまだ来ていないもの（日付の近い順）
@@ -963,7 +955,6 @@ function subjectPools(sk){
   var qs=state.questions[sk]||[], h=state.history[sk]||{}, today=todayStr();
   var review=[], fresh=[], later=[];
   qs.forEach(function(q,i){
-    if(isUnitExcluded(sk,q.unit||'その他')) return;
     var r=h[i];
     if(!r||!r.attempts) fresh.push(i);
     else if(isReviewDue(r,today)) review.push(i);
@@ -999,7 +990,7 @@ var lastStart=null;
 
 function startSubjectQuiz(sk){
   var qs=state.questions[sk]||[], pick=pickSubjectQuestions(sk);
-  if(!pick.ids.length){ alert('出題できる問題がありません。おやすみ中の単元をもどしてみてください。'); return; }
+  if(!pick.ids.length){ alert('この教科の問題がまだありません。'); return; }
   quizQueue=pick.ids.map(function(id){ return {id:id,q:qs[id]}; });
   quizIndex=0; quizCorrect=0; quizSessionCorrect=0; lastSessionSubject=sk;
   sessionWrong=[];
@@ -1083,7 +1074,7 @@ window.addEventListener('load', function(){
 
 // ── Subject screen ────────────────────────────────────────
 // sel を渡したときだけ、その選択を復元する（出題から戻ったとき）。
-// それ以外は、おやすみ中と準備中を除くすべての単元を選んだ状態で開く。選択は保存しない。
+// それ以外は、準備中を除くすべての単元を選んだ状態で開く。選択は保存しない。
 function renderSubject(sk, sel){
   currentSubject=sk;
   selectedUnits=sel?sel.slice():defaultUnitSelection(sk);
@@ -1096,7 +1087,7 @@ function renderSubject(sk, sel){
 }
 function defaultUnitSelection(sk){
   var map=getUnits(sk);
-  return getFrameworkUnits(sk).filter(function(u){ return (map[u]||[]).length>0 && !isUnitExcluded(sk,u); });
+  return getFrameworkUnits(sk).filter(function(u){ return (map[u]||[]).length>0; });
 }
 function openSubject(sk){
   renderSubject(sk);
@@ -1105,7 +1096,7 @@ function openSubject(sk){
   history.pushState({d:2,buf:0}, '');
 }
 
-// 選択だけを空にする。学習記録もおやすみも変わらないので確認なしで消す
+// 選択だけを空にする。学習記録は変わらないので確認なしで消す
 function clearSelection(){
   if(selectedUnits.length===0) return;
   selectedUnits=[];
@@ -1136,16 +1127,13 @@ function getFrameworkUnits(sk){
 // 単元行の状態表示。2行目に「7問・未学習」の形で出す。
 // 「復習どき」だけは文字に埋めず、緑の小さなラベルと単元名の太字で示す。
 // 押してほしい単元が一覧の中で埋もれないようにするため。
-function applyUnitState(row,count,unlearned,reviewDue,excluded){
-  var recommend=!excluded&&reviewDue>0;
+function applyUnitState(row,count,unlearned,reviewDue){
+  var recommend=reviewDue>0;
   // 「学習済み」は“一度は全部といた”の意味。復習どきと重なっても矛盾しない言い方にしている
-  var label=excluded?'おやすみ中':(unlearned>0?'未学習':'学習済み');
+  var label=unlearned>0?'未学習':'学習済み';
   var meta=row.querySelector('.meta-text');
   if(meta) meta.textContent=count+'問・'+label;
   row.classList.toggle('is-recommend',recommend);
-  row.classList.toggle('is-excluded',excluded);
-  var moon=row.querySelector('.moon-btn');
-  if(moon){ moon.classList.toggle('on',excluded); moon.setAttribute('aria-pressed',excluded?'true':'false'); }
 }
 
 function renderUnitList(){
@@ -1161,7 +1149,7 @@ function renderUnitList(){
     var row=document.createElement('div');
     row.className='unit-row';
     if(!ids.length){
-      // 空枠：準備中表示（選ぶ・おやすみのボタンなし）。左は単元名の位置をそろえる空き
+      // 空枠：準備中表示（選ぶボタンなし）。左は単元名の位置をそろえる空き
       row.classList.add('is-empty');
       row.innerHTML='<span class="sel-btn blank"></span><div class="unit-info"><span class="unit-name"></span><span class="unit-meta">準備中</span></div>';
       row.querySelector('.unit-name').textContent=unit;
@@ -1174,16 +1162,11 @@ function renderUnitList(){
     row.dataset.unit=unit;
     row.innerHTML='<button class="sel-btn'+(on?' on':'')+'" aria-pressed="'+on+'" aria-label="この単元を選ぶ"><i><svg class="ic"><use href="#i-check"/></svg></i></button>'
       +'<button class="unit-info"><span class="unit-name"></span>'
-      +'<span class="unit-meta"><span class="due-tag">復習どき</span><span class="meta-text"></span></span></button>'
-      +'<button class="moon-btn" title="おやすみにした単元は、教科を押して始めるときに飛ばされます" aria-label="おやすみ。おやすみにした単元は、教科を押して始めるときに飛ばされます"><svg class="ic"><use href="#i-moon"/></svg></button>';
+      +'<span class="unit-meta"><span class="due-tag">復習どき</span><span class="meta-text"></span></span></button>';
     row.querySelector('.unit-name').textContent=unit;
-    applyUnitState(row,ids.length,unlearned,reviewDue,isUnitExcluded(sk,unit));
+    applyUnitState(row,ids.length,unlearned,reviewDue);
     row.querySelector('.sel-btn').onclick=function(){ toggleUnit(unit,row); };
     row.querySelector('.unit-info').onclick=function(){ toggleUnit(unit,row); };
-    row.querySelector('.moon-btn').onclick=function(){
-      toggleExcludeUnit(sk,unit);
-      applyUnitState(row,ids.length,unlearned,reviewDue,isUnitExcluded(sk,unit));
-    };
     el.appendChild(row);
   });
   // 選択の有無を下のボタンに反映する
@@ -1204,7 +1187,6 @@ function startQuiz(){
   var sk=currentSubject, qs=state.questions[sk]||[];
   if(!qs.length){ alert('この教科の問題がまだありません。'); return; }
   if(selectedUnits.length===0){ alert('単元を選んでください'); return; }
-  // おやすみは教科のタイルから始めるときだけに効く。単元を選んで出題するときは、おやすみ中の単元も出す
   var ids=[], unitMap=getUnits(sk);
   selectedUnits.forEach(function(u){ if(unitMap[u]) ids=ids.concat(unitMap[u]); });
   ids=shuffle(ids);
@@ -1455,7 +1437,7 @@ function checkBackup(d){
   // ここから下はあとから増やした項目。入っていれば形をたしかめ、
   // 入っていなければ何もしない（6項目だけの古いファイルもそのまま読める）。
   if(!isPlainObject(d.dailyRecords,true)) return '週間の記録のかたちがちがいます';
-  if(!isPlainObject(d.excludedUnits,true)) return 'おやすみ中の単元のかたちがちがいます';
+  if(!isPlainObject(d.excludedUnits,true)) return '単元の設定のかたちがちがいます';
   if(d.fontSize!==undefined && !FONT_SCALES.hasOwnProperty(d.fontSize)) return '文字サイズの書き方がちがいます';
   if(d.dailyGoal!==undefined && !isCount(d.dailyGoal,1)) return '1日の目標が数字になっていません';
   // 1回の出題数は「すべて」を選ぶと 0 になるので、0 も正しい値として通す。
@@ -1511,7 +1493,7 @@ function restoreDataFile(input){
     // 入っていなければ今の値をそのまま残す（|| で既定値に書きもどさない）。
     ['dailyRecords','excludedUnits','fontSize','dailyGoal','sessionSize','explainMode']
       .forEach(function(k){ if(data[k]!==undefined) state[k]=data[k]; });
-    // おやすみはこの行で入れかわるので、掃除はここまで待ってから行う
+    // excludedUnits はこの行で入れかわるので、掃除はここまで待ってから行う
     // （syncPreload() の直後に呼ぶと、そのあとに古い設定が上書きで戻ってしまう）
     pruneExcludedUnits();
     saveState();
@@ -1605,18 +1587,6 @@ function resetAllConfirm(){
 // ── Settings ──────────────────────────────────────────────
 function unitKey(sk, unit){ return sk + '||' + unit; }
 
-function isUnitExcluded(sk, unit){
-  var ex = state.excludedUnits || {};
-  return ex[unitKey(sk, unit)] === true;
-}
-
-function toggleExcludeUnit(sk, unit){
-  if(!state.excludedUnits) state.excludedUnits = {};
-  var k = unitKey(sk, unit);
-  if(state.excludedUnits[k]) delete state.excludedUnits[k];
-  else state.excludedUnits[k] = true;
-  saveState();
-}
 
 // 閉じるときは危険な操作の枠も畳み、確認の段階と入力欄を初期状態に戻す
 function closeSettingsMenu(){
