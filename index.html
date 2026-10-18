@@ -124,7 +124,7 @@ button{cursor:pointer}
 .subj-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .subj-intro{margin:0 6px 12px}
 .subj-intro .card-title{font-size:1.25rem}
-/* タイルは2つに分ける。上（.subj-main）を押すとすぐ出題、下（.subj-units）で単元を選ぶ */
+/* タイルは2つに分ける。上（.subj-main）を押すとすぐ出題、下（.subj-units「選ぶ」）で教科ページを開く */
 .subj-tile{min-width:0;background:var(--green-l);border-radius:var(--r-tile);padding:8px;display:flex;flex-direction:column;gap:6px}
 .subj-main{min-width:0;border:none;background:none;text-align:left;padding:8px;display:flex;flex-direction:column;gap:8px;border-radius:18px}
 .subj-main:active{opacity:0.8}
@@ -310,7 +310,7 @@ button{cursor:pointer}
 
 <!-- 共通フッター（ホーム以外で画面の下に固定。ホームではスクロールの末尾に複製する） -->
 <div id="app-footer" class="foot">
-  <span class="footer-updated">Updated Oct 18, 2026 10:18</span>
+  <span class="footer-updated">Updated Oct 18, 2026 10:25</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -558,7 +558,7 @@ button{cursor:pointer}
     </div>
     <div class="card guide-card">
       <h3>② 単元を選んで出題</h3>
-      <p>テスト前などは、タイルの下の「単元を選ぶ」から、<b>やりたい単元だけで出題</b>もできるよ。やらない単元の丸をタップして外してね。チェックはそのまま保存されて、<b>教科を押して始めるときも、チェックした単元からだけ</b>出るよ。下の「全選択」で全部にチェック、「クリア」で全部外す、「はじめる」で出題だよ。</p>
+      <p>テスト前などは、タイルの下の「選ぶ」から、<b>やりたい単元だけで出題</b>もできるよ。やらない単元の丸をタップして外してね。チェックはそのまま保存されて、<b>教科を押して始めるときも、チェックした単元からだけ</b>出るよ。下の「全選択」で全部にチェック、「クリア」で全部外す、「はじめる」で出題だよ。</p>
     </div>
     <div class="card guide-card">
       <h3>③ 4つの中からえらぶ</h3>
@@ -721,13 +721,14 @@ var quizCorrect=0, quizSessionCorrect=0, lastSessionSubject=null;
 var sessionWrong=[];
 
 // 教科ごとの色分けはしない。ホームのタイルに出す頭文字だけを持つ
+// 並び順がホームのタイルの順（2列で 国語・数学／英語・理科／地理・歴史）
 var SUBJECTS={
   kokugo:{name:'国語',ini:'国'},
   sugaku:{name:'数学',ini:'数'},
+  eigo:{name:'英語',ini:'英'},
   rika:{name:'理科',ini:'理'},
   chiri:{name:'地理',ini:'地'},
-  rekishi:{name:'歴史',ini:'歴'},
-  eigo:{name:'英語',ini:'英'}
+  rekishi:{name:'歴史',ini:'歴'}
 };
 var WEEK_LABELS=['月','火','水','木','金','土','日'];
 
@@ -939,7 +940,7 @@ function renderSubjectTiles(){
       +'<span class="subj-play" aria-hidden="true"><svg class="ic"><use href="#i-play"/></svg></span></span>'
       +'<span class="mini-dots" aria-hidden="true">'+dots+'</span>'
       +'<span class="subj-pct">'+(qs.length?'学習済み '+pct+'%':'問題なし')+'</span></button>'
-      +'<button class="subj-units" onclick="openSubject(\''+sk+'\')">単元を選ぶ<svg class="ic ic-s"><use href="#i-next"/></svg></button>'
+      +'<button class="subj-units" onclick="openSubject(\''+sk+'\')" aria-label="'+SUBJECTS[sk].name+'の単元を選ぶ">選ぶ<svg class="ic ic-s"><use href="#i-next"/></svg></button>'
       +'</div>';
   });
   el.innerHTML=html;
@@ -997,7 +998,7 @@ var lastStart=null;
 function startSubjectQuiz(sk){
   var qs=state.questions[sk]||[];
   if(!qs.length){ alert('この教科の問題がまだありません。'); return; }
-  if(!checkedUnits(sk).length){ alert('単元が選ばれていません。単元を選ぶから選んでください'); return; }
+  if(!checkedUnits(sk).length){ alert('単元が選ばれていません。「選ぶ」から選んでください'); return; }
   var pick=pickSubjectQuestions(sk);
   quizQueue=pick.ids.map(function(id){ return {id:id,q:qs[id]}; });
   quizIndex=0; quizCorrect=0; quizSessionCorrect=0; lastSessionSubject=sk;
