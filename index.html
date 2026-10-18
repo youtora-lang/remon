@@ -129,8 +129,6 @@ button{cursor:pointer}
 .subj-main{min-width:0;border:none;background:none;text-align:left;padding:8px;display:flex;flex-direction:column;gap:8px;border-radius:18px}
 .subj-main:active{opacity:0.8}
 .subj-head{display:flex;align-items:center;gap:8px;min-width:0}
-.subj-play{margin-left:auto;width:28px;height:28px;border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.subj-play .ic{width:14px;height:14px;fill:currentColor;stroke:none;margin-left:2px}
 .subj-units{border:none;background:var(--white);border-radius:999px;min-height:44px;padding:0 12px;font-size:0.8125rem;font-weight:500;display:flex;align-items:center;justify-content:center;gap:4px}
 .subj-units:active{opacity:0.8}
 .subj-ini{width:40px;height:40px;flex-shrink:0;border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.125rem}
@@ -289,7 +287,6 @@ button{cursor:pointer}
   <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
   <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></symbol>
-  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
@@ -310,7 +307,7 @@ button{cursor:pointer}
 
 <!-- 共通フッター（ホーム以外で画面の下に固定。ホームではスクロールの末尾に複製する） -->
 <div id="app-footer" class="foot">
-  <span class="footer-updated">Updated Oct 18, 2026 10:25</span>
+  <span class="footer-updated">Updated Oct 18, 2026 10:33</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -554,7 +551,7 @@ button{cursor:pointer}
     <div class="label">HOW TO</div>
     <div class="card guide-card">
       <h3>① 教科を押して始める</h3>
-      <p>ホームの教科のタイルの上の部分（再生の印があるところ）を押すと、すぐ始まるよ。<b>まちがえた問題</b>と、<b>教科書の順に次の問題</b>が出るよ。問題の数は設定の「1回の出題数」で決まるよ。</p>
+      <p>ホームの教科のタイルの上の部分（教科名のところ）を押すと、すぐ始まるよ。<b>まちがえた問題</b>と、<b>教科書の順に次の問題</b>が出るよ。問題の数は設定の「1回の出題数」で決まるよ。</p>
     </div>
     <div class="card guide-card">
       <h3>② 単元を選んで出題</h3>
@@ -937,7 +934,7 @@ function renderSubjectTiles(){
       +'<span class="subj-head"><span class="subj-ini">'+SUBJECTS[sk].ini+'</span>'
       +'<span class="subj-name-wrap"><span class="subj-name">'+SUBJECTS[sk].name+'</span>'
       +(total&&checked<total?'<span class="subj-count">'+checked+'/'+total+'単元</span>':'')+'</span>'
-      +'<span class="subj-play" aria-hidden="true"><svg class="ic"><use href="#i-play"/></svg></span></span>'
+      +'</span>'
       +'<span class="mini-dots" aria-hidden="true">'+dots+'</span>'
       +'<span class="subj-pct">'+(qs.length?'学習済み '+pct+'%':'問題なし')+'</span></button>'
       +'<button class="subj-units" onclick="openSubject(\''+sk+'\')" aria-label="'+SUBJECTS[sk].name+'の単元を選ぶ">選ぶ<svg class="ic ic-s"><use href="#i-next"/></svg></button>'
