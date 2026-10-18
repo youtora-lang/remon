@@ -106,15 +106,6 @@ button{cursor:pointer}
 .home-scroll-footer{padding:28px 0 12px}
 
 /* ===== ホーム ===== */
-.today-card{position:relative;overflow:hidden;display:block;width:100%;border:none;text-align:left;background:var(--pink);border-radius:var(--r-card);padding:22px 22px 24px;min-height:136px}
-.today-card:active{opacity:0.9}
-.today-title{font-size:1.75rem;font-weight:700;line-height:1.2;position:relative}
-.today-sub{font-size:0.8125rem;margin-top:6px;position:relative;max-width:70%}
-.today-card .deco{position:absolute;border-radius:50%;background:var(--white)}
-.today-card .deco.d1{width:46px;height:46px;top:-12px;right:44px}
-.today-card .deco.d2{width:22px;height:22px;top:22px;right:20px}
-.today-card .deco.d3{width:12px;height:12px;top:48px;right:52px}
-.today-go{position:absolute;right:16px;bottom:16px;width:48px;height:48px;border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center}
 
 .week-card{display:block;width:100%;border:none;text-align:left}
 .week-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
@@ -131,11 +122,21 @@ button{cursor:pointer}
 .wd.today span{font-weight:700;color:var(--text)}
 
 .subj-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.subj-tile{min-width:0;border:none;background:var(--green-l);border-radius:var(--r-tile);padding:16px;text-align:left;display:flex;flex-direction:column;gap:10px}
-.subj-tile:active{opacity:0.85}
-.subj-head{display:flex;align-items:center;gap:10px;min-width:0}
-.subj-ini{width:44px;height:44px;border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.125rem}
-.subj-name{font-size:1rem;font-weight:700}
+.subj-intro{margin:0 6px 12px}
+.subj-intro .card-title{font-size:1.25rem}
+/* タイルは2つに分ける。上（.subj-main）を押すとすぐ出題、下（.subj-units）で単元を選ぶ */
+.subj-tile{min-width:0;background:var(--green-l);border-radius:var(--r-tile);padding:8px;display:flex;flex-direction:column;gap:6px}
+.subj-main{min-width:0;border:none;background:none;text-align:left;padding:8px;display:flex;flex-direction:column;gap:8px;border-radius:18px}
+.subj-main:active{opacity:0.8}
+.subj-head{display:flex;align-items:center;gap:8px;min-width:0}
+.subj-play{margin-left:auto;width:28px;height:28px;border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.subj-play .ic{width:14px;height:14px;fill:currentColor;stroke:none;margin-left:2px}
+.subj-review{font-size:0.8125rem;font-weight:700}
+.subj-review.none{font-weight:400;color:var(--text-sub)}
+.subj-units{border:none;background:var(--white);border-radius:999px;min-height:44px;padding:0 12px;font-size:0.8125rem;font-weight:500;display:flex;align-items:center;justify-content:center;gap:4px}
+.subj-units:active{opacity:0.8}
+.subj-ini{width:40px;height:40px;flex-shrink:0;border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.125rem}
+.subj-name{font-size:1rem;font-weight:700;white-space:nowrap}
 .mini-dots{display:flex;gap:3px}
 .mini-dots i{display:block;flex:1;max-width:10px;aspect-ratio:1;border-radius:50%;background:var(--white)}
 .mini-dots i.on{background:var(--green-d)}
@@ -292,6 +293,7 @@ button{cursor:pointer}
   <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
   <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 13.5A8 8 0 1 1 10.5 4a6.2 6.2 0 0 0 9.5 9.5z"/></symbol>
@@ -325,14 +327,6 @@ button{cursor:pointer}
   </div>
 
   <div class="scroll">
-    <div class="label">TODAY</div>
-    <button class="today-card" onclick="startDailyMix()">
-      <span class="deco d1"></span><span class="deco d2"></span><span class="deco d3"></span>
-      <div class="today-title">今日の20</div>
-      <div class="today-sub">全教科から、復習どきと未学習の問題を20問</div>
-      <span class="today-go" aria-hidden="true"><svg class="ic"><use href="#i-arrow"/></svg></span>
-    </button>
-
     <div class="label">THIS WEEK</div>
     <button class="card week-card" onclick="openStats()">
       <div class="week-head">
@@ -349,6 +343,10 @@ button{cursor:pointer}
     <div class="card" id="home-collection"></div>
 
     <div class="label">SUBJECTS</div>
+    <div class="subj-intro">
+      <div class="card-title">どの教科にする？</div>
+      <div class="sub">押すとすぐ始まります。復習と、次の問題から出ます</div>
+    </div>
     <div class="subj-grid" id="subject-list"></div>
 
     <!-- 更新日時は #app-footer が唯一の情報源。起動時にここへ中身を複製する -->
@@ -559,12 +557,13 @@ button{cursor:pointer}
 
     <div class="label">HOW TO</div>
     <div class="card guide-card">
-      <h3>① 今日の20</h3>
-      <p>ホームのいちばん上のピンクのカード。全教科から、まだといていない問題と復習どきの問題を中心に20問出すよ。まよったらこれ！</p>
+      <h3>① 教科を押して始める</h3>
+      <p>ホームの教科のタイルの上の部分（再生の印があるところ）を押すと、その教科の問題がすぐ始まるよ。</p>
+      <p>出るのは、<b>復習どきの問題</b>（半分まで）と、<b>まだといていない問題</b>（教科書の順に、続きから）。問題の数は設定の「1回の出題数」で決まるよ。タイルの「復習 ○問」は、いま復習どきの問題の数だよ。</p>
     </div>
     <div class="card guide-card">
       <h3>② 単元を選んで出題</h3>
-      <p>ホームで教科をタップして、やりたい単元の左の丸をタップ（緑のチェックがつくよ）。いくつでも選べるよ。下の「はじめる」で出題、「クリア」で選んだものをまとめて消せるよ。</p>
+      <p>教科のタイルの下の「単元を選ぶ」を押すと、単元の一覧がひらくよ。やりたい単元の左の丸をタップ（緑のチェックがつくよ）。いくつでも選べるよ。下の「はじめる」で出題、「クリア」で選んだものをまとめて消せるよ。</p>
     </div>
     <div class="card guide-card">
       <h3>③ 4つの中からえらぶ</h3>
@@ -583,7 +582,7 @@ button{cursor:pointer}
     </div>
     <div class="card guide-card">
       <h3>おやすみ（月のボタン）</h3>
-      <p>単元の右にある月のボタンをタップすると、その単元はおやすみになって「今日の20」に出なくなるよ。月がぬりつぶされて、行がうすくなるよ。もう一度タップするともとにもどるよ。</p>
+      <p>単元の右にある月のボタンをタップすると、その単元はおやすみになって、教科を押して始めるときに出なくなるよ。月がぬりつぶされて、行がうすくなるよ。もう一度タップするともとにもどるよ。</p>
       <p>テスト前に、範囲に入らない単元をおやすみにしておくと便利。おやすみ中の単元も、自分で選べば練習できるよ。</p>
     </div>
 
@@ -612,7 +611,7 @@ button{cursor:pointer}
       <p>ホームの右上の歯車から。<br>
       ・<b>文字サイズ</b>：小・中・大から選べる<br>
       ・<b>1日の目標</b>：1日に正解したい問題数<br>
-      ・<b>1回の出題数</b>：単元を選んだときに出す問題数<br>
+      ・<b>1回の出題数</b>：1回に出す問題数（5問・10問・20問・全問）<br>
       ・<b>解説の出し方</b>：いつも出す／まちがえた時だけ</p>
     </div>
 
@@ -620,8 +619,8 @@ button{cursor:pointer}
     <div class="card guide-card">
       <h3>つづけるコツ</h3>
       <p>・一度に全部やろうとしなくて大丈夫。<b>毎日少しずつ</b>が、いちばん身につくよ。<br>
-      ・まよったら<b>「今日の20」</b>。今やるとよい問題をえらんで出してくれる。<br>
-      ・<b>「復習どき」</b>の単元から手をつけると、効率よく復習できるよ。<br>
+      ・まよったら<b>教科を押すだけ</b>。復習どきの問題と、続きの問題をえらんで出してくれる。<br>
+      ・タイルの<b>「復習 ○問」</b>が多い教科から手をつけると、効率よく復習できるよ。<br>
       ・まちがえても大丈夫。それが覚えるチャンス。解説を読んでから次に進もう。</p>
     </div>
   </div>
@@ -724,7 +723,6 @@ var currentSubject=null;
 var selectedUnits=[], quizQueue=[], quizIndex=0;
 var quizCorrect=0, quizSessionCorrect=0, lastSessionSubject=null;
 var sessionWrong=[];
-var isDailyMix=false;
 
 // 教科ごとの色分けはしない。ホームのタイルに出す頭文字だけを持つ
 var SUBJECTS={
@@ -935,13 +933,76 @@ function renderSubjectTiles(){
     var pct=qs.length?Math.floor(learned*100/qs.length):0;
     var on=qs.length?Math.floor(learned*10/qs.length):0, dots='';
     for(var i=0;i<10;i++) dots+='<i'+(i<on?' class="on"':'')+'></i>';
-    html+='<button class="subj-tile" onclick="openSubject(\''+sk+'\')">'
+    var due=subjectPools(sk).review.length;
+    html+='<div class="subj-tile">'
+      +'<button class="subj-main" onclick="startSubjectQuiz(\''+sk+'\')" aria-label="'+SUBJECTS[sk].name+'をはじめる">'
       +'<span class="subj-head"><span class="subj-ini">'+SUBJECTS[sk].ini+'</span>'
-      +'<span class="subj-name">'+SUBJECTS[sk].name+'</span></span>'
+      +'<span class="subj-name">'+SUBJECTS[sk].name+'</span>'
+      +'<span class="subj-play" aria-hidden="true"><svg class="ic"><use href="#i-play"/></svg></span></span>'
+      +'<span class="subj-review'+(due?'':' none')+'">'+(due?'復習 '+due+'問':'復習はなし')+'</span>'
       +'<span class="mini-dots" aria-hidden="true">'+dots+'</span>'
-      +'<span class="subj-pct">'+(qs.length?'学習済み '+pct+'%':'問題なし')+'</span></button>';
+      +'<span class="subj-pct">'+(qs.length?'学習済み '+pct+'%':'問題なし')+'</span></button>'
+      +'<button class="subj-units" onclick="openSubject(\''+sk+'\')">単元を選ぶ<svg class="ic ic-s"><use href="#i-next"/></svg></button>'
+      +'</div>';
   });
   el.innerHTML=html;
+}
+
+// ── 教科のタイルから始める出題 ───────────────────────────
+// おやすみ中の単元を除いた、その教科の問題を3つに分ける（どれも state.questions の位置）。
+//   review … 復習どき：次に出す日が今日以前のもの、または一度も正解していないもの（次に出す日の近い順）
+//   fresh  … 未学習：教科書の順（PRELOAD の単元の並び、単元内の問題の順）
+//   later  … 次に出す日がまだ来ていないもの（日付の近い順）
+function subjectPools(sk){
+  var qs=state.questions[sk]||[], h=state.history[sk]||{}, today=todayStr();
+  var review=[], fresh=[], later=[];
+  qs.forEach(function(q,i){
+    if(isUnitExcluded(sk,q.unit||'その他')) return;
+    var r=h[i];
+    if(!r||!r.attempts) fresh.push(i);
+    else if(r.nextDate<=today||r.correct===0) review.push(i);
+    else later.push(i);
+  });
+  function byDate(a,b){
+    var da=(h[a]&&h[a].nextDate)||'', db=(h[b]&&h[b].nextDate)||'';
+    return da<db?-1:(da>db?1:a-b);
+  }
+  review.sort(byDate); later.sort(byDate);
+  return {review:review, fresh:fresh, later:later};
+}
+
+// 出題する問題を選ぶ。出題数は「1回の出題数」（0 は全問）。
+//   (1) 復習どきを出題数の半分（切り捨て）まで
+//   (2) 残りを未学習で、教科書の順の先頭から
+//   (3) どちらかが足りなければもう一方で埋め、それでも足りなければ later を日付の近い順に
+//   (4) 選んだものを混ぜる
+function pickSubjectQuestions(sk){
+  var p=subjectPools(sk), total=p.review.length+p.fresh.length+p.later.length;
+  var n=sessionSizeSetting();
+  if(n===0||n>total) n=total;
+  var r=Math.min(p.review.length,Math.floor(n/2));
+  var f=Math.min(p.fresh.length,n-r);
+  r=Math.min(p.review.length,n-f);
+  var l=n-r-f;
+  return {ids:shuffle(p.review.slice(0,r).concat(p.fresh.slice(0,f)).concat(p.later.slice(0,l))),
+    review:r, fresh:f, later:l};
+}
+
+// 結果画面の「もう一度」で同じやり方をやり直すために、どう始めたかを覚えておく（保存しない）
+var lastStart=null;
+
+function startSubjectQuiz(sk){
+  var qs=state.questions[sk]||[], pick=pickSubjectQuestions(sk);
+  if(!pick.ids.length){ alert('出題できる問題がありません。おやすみ中の単元をもどしてみてください。'); return; }
+  quizQueue=pick.ids.map(function(id){ return {id:id,q:qs[id]}; });
+  quizIndex=0; quizCorrect=0; quizSessionCorrect=0; lastSessionSubject=sk;
+  sessionWrong=[];
+  lastStart={type:'subject', sk:sk};
+  // ホームから始めるので、段は ホーム > 出題
+  navStack=[ function(){ showScreen('home'); } ];
+  showScreen('quiz');
+  renderQuestion();
+  navGo(restoreQuiz);
 }
 
 // ── Screen ────────────────────────────────────────────────
@@ -1104,7 +1165,7 @@ function renderUnitList(){
     row.innerHTML='<button class="sel-btn'+(on?' on':'')+'" aria-pressed="'+on+'" aria-label="この単元を選ぶ"><i><svg class="ic"><use href="#i-check"/></svg></i></button>'
       +'<button class="unit-info"><span class="unit-name"></span>'
       +'<span class="unit-meta"><span class="due-tag">復習どき</span><span class="meta-text"></span></span></button>'
-      +'<button class="moon-btn" aria-label="おやすみ（今日の20に出さない）"><svg class="ic"><use href="#i-moon"/></svg></button>';
+      +'<button class="moon-btn" aria-label="おやすみ（教科のタイルから始めるときに飛ばす）"><svg class="ic"><use href="#i-moon"/></svg></button>';
     row.querySelector('.unit-name').textContent=unit;
     applyUnitState(row,ids.length,unlearned,reviewDue,isUnitExcluded(sk,unit));
     row.querySelector('.sel-btn').onclick=function(){ toggleUnit(unit,row); };
@@ -1133,15 +1194,16 @@ function startQuiz(){
   var sk=currentSubject, qs=state.questions[sk]||[];
   if(!qs.length){ alert('この教科の問題がまだありません。'); return; }
   if(selectedUnits.length===0){ alert('単元を選んでください'); return; }
-  // おやすみは今日の20だけに効く。選んで出題するときは、おやすみ中の単元も出す
+  // おやすみは教科のタイルから始めるときだけに効く。単元を選んで出題するときは、おやすみ中の単元も出す
   var ids=[], unitMap=getUnits(sk);
   selectedUnits.forEach(function(u){ if(unitMap[u]) ids=ids.concat(unitMap[u]); });
   ids=shuffle(ids);
   var sz=sessionSizeSetting();
   if(sz>0) ids=ids.slice(0,sz);
   quizQueue=ids.map(function(id){ return {id:id,q:qs[id]}; });
-  quizIndex=0; quizCorrect=0; quizSessionCorrect=0; lastSessionSubject=sk; isDailyMix=false;
+  quizIndex=0; quizCorrect=0; quizSessionCorrect=0; lastSessionSubject=sk;
   sessionWrong=[];
+  lastStart={type:'units'};
   // 進む前に下の段を組み立てる。戻り先は、出題前の選択を復元した教科ページ
   var savedSk=sk, savedSel=selectedUnits.slice();
   navStack=[ function(){ showScreen('home'); } ];
@@ -1232,7 +1294,7 @@ function selectChoice(btn,chosen,correct,item){
 }
 
 function updateSR(id,correct,subject){
-  // 今日の20・まちがえた問題の復習では lastSessionSubject が null なので、
+  // まちがえた問題の復習では lastSessionSubject が null なので、
   // 呼び出し側が渡す教科（item.mixSubject）を優先する。
   var sk=subject||lastSessionSubject;
   if(!state.history[sk]) state.history[sk]={};
@@ -1309,7 +1371,8 @@ function startReviewWrong(){
   });
   if(!q.length){ alert('復習する問題がありません'); return; }
   quizQueue=q; quizIndex=0; quizCorrect=0; quizSessionCorrect=0;
-  lastSessionSubject=null; sessionWrong=[]; isDailyMix=true;
+  lastSessionSubject=null; sessionWrong=[];
+  lastStart={type:'review'};
   // 結果画面から始めるので、下はホーム1段に戻してからクイズの段を積む
   navStack=[ function(){ showScreen('home'); } ];
   showScreen('quiz'); renderQuestion();
@@ -1319,6 +1382,8 @@ function startReviewWrong(){
 function goHome(){ goHomeNav(); }
 
 function restartSame(){
+  // 教科のタイルから始めた回は、同じ教科で選び直す（復習どき・未学習は解いた結果で変わっている）
+  if(lastStart&&lastStart.type==='subject'){ startSubjectQuiz(lastStart.sk); return; }
   quizIndex=0; quizCorrect=0; quizSessionCorrect=0;
   quizQueue=shuffle(quizQueue);
   // 結果画面から始めるので、下はホーム1段に戻してからクイズの段を積む
@@ -1541,39 +1606,6 @@ function toggleExcludeUnit(sk, unit){
   if(state.excludedUnits[k]) delete state.excludedUnits[k];
   else state.excludedUnits[k] = true;
   saveState();
-}
-
-function startDailyMix(){
-  var today = todayStr();
-  var pool0 = [];  // 未着手
-  var pool1 = [];  // 定着していない（期限到来・前回不正解）
-  var pool2 = [];  // その他
-  Object.keys(SUBJECTS).forEach(function(sk){
-    var qs = state.questions[sk] || [];
-    var h = state.history[sk] || {};
-    qs.forEach(function(q, i){
-      var unit = q.unit || 'その他';
-      if(isUnitExcluded(sk, unit)) return;
-      var rec = h[i];
-      var item = {subject:sk, id:i, q:q};
-      if(!rec || rec.attempts === 0){ pool0.push(item); }
-      else if(rec.nextDate <= today || rec.correct === 0){ pool1.push(item); }
-      else { pool2.push(item); }
-    });
-  });
-  var picked = shuffle(pool0).concat(shuffle(pool1)).concat(shuffle(pool2));
-  if(picked.length === 0){ alert('出題できる問題がありません。おやすみ中の単元をもどしてみてください。'); return; }
-  picked = picked.slice(0, 20);
-  quizQueue = picked.map(function(it){ return {id:it.id, q:it.q, mixSubject:it.subject}; });
-  quizIndex = 0; quizCorrect = 0; quizSessionCorrect = 0;
-  lastSessionSubject = null;
-  sessionWrong = [];
-  isDailyMix = true;
-  // ホームから始めるので、下はホーム1段にしてからクイズの段を積む
-  navStack=[ function(){ showScreen('home'); } ];
-  showScreen('quiz');
-  renderQuestion();
-  navGo(restoreQuiz);
 }
 
 // 閉じるときは危険な操作の枠も畳み、確認の段階と入力欄を初期状態に戻す
