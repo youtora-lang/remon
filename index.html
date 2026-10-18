@@ -315,7 +315,7 @@ button{cursor:pointer}
 
 <!-- 共通フッター（ホーム以外で画面の下に固定。ホームではスクロールの末尾に複製する） -->
 <div id="app-footer" class="foot">
-  <span class="footer-updated">Updated Oct 18, 2026 09:32</span>
+  <span class="footer-updated">Updated Oct 18, 2026 09:37</span>
   <span class="footer-made">Made by Chii</span>
 </div>
 
@@ -953,6 +953,12 @@ function renderSubjectTiles(){
 //   review … 復習どき：次に出す日が今日以前のもの、または一度も正解していないもの（次に出す日の近い順）
 //   fresh  … 未学習：教科書の順（PRELOAD の単元の並び、単元内の問題の順）
 //   later  … 次に出す日がまだ来ていないもの（日付の近い順）
+// 復習どきかどうか。教科のタイルの「復習 ○問」・出題の選び方・単元の「復習どき」のラベルで同じ判定を使う。
+// 一度は解いた問題のうち、次に出す日が今日以前のもの、または一度も正解していないもの
+function isReviewDue(r,today){
+  return !!(r&&r.attempts&&(r.nextDate<=today||r.correct===0));
+}
+
 function subjectPools(sk){
   var qs=state.questions[sk]||[], h=state.history[sk]||{}, today=todayStr();
   var review=[], fresh=[], later=[];
@@ -960,7 +966,7 @@ function subjectPools(sk){
     if(isUnitExcluded(sk,q.unit||'その他')) return;
     var r=h[i];
     if(!r||!r.attempts) fresh.push(i);
-    else if(r.nextDate<=today||r.correct===0) review.push(i);
+    else if(isReviewDue(r,today)) review.push(i);
     else later.push(i);
   });
   function byDate(a,b){
@@ -1163,7 +1169,7 @@ function renderUnitList(){
       return;
     }
     var unlearned=ids.filter(function(id){ return !h[id]; }).length;
-    var reviewDue=ids.filter(function(id){ var r=h[id]; return r&&r.nextDate<=today; }).length;
+    var reviewDue=ids.filter(function(id){ return isReviewDue(h[id],today); }).length;
     var on=selectedUnits.indexOf(unit)>=0;
     row.dataset.unit=unit;
     row.innerHTML='<button class="sel-btn'+(on?' on':'')+'" aria-pressed="'+on+'" aria-label="この単元を選ぶ"><i><svg class="ic"><use href="#i-check"/></svg></i></button>'
